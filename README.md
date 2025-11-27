@@ -10,60 +10,45 @@
 
 ---
 
-# Sample Proposal - Pokémon the Trading Card Game
-
-> [!note]
-> This was taken from a project I did in university so the scope is **much** larger than what I'm expecting from you in terms of number of features!
+# Sample Proposal - Sonic Game
 
 ## ✒️ Description
 
-In this turn-based battle card game, players assume the role of a Pokémon trainer and use their Pokémon to battle their opponent's Pokémon. Players play Pokémon to the field and attack their opponent's Pokémon. A Pokémon that has sustained enough damage is Knocked Out, and the player who knocked it out draws a Prize card. There are usually six Prize cards, and the primary win condition is to draw all of them. Other ways to win are by knocking out all the Pokémon the opponent has on the field so that the opponent has none left, or if at the beginning of their opponent's turn there are no cards left to draw in the opponent's deck.
-
-
-We will be implementing a Sonic game! We're going to base ourselves off of Sonic 1 and have 1 complete working level. The player will take controll of Sonic and attempt to navigate through the obstacles in the level such as enemies, map drops, gain enough speed to do a loop. The win condition is basiaclly trying to corss the level without dying as players can loose health from ennemies.  
-
+We will be implementing a Sonic The Hedgehog game! We're going to base ourselves off of Sonic 1 and have 1 complete working level. The player will take control of Sonic and attempt to navigate through the obstacles in the level such as enemies, item boxes, obstacles, gain enough speed to do a loop, etc. The win condition is basically trying to cross the level without dying as players can lose health from enemies.  
 ## 🕹️ Gameplay
 
-Players begin by having one player select heads or tails, and the other flips a coin; the winner of the coin flip will decide who goes first or second. The player going first cannot attack their first turn, unless the card says otherwise. (Dice may be used in place of coins, with even numbers representing heads and odd numbers representing tails). Players then shuffle their decks and draw seven cards, then play one Basic Pokémon onto the field. This Pokémon is known as the Active Pokémon and is usually the one that attacks and receives damage. If a player does not have any Basic Pokémon, they must shuffle and draw a new hand, and the opponent may draw one additional card. Once both players have at least one Basic Pokémon, they can play up to five more Basic Pokémon onto their "Bench" (representing the maximum-carry limit of six from the video games). Players then take the top six cards of their deck and place them to the side as Prize Cards. Play then begins with the player who won the coin flip.
+The player begins at the title screen, and instructions containing how to play once they press Start. The gameplay is simple. The player enters the level and plays as Sonic. The player can move left and right with the left and right arrow keys, and jump with the Z key. The player can look up with the up arrow, which, after 3 seconds, will drag the camera up (This may be optional if we don't have time). The player can also crouch with the down arrow. If the player moves and presses the down arrow, Sonic will roll forward. Depending on the speed and momentum, he can roll very slowly, or very fast. 
 
-Play alternates between players who may take several actions during their turn, including playing new Basic Pokémon, evolving their Pokémon, playing Trainer cards and Energy cards, and using Pokémon Abilities. A player may also retreat their Active Pokémon, switching the Active Pokémon with one on the Bench. At the end of their turn, a player may use one of their Active Pokémon's attacks, provided the prerequisite amount and types of Energy are attached to that Pokémon. Effects from that attack are then activated and damage may be placed on the Defending Pokémon; some attacks simply have effects but do not do damage. Damage may be modified depending on whether the defender has a weakness or a resistance to the attacker's Pokémon type. If the final damage exceeds the defending Pokémon's HP, it is Knocked Out, and the active player takes a prize card and ends their turn.
+The goal is to get to the sign post at the end of the level. Along the way, Sonic can collect rings, which are like coins from Mario. However, if he is damaged by a badnik (an enemy), he will take damage and lose his rings. He can collect them after he loses them, as they will be falling around him (May be an optional feature if we don't have time). To defeat a badnik, he needs to jump on it, similarly to Mario. There are also spikes to avoid, as if he hits them, he will take damage and lose rings. There can be platforms to jump on (Optional feature if we don't have time). There are three item boxes he can jump on: Speed shoes, to make him go faster for ~10 seconds, invincibility makes him invulnerable for ~10 seconds, and a ring box which grants 10 rings. The player is given 3 lives. If Sonic loses all lives, he will enter gameover, which returns the player to the title screen.
 
-This implementation of _Pokémon the Trading Card Game_ is a single player experience with an AI. The game is played primarily with the mouse to interact with the cards and general GUI. The players can optionally hit `M` on their keyboard to mute all game sounds.
-
-
-
+There is a HUD that displays the scores, time and rings on the top left, and his lives on the bottom left.
 
 ## 📃 Requirements
 
-> [!note]
-> This was a web project so that's why you'll see requirements about logging in and uploading data which for you is irrelevant. Focus more on the requirements describing actions taken for gameplay.
-
-1. The user shall register to be able to login.
-2. The user shall login to be able to play a game.
-3. The user shall upload a valid deck file.
-4. The user shall upload a valid cards file.
-5. The user shall upload a valid abilities file.
-6. The user shall select which deck they will use in the game.
-7. The user shall select which deck the AI will use in the game.
-8. The system shall "flip a coin" to decide which player goes first.
-9. The system shall shuffle the user's deck.
-10. The system shall draw the top 7 cards from the user's deck.
-11. If the user does not have a Basic Pokémon in their hand the system shall "mulligan" until they do.
-12. Upon each mulligan, the AI shall draw a card.
-13. The user shall put one of their Basic Pokémon face down as their Active Pokémon.
-14. The user shall put up to 5 more Basic Pokémon face down on their Bench.
-15. Upon a new turn, the system shall draw a card from the deck of the current player.
-16. Upon a new turn, the system shall place the drawn card in the hand of the current player.
-17. The user shall put (up to 5 total) Basic Pokémon cards from their hand onto their Bench.
-18. The user shall Evolve their Pokémon as many times as they choose.
-19. The user shall attach an Energy card from their hand to one of their Pokémon once per turn.
-20. The user shall play Trainer cards (as many as they want, but only one Supporter card and one Stadium card per turn).
-21. The user shall Retreat their Active Pokémon once per turn.
-22. The user shall use as many Abilities as they choose.
-23. The user shall attack the opponent's Active Pokémon.
-24. After a player attacks, the system shall end their turn and start their opponent's turn.
-25. The system shall execute any "special conditions" after a turn is over.
-26. The user shall pick a Victory Card when the opposing Active Pokémon dies.
+1. The user shall start the game from the title screen.
+2. The user shall view instructions on how to play after pressing Start.
+3. The user shall control Sonic using the arrow keys and the Z key.
+4. The user shall move Sonic left by pressing the left arrow key.
+5. The user shall move Sonic right by pressing the right arrow key.
+6. The user shall make Sonic jump by pressing the Z key.
+7. The user shall make Sonic look up by pressing the up arrow key.
+8. The system shall drag the camera up after 3 seconds if Sonic is looking up (optional).
+9. The user shall make Sonic crouch by pressing the down arrow key.
+10. The user shall make Sonic roll forward by moving and pressing the down arrow key.
+11. The system shall adjust Sonic’s roll speed based on his momentum.
+12. The user shall reach the sign post at the end of the level to complete it.
+13. The user shall collect rings throughout the level.
+14. The system shall reduce Sonic's rings when he is damaged by a badnik or spikes.
+15. The user shall be able to collect rings dropped after taking damage (optional).
+16. The user shall defeat badniks by jumping on them.
+17. The system shall cause Sonic to take damage if he touches spikes.
+18. The system may include platforms for Sonic to jump on (optional).
+19. The user shall jump on item boxes to gain power-ups.
+20. The system shall grant Speed Shoes for ~10 seconds when Sonic jumps on the Speed Shoes box.
+21. The system shall grant Invincibility for ~10 seconds when Sonic jumps on the Invincibility box.
+22. The system shall grant 10 rings when Sonic jumps on the Ring box.
+23. The system shall give the player 3 lives at the start of the game.
+24. The system shall enter Game Over and return to the title screen if Sonic loses all lives.
 
 ### 🤖 State Diagram
 
@@ -93,11 +78,7 @@ We want to keep the GUI as simple and clear as possible by having cards with rel
 
 ### 🎨 Assets
 
-We used [app.diagrams.net](https://app.diagrams.net/) to create the wireframes. Wireframes are the equivalent to the skeleton of a web app since they are used to describe the functionality of the product and the users experience.
-
-We plan on following trends already found in other trading card video games, such as Pokémon Trading Card Game Online, Hearthstone, Magic the Gathering Arena, and Gwent.
-
-The GUI will be kept simple and playful, as to make sure the game is easy to understand what each component does and is, as well as light hearted to keep to the Pokémon theme.
+We are going to be using assets from Sonic The Hedgehog 1 to create the game.
 
 #### 🖼️ Images
 
