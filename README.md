@@ -14,7 +14,8 @@
 
 ## ✒️ Description
 
-We will be implementing a Sonic The Hedgehog game! We're going to base ourselves off of Sonic 1 and have 1 complete working level. The player will take control of Sonic and attempt to navigate through the obstacles in the level such as enemies, item boxes, obstacles, gain enough speed to do a loop, etc. The win condition is basically trying to cross the level without dying as players can lose health from enemies. It will be a sidescrolling game, where the camera will follow the player.  
+We will be implementing a Sonic The Hedgehog game! We're going to base ourselves off of Sonic 1 and have 1 complete working level. The player will take control of Sonic and attempt to navigate through the obstacles in the level such as enemies, item boxes, obstacles, gain enough speed to do a loop, etc. The win condition is basically trying to cross the level without dying as players can lose health from enemies. It will be a sidescrolling game, where the camera will follow the player. 
+
 ## 🕹️ Gameplay
 
 The player begins at the title screen, and instructions containing how to play once they press Start. The gameplay is simple. The player enters the level and plays as Sonic. The player can move left and right with the left and right arrow keys, and jump with the Z key. The player can look up with the up arrow, which, after 3 seconds, will drag the camera up (This may be optional if we don't have time). The player can also crouch with the down arrow. If the player moves and presses the down arrow, Sonic will roll forward. Depending on the speed and momentum, he can roll very slowly, or very fast. If the player wants to stop moving, Sonic can stop abruptly by pressing the other direction key. For example, if Sonic is running right and the player presses left, he will skid and come to a stop. The player can also slow down by releasing the key.
@@ -78,7 +79,7 @@ We want to keep the GUI as simple and clear as possible by having cards with rel
 
 ### 🎨 Assets
 
-We are going to be using assets from Sonic The Hedgehog 1 to create the game.
+We are going to be using assets from Sonic The Hedgehog 1 to create the game. We will be using Matter.js for collision detection.
 
 #### 🖼️ Images
 
