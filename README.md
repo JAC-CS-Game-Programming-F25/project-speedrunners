@@ -107,7 +107,7 @@ Taking damage makes him lose all his rings.
 
 ### 🎨 Assets
 
-We are going to be using assets from Sonic The Hedgehog 1 to create the game. We will be using Matter.js for collision detection.
+We are going to be using assets from Sonic The Hedgehog 1 to create the game. 
 
 
 #### 🖼️ Images
