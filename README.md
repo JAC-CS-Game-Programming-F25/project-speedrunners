@@ -64,18 +64,46 @@ There is a HUD that displays the scores, time and rings on the top left, and his
 
 ### 🧵 Wireframes
 
-> [!note]
-> Your wireframes don't have to be super polished. They can even be black/white and hand drawn. I'm just looking for a rough idea about what you're visualizing.
+![TitleScreen](./assets/images/TitleScreen.png)
 
-![Main Menu](./assets/images/Main-Menu.png)
+- Pressing any button will start the game.
 
--   _Let's Play_ will navigate to the main game.
--   _Upload Cards_ will navigation to the forms for uploading and parsing the data files for the game.
--   _Change Log_ will navigate the user to a page with a list of features/changes that have been implemented throughout the development of the game.
+![TransitionScreen](./assets/images/TransitionScreen.png)
 
-![Game Board](./assets/images/Game-Board.png)
+- Only one level, so one transition screen for this project.
 
-We want to keep the GUI as simple and clear as possible by having cards with relevant images to act as a way for the user to intuitively navigate the game. We want to implement a layout that would look like as if one were playing a match of the Pokémon Trading Card Game with physical cards in real life. Clicking on any of the cards will reveal that card's details to the player.
+![Idle](./assets/images/Idle.png)a
+
+![Jumping](./assets/images/Jumping.png)
+
+- Particles from defeating an enemy
+- Score points added.
+- Possible flicky (optional if we have time) that comes out of the badnik.
+
+![LookUpRings](./assets/images/LookUpRings.png)
+
+- Rings are placed like coins from Mario.
+
+![ItemBoxBadnik](./assets/images/ItemBoxBadnik.png)
+
+- A ring item box and a badnik
+
+![SpringBouncedUp](./assets/images/SpringBouncedUp.png)
+
+Jumping on a spring makes Sonic go upwards, changing his sprite.
+
+![Spikes](./assets/images/Spikes.png)
+
+![Skidding](./assets/images/Skidding.png)
+
+When going too fast, pressing the opposite direction makes him come to a stop.
+
+![Damage](./assets/images/Damage.png)
+
+Taking damage makes him lose all his rings.
+
+![Die](./assets/images/Die.png)
+
 
 ### 🎨 Assets
 
