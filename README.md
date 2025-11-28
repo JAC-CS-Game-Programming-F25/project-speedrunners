@@ -60,7 +60,7 @@ There is a HUD that displays the scores, time and rings on the top left, and his
 
 ### 🗺️ Class Diagram
 
-![Class Diagram](./UMLclass.pdf)
+![Class Diagram](./UMLclassDiagram.png)
 
 ### 🧵 Wireframes
 
