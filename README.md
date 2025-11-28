@@ -113,7 +113,7 @@ We are going to be using assets from Sonic The Hedgehog 1 to create the game.
 #### 🖼️ Images
 
 -   Most images will be taken from Sprite Ressource, [Sprite Resource](https://www.spriters-resource.com).
--   Especially their [Sonic 1 Section](<https://www.spriters-resource.com/browse/?name=sonic+1>).
+-   Especially their [Sonic 1 Section]([<https://www.spriters-resource.com/browse/?name=sonic+1](https://www.spriters-resource.com/sega_genesis/sonicth1/)>).
 
 #### ✏️ Fonts
 
