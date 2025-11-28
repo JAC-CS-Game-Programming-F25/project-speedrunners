@@ -56,7 +56,7 @@ There is a HUD that displays the scores, time and rings on the top left, and his
 > [!note]
 > Remember that you'll need diagrams for not only game states but entity states as well.
 
-![State Diagram](./assets/images/StateDiagram.png)
+![State Diagram](./StateDiagram.png)
 
 ### 🗺️ Class Diagram
 
