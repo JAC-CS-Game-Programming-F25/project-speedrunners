@@ -109,24 +109,21 @@ Taking damage makes him lose all his rings.
 
 We are going to be using assets from Sonic The Hedgehog 1 to create the game. We will be using Matter.js for collision detection.
 
+
 #### 🖼️ Images
 
--   Most images will be used from the well known community driven wikipedia site, [Bulbapedia](https://bulbapedia.bulbagarden.net/wiki/Main_Page).
--   Especially their [Trading Card Game section](<https://bulbapedia.bulbagarden.net/wiki/Full_Art_card_(TCG)>).
+-   Most images will be taken from Sprite Ressource, [Sprite Resource](https://www.spriters-resource.com).
+-   Especially their [Sonic 1 Section](<https://www.spriters-resource.com/browse/?name=sonic+1>).
 
 #### ✏️ Fonts
 
-For fonts, a simple sans-serif like Roboto will look quite nice. It's a font that is legible, light on storage size, and fun to keep with the theme we're going for. We also used a more cartoonish Pokemon font for the title screen.
+For fonts, we will use an external font that will be imported into our game. It mimics the font from the classic Sonic 1 game, so the feel for the player will be simillar to that of the original game.
 
--   [Pokemon](https://www.dafont.com/pokemon.font)
--   [Roboto](https://fonts.google.com/specimen/Roboto)
+-   [Sonic 1 Font](https://fontstruct.com/fontstructions/show/2709973/sonic-1-title-card-fixed-back)
 
 #### 🔊 Sounds
 
-All sounds were taken from [freesound.org](https://freesound.org) for the actions pertaining to cards.
-
--   [Shuffle cards](https://freesound.org/people/VKProduktion/sounds/217502/)
--   [Flip card](https://freesound.org/people/Splashdust/sounds/84322/)
+All sounds were taken from [Sprite Ressource](https://sounds.spriters-resource.com/pc_computer/sonicorigins/asset/441860/).
 
 ### 📚 References
 
