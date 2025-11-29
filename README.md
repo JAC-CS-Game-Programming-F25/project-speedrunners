@@ -51,12 +51,16 @@ There is a HUD that displays the scores, time and rings on the top left, and his
 23. The system shall give the player 3 lives at the start of the game.
 24. The system shall enter Game Over and return to the title screen if Sonic loses all lives.
 
-### 🤖 State Diagram
+### 🤖 Game State Diagram
 
 > [!note]
 > Remember that you'll need diagrams for not only game states but entity states as well.
 
-![State Diagram](./StateDiagram.png)
+![Game State Diagram](./Diagrams/GameState.png)
+
+### 🤖 Sonic State Diagram
+
+![Sonic State Diagram](./Diagrams/SonicState.png)
 
 ### 🗺️ Class Diagram
 
