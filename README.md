@@ -60,7 +60,7 @@ There is a HUD that displays the scores, time and rings on the top left, and his
 
 ### 🤖 Sonic State Diagram
 
-![Sonic State Diagram](./Diagrams/SonicState.png)
+![Sonic State Diagram](./Diagrams/SonicStates.png)
 
 ### 🗺️ Class Diagram
 
