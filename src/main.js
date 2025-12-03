@@ -1,9 +1,9 @@
 /**
- * Game Name
+ * Sonic
  *
- * Authors
+ * Authors: Ahmed and Vithusa
  *
- * Brief description
+ * Brief description: 	
  *
  * Asset sources
  */
