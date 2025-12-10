@@ -23,3 +23,22 @@ export const spriteConfig = {
         { x: 390, y: 348, width: 40, height: 40 }
     ]
 }
+
+export function loadPlayerSprites(spriteSheet, spriteConfig) {
+	const sprites = {};
+
+	for (const [animationName, frames] of Object.entries(spriteConfig)) {
+		sprites[animationName] = frames.map(
+			(frame) =>
+				new Sprite(
+					spriteSheet,
+					frame.x,
+					frame.y,
+					frame.width,
+					frame.height
+				)
+		);
+	}
+
+	return sprites;
+}

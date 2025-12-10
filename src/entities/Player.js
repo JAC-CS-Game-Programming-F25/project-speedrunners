@@ -1,15 +1,15 @@
-import { images, sounds, timer } from '../../globals.js';
-import {
-	loadPlayerSprites,
-	smallSpriteConfig,
-} from '../../../config/SpriteConfig.js';
-import Vector from '../../../lib/Vector.js';
-import ImageName from '../../enums/ImageName.js';
+
 import Animation from '../../../lib/Animation.js';
 import Map from '../../services/Map.js';
 import Entity from '../Entity.js';
-import StateMachine from '../../../lib/StateMachine.js';
 import SoundName from '../../enums/SoundName.js';
+import { images } from '../globals.js';
+import ImageName from '../enums/ImageName.js';
+import { loadPlayerSprites, spriteConfig } from '../../config/SpriteConfig.js';
+import Vector from '../../lib/Vector.js';
+import StateMachine from '../../lib/StateMachine.js';
+import PlayerIdlingState from './PlayerIdlingState.js';
+import PlayerWalkingState from './PlayerWalkingState.js';
 
 /**
  * Represents the player character in the game.
@@ -35,9 +35,16 @@ export default class Player extends Entity {
 		this.facingRight = true;
 
 		// Load player sprites
-        this.sprites = loadPlayerSprites()
+        this.sprites = loadPlayerSprites(
+            images.get(ImageName.Sonic),
+            spriteConfig
+        )
 
 		// Create animations for different player states
+		this.animations = {
+			idle: new Animation(this.sprites.idle),
+			walk: new Animation(this.sprites.walk, 0.07),
+		};
 
 		this.currentAnimation = this.animations.idle;
 
@@ -45,7 +52,14 @@ export default class Player extends Entity {
 		this.stateMachine = new StateMachine();
 
 		// Add states to the state machine
-
+        this.stateMachine.add(
+			PlayerStateName.Walking,
+			new PlayerWalkingState(this)
+		);
+		this.stateMachine.add(
+			PlayerStateName.Idling,
+			new PlayerIdlingState(this)
+		);
 	}
 
 	/**

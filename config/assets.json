@@ -1,22 +1,10 @@
 {
 	"images": [
 		{
-			"name": "tiles",
-			"path": "./assets/images/tiles.png",
-			"width": 144,
-			"height": 48
-		},
-		{
-			"name": "mario",
-			"path": "./assets/images/mario.png",
-			"width": 1004,
-			"height": 3618
-		},
-		{
-			"name": "background",
-			"path": "./assets/images/background.png",
-			"width": 512,
-			"height": 432
+			"name": "sonic",
+			"path": "./assets/images/Sonic.png",
+			"width": 690,
+			"height": 1558
 		}
 	]
 }
