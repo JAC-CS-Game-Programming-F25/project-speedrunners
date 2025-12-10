@@ -8,6 +8,10 @@ import Input from '../lib/Input.js';
 export const canvas = document.createElement('canvas');
 export const context =
 	canvas.getContext('2d') || new CanvasRenderingContext2D();
+const assetDefinition = await fetch('./config/assets.json').then((response) =>
+	response.json()
+);
+
 
 // Replace these values according to how big you want your canvas.
 export const CANVAS_WIDTH = 0;
@@ -34,3 +38,5 @@ export const stateMachine = new StateMachine();
 export const timer = new Timer();
 export const input = new Input(canvas);
 export const sounds = new Sounds();
+
+images.load(assetDefinition.images);
