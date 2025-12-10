@@ -40,3 +40,42 @@ export const input = new Input(canvas);
 export const sounds = new Sounds();
 
 images.load(assetDefinition.images);
+
+// Debug options
+export const debugOptions = {
+	mapGrid: false,
+	cameraCrosshair: false,
+	playerCollision: false,
+	watchPanel: false,
+};
+
+// Function to toggle a debug option
+export function toggleDebugOption(option) {
+	debugOptions[option] = !debugOptions[option];
+	localStorage.setItem(`debug_${option}`, debugOptions[option]);
+}
+
+// Function to initialize debug options from localStorage
+function initializeDebugOptions() {
+	Object.keys(debugOptions).forEach((option) => {
+		const storedValue = localStorage.getItem(`debug_${option}`);
+		if (storedValue !== null) {
+			debugOptions[option] = storedValue === 'true';
+		}
+	});
+}
+
+// Event listener for debug checkboxes
+initializeDebugOptions();
+
+const debugCheckboxes = document.querySelectorAll(
+	'#controlPanel .debug input[type="checkbox"]'
+);
+
+debugCheckboxes.forEach((checkbox) => {
+	checkbox.checked = debugOptions[checkbox.name];
+
+	checkbox.addEventListener('change', () => {
+		toggleDebugOption(checkbox.name);
+	});
+});

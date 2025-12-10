@@ -6,10 +6,10 @@ import SoundName from '../../enums/SoundName.js';
 import { images } from '../globals.js';
 import ImageName from '../enums/ImageName.js';
 import { loadPlayerSprites, spriteConfig } from '../../config/SpriteConfig.js';
-import Vector from '../../lib/Vector.js';
 import StateMachine from '../../lib/StateMachine.js';
 import PlayerIdlingState from './PlayerIdlingState.js';
 import PlayerWalkingState from './PlayerWalkingState.js';
+import Vector from '../../lib/Vector.js';
 
 /**
  * Represents the player character in the game.

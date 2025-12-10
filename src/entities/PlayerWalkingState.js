@@ -1,9 +1,9 @@
 import PlayerState from './PlayerState.js';
-import { input } from '../../globals.js';
-import { PlayerConfig } from '../../../config/PlayerConfig.js';
-import Input from '../../../lib/Input.js';
 import PlayerStateName from '../../enums/PlayerStateName.js';
 import Player from './Player.js';
+import Input from '../../lib/Input.js';
+import { input } from '../globals.js';
+import { PlayerConfig } from '../../config/PlayerConfig.js';
 
 /**
  * Represents the walking state of the player.
@@ -55,9 +55,9 @@ export default class PlayerWalkingState extends PlayerState {
 			this.isMovingRight = false;
 		}
 
-		if (input.isKeyPressed(Input.KEYS.SPACE)) {
-			this.player.stateMachine.change(PlayerStateName.Jumping);
-		}
+		// if (input.isKeyPressed(Input.KEYS.SPACE)) {
+		// 	this.player.stateMachine.change(PlayerStateName.Jumping);
+		// }
 	}
 
 	/**
@@ -68,18 +68,18 @@ export default class PlayerWalkingState extends PlayerState {
 			this.player.stateMachine.change(PlayerStateName.Idling);
 		}
 
-		if (this.shouldSkid()) {
-			this.player.facingRight = !this.player.facingRight;
-			this.player.stateMachine.change(PlayerStateName.Skidding);
-		}
+		// if (this.shouldSkid()) {
+		// 	this.player.facingRight = !this.player.facingRight;
+		// 	this.player.stateMachine.change(PlayerStateName.Skidding);
+		// }
 
-		if (!this.player.isOnGround) {
-			if (this.player.velocity.y < 0) {
-				this.player.stateMachine.change(PlayerStateName.Jumping);
-			} else {
-				this.player.stateMachine.change(PlayerStateName.Falling);
-			}
-		}
+		// if (!this.player.isOnGround) {
+		// 	if (this.player.velocity.y < 0) {
+		// 		this.player.stateMachine.change(PlayerStateName.Jumping);
+		// 	} else {
+		// 		this.player.stateMachine.change(PlayerStateName.Falling);
+		// 	}
+		// }
 	}
 
 	/**
