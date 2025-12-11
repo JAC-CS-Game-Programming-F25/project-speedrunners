@@ -9,6 +9,7 @@ import PlayerWalkingState from './PlayerWalkingState.js';
 import Vector from '../../lib/Vector.js';
 import Entity from './Entity.js';
 import Map from '../services/Map.js';
+import PlayerStateName from '../enums/PlayerStateName.js';
 
 /**
  * Represents the player character in the game.
@@ -25,7 +26,6 @@ export default class Player extends Entity {
 	 */
 	constructor(x, y, width, height, map) {
 		super(x, y, width, height);
-
 		this.initialPosition = new Vector(x, y);
 		this.position = new Vector(x, y);
 		this.dimensions = new Vector(width, height);

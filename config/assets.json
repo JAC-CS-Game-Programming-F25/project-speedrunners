@@ -5,6 +5,12 @@
 			"path": "./assets/images/Sonic.png",
 			"width": 690,
 			"height": 1558
+		},
+		{
+			"name": "tiles",
+			"path": "./assets/sprites/tilesets.png",
+			"width": 1360,
+			"height": 3184
 		}
 	]
 }

@@ -34,6 +34,10 @@ canvas.setAttribute('tabindex', '1'); // Allows the canvas to receive user input
 // Now that the canvas element has been prepared, we can add it to the DOM.
 document.body.appendChild(canvas);
 
+const mapDefinition = await fetch('../config/map.json').then((response) =>
+	response.json()
+);
+
 // Fetch the asset definitions from config.json.
 const {
 	images: imageDefinitions,
@@ -50,7 +54,7 @@ sounds.load(soundDefinitions);
 stateMachine.add(GameStateName.TitleScreen, new TitleScreenState());
 stateMachine.add(GameStateName.GameOver, new GameOverState());
 stateMachine.add(GameStateName.Victory, new VictoryState());
-stateMachine.add(GameStateName.Play, new PlayState());
+stateMachine.add(GameStateName.Play, new PlayState(mapDefinition));
 
 stateMachine.change(GameStateName.Play);
 
