@@ -11,6 +11,12 @@
 			"path": "./assets/sprites/tilesets.png",
 			"width": 1360,
 			"height": 3184
+		},
+		{
+			"name": "gameObjects",
+			"path": "assets/sprites/objects-common-no-bg.png",
+			"width": 712,
+			"height": 1014
 		}
 	]
-}
+} 

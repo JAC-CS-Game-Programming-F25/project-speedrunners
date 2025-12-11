@@ -12,6 +12,7 @@ import {
 	canvas
 } from "../globals.js";  
 import Camera from "./Camera.js";
+import RingManager from "./RingManager.js";
 
 export default class Map {
     static BACKGROUND_LAYER = 1;
@@ -47,19 +48,49 @@ export default class Map {
 			this.width * Tile.SIZE,
 			this.height * Tile.SIZE
 		);
+		this.ringManager = new RingManager();
+        this.setupRings();
 	}
+    
+    setupRings() {
+        // Add some example rings - adjust positions as needed
+        
+        // Line of rings at y=160
+        this.ringManager.addRingLine(100, 160, 8, 25);
+        
+        // Arc of rings
+        this.ringManager.addRingArc(300, 180, 40, 7);
+        
+        // Single rings
+        this.ringManager.addRing(450, 170);
+        this.ringManager.addRing(480, 150);
+        this.ringManager.addRing(510, 170);
+    }
     
     update(dt) {
         this.player.update(dt);
-		this.camera.update(dt)
+        this.camera.update(dt);
+        this.ringManager.update(dt);
+        this.ringManager.checkCollisions(this.player);
     }
     
     render() {
-		this.camera.applyTransform(context);
+        this.camera.applyTransform(context);
         this.collisionLayer.render();
+        this.ringManager.render(context);
         this.player.render(context);
         this.backgroundLayer.render();
-		this.camera.resetTransform(context);
+        this.camera.resetTransform(context);
+        
+        // Render ring counter in top-left (not affected by camera)
+        this.renderUI();
+    }
+    
+    renderUI() {
+        context.save();
+        context.font = '20px Arial';
+        context.fillText(`Rings: ${this.ringManager.getRingCount()}`, 10, 25);
+        context.restore();
     }
     
     static renderGrid() {
