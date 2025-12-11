@@ -109,7 +109,6 @@ export default class Map {
 	 */
 	isSolidTileAt(col, row) {
 		const tile = this.foregroundLayer.getTile(col, row);
-		console.log(tile);
 		return tile !== null && tile.id !== -1;
 	}
 }

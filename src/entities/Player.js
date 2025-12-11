@@ -1,5 +1,5 @@
 
-import Animation from '../../../lib/Animation.js';
+import Animation from '../../lib/Animation.js';
 import { images, context } from '../globals.js';
 import ImageName from '../enums/ImageName.js';
 import { loadPlayerSprites, spriteConfig } from '../../config/SpriteConfig.js';
@@ -42,7 +42,7 @@ export default class Player extends Entity {
 		// Create animations for different player states
 		this.animations = {
 			idle: new Animation(this.sprites.idle),
-			walk: new Animation(this.sprites.walk, 0.07),
+			walk: new Animation(this.sprites.walk, 0.1),
 		};
 
 		this.currentAnimation = this.animations.idle;

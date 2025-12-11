@@ -44,8 +44,8 @@ export default class PlayerState extends State {
 		context.save();
 
 		// Handle player orientation (facing right or left)
-		if (this.player.facingRight) {
-			// If facing right, flip the sprite horizontally
+		if (!this.player.facingRight) {
+			// If facing left, flip the sprite horizontally
 			context.scale(-1, 1);
 			// Adjust position to account for the flip
 			context.translate(
@@ -53,7 +53,7 @@ export default class PlayerState extends State {
 				Math.floor(this.player.position.y)
 			);
 		} else {
-			// If facing left, just translate to the player's position
+			// If facing right, just translate to the player's position
 			context.translate(
 				Math.floor(this.player.position.x),
 				Math.floor(this.player.position.y)
