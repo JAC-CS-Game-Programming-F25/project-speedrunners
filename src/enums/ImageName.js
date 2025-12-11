@@ -1,3 +1,7 @@
 export const ImageName = {
-    Tiles: 'tiles',
-}
+	Tiles: 'tiles',
+	Sonic: 'sonic',
+	Background: 'background',
+};
+
+export default ImageName;
