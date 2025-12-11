@@ -242,6 +242,7 @@ export default class PlayerState extends State {
 			)
 		);
 
+
 		// Round vertical position to avoid sub-pixel rendering
 		this.player.position.y = Math.round(this.player.position.y);
 	}

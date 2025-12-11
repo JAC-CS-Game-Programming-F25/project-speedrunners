@@ -1,4 +1,5 @@
 import Tile from "./Tile.js";
+
 export default class Layer {
 	static BOTTOM = 0;
 	static COLLISION = 1;

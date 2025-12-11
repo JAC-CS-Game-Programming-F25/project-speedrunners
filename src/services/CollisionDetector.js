@@ -1,6 +1,7 @@
 import Entity from '../entities/Entity.js';
 import PlayerStateName from '../enums/PlayerStateName.js';
 import Map from './Map.js'
+import Tile from './Tile.js';
 
 /**
  * Handles collision detection for entities in the game world.
@@ -19,7 +20,7 @@ export default class CollisionDetector {
 	 * @param {Entity} entity - The entity to check collisions for.
 	 */
 	checkHorizontalCollisions(entity) {
-		const tileSize = this.map.tileSize;
+		const tileSize = Tile.SIZE;
 		const tileLeft = Math.floor(entity.position.x / tileSize);
 		const tileRight = Math.floor(
 			(entity.position.x + entity.dimensions.x) / tileSize
@@ -53,7 +54,7 @@ export default class CollisionDetector {
 	 * @param {Entity} entity - The entity to check collisions for.
 	 */
 	checkVerticalCollisions(entity) {
-		const tileSize = this.map.tileSize;
+		const tileSize = Tile.SIZE;
 		const tileLeft = Math.floor(entity.position.x / tileSize);
 		const tileRight = Math.floor(
 			(entity.position.x + entity.dimensions.x - 1) / tileSize

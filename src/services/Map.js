@@ -14,6 +14,14 @@ import {
 
 
 export default class Map {
+
+	/**
+	 * The index of the foreground layer in the layers array.
+	 * @type {number}
+	 */
+	static FOREGROUND_LAYER = 0;
+	
+
 	/**
 	 * The collection of layers, sprites,
 	 * and characters that comprises the world.
@@ -21,17 +29,24 @@ export default class Map {
 	 * @param {object} mapDefinition JSON from Tiled map editor.
 	 */
 	constructor(mapDefinition) {
-		console.log(mapDefinition)
+		this.width = mapDefinition.width;
+		this.height = mapDefinition.height;
+		this.tilesets = mapDefinition.tilesets;
+
 		const sprites = Sprite.generateSpritesFromSpriteSheet(
 			images.get(ImageName.Tiles),
 			Tile.SIZE,
 			Tile.SIZE,
 		);
 
-		this.bottomLayer = new Layer(mapDefinition.layers[Layer.BOTTOM], sprites);
+		this.player = new Player(7, 5, 16, 16, this);
+		// this.bottomLayer = new Layer(mapDefinition.layers[Layer.BOTTOM], sprites);
 		//this.collisionLayer = new Layer(mapDefinition.layers[Layer.COLLISION], sprites);
 		//this.topLayer = new Layer(mapDefinition.layers[Layer.TOP], sprites);
-		this.player = new Player({ position: new Vector(7, 5) }, this);
+		this.layers = mapDefinition.layers.map(
+			(layerData) => new Layer(layerData, sprites)
+		);
+		this.foregroundLayer = this.layers[Map.FOREGROUND_LAYER];
 	}
 
 	update(dt) {
@@ -39,7 +54,7 @@ export default class Map {
 	}
 
 	render() {
-		this.bottomLayer.render();
+		this.foregroundLayer.render();
 		//this.collisionLayer.render();
 		this.player.render();
 		//this.topLayer.render();
@@ -73,5 +88,27 @@ export default class Map {
 		}
 
 		context.restore();
+	}
+
+	/**
+	 * Gets a tile from a specific layer at the given column and row.
+	 * @param {number} layerIndex - The index of the layer.
+	 * @param {number} col - The column of the tile.
+	 * @param {number} row - The row of the tile.
+	 * @returns {Tile|null} The tile at the specified position, or null if no tile exists.
+	 */
+	getTileAt(layerIndex, col, row) {
+		return this.bottomLayer.getTile(col, row);
+	}
+
+	/**
+	 * Checks if there's a solid tile at the specified column and row.
+	 * @param {number} col - The column to check.
+	 * @param {number} row - The row to check.
+	 * @returns {boolean} True if there's a solid tile, false otherwise.
+	 */
+	isSolidTileAt(col, row) {
+		const tile = this.foregroundLayer.getTile(col, row);
+		return tile !== null && tile.id !== -1;
 	}
 }

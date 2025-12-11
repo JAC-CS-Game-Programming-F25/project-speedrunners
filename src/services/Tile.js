@@ -1,14 +1,13 @@
+import Sprite from "../../lib/Sprite.js";
+
 export default class Tile {
 	static SIZE = 32;
-	static GRASS = 6;
-	static DOOR_CLOSED = 1681;
-	static DOOR_OPEN = 2891;
 
 	/**
 	 * Represents one tile in a Layer and on the screen.
 	 *
 	 * @param {number} id
-	 * @param {array} sprites
+	 * @param {Sprite[]} sprites
 	 */
 	constructor(id, sprites) {
 		this.sprites = sprites;
