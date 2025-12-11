@@ -1,6 +1,6 @@
 import Entity from '../entities/Entity.js';
 import PlayerStateName from '../enums/PlayerStateName.js';
-import Map from './Map.js';
+import Map from './Map.js'
 
 /**
  * Handles collision detection for entities in the game world.
