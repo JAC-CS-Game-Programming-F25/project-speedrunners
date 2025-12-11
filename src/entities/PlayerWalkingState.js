@@ -43,7 +43,6 @@ export default class PlayerWalkingState extends PlayerState {
 	 * Handles player input.
 	 */
 	handleInput() {
-		console.log(this.isMovingLeft, this.isMovingRight)
 		if (input.isKeyHeld(Input.KEYS.A) && !this.isMovingRight) {
 			this.isMovingLeft = true;
 		} else {

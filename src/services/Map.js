@@ -29,26 +29,26 @@ export default class Map {
 	 * @param {object} mapDefinition JSON from Tiled map editor.
 	 */
 	constructor(mapDefinition) {
-    this.width = mapDefinition.width;
-    this.height = mapDefinition.height;
-    this.tilesets = mapDefinition.tilesets;
-    
-    // Generate sprites with 16px margin (from tileset.tsx)
-    const sprites = Sprite.generateSpritesFromSpriteSheet(
-        images.get(ImageName.Tiles),
-        Tile.SIZE,
-        Tile.SIZE,
-        16  
-    );
-    
-    this.player = new Player(32, 192, 32, 40, this);
+		this.width = mapDefinition.width;
+		this.height = mapDefinition.height;
+		this.tilesets = mapDefinition.tilesets;
+		
+		// Generate sprites with 16px margin (from tileset.tsx)
+		const sprites = Sprite.generateSpritesFromSpriteSheet(
+			images.get(ImageName.Tiles),
+			Tile.SIZE,
+			Tile.SIZE,
+			16  
+		);
+		
+		this.player = new Player(32, 192, 32, 40, this);
 
-    this.layers = mapDefinition.layers.map(
-        (layerData) => new Layer(layerData, sprites)
-    );
-    
-    this.foregroundLayer = this.layers[Map.FOREGROUND_LAYER];
-}
+		this.layers = mapDefinition.layers.map(
+			(layerData) => new Layer(layerData, sprites)
+		);
+		
+		this.foregroundLayer = this.layers[Map.FOREGROUND_LAYER];
+	}
 
 	update(dt) {
 		this.player.update(dt);
