@@ -14,9 +14,17 @@
 		},
 		{
 			"name": "gameObjects",
-			"path": "assets/sprites/objects-common-no-bg.png",
+			"path": "./assets/sprites/objects-common-no-bg.png",
 			"width": 712,
 			"height": 1014
+		}
+	],
+	"sounds":[
+		{
+			"name": "ring",
+			"path": "./assets/sounds/ring.wav",
+			"size": 2,
+			"volume":1
 		}
 	]
 } 

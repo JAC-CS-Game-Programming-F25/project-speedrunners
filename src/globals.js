@@ -40,6 +40,7 @@ export const input = new Input(canvas);
 export const sounds = new Sounds();
 
 images.load(assetDefinition.images);
+sounds.load(assetDefinition.sounds);
 
 // Debug options
 export const debugOptions = {

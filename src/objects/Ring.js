@@ -3,6 +3,8 @@ import Animation from "../../lib/Animation.js";
 import Sprite from "../../lib/Sprite.js";
 import { images } from "../globals.js";
 import { ImageName } from "../enums/ImageName.js";
+import {SoundName} from "../enums/SoundName.js";
+import { sounds } from "../globals.js";
 
 export default class Ring extends Entity {
     static WIDTH = 16;
@@ -71,6 +73,7 @@ export default class Ring extends Entity {
     collect() {
         if (!this.isCollected) {
             this.isCollected = true;
+            sounds.play(SoundName.Ring);
             return Ring.RING_VALUE;
         }
         return 0;
