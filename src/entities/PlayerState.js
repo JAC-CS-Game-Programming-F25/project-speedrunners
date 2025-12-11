@@ -1,10 +1,10 @@
 import State from '../../../lib/State.js';
-import Tile from '../../services/Tile.js';
 import Player from './Player.js';
 import CollisionDetector from '../services/CollisionDetector.js';
 import { debugOptions, input } from '../globals.js';
 import Input from '../../lib/Input.js';
 import { PlayerConfig } from '../../config/PlayerConfig.js';
+import Tile from '../services/Tile.js';
 
 /**
  * Base class for all player states.
