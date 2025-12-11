@@ -12,11 +12,9 @@ import {
     images,
 } from "../globals.js";  
 
-
 export default class Map {
     static BACKGROUND_LAYER = 1;
     static COLLISION_LAYER = 0;
-    //static BOTTOM_LAYER = 0;
     
     constructor(mapDefinition) {
         this.width = mapDefinition.width;
@@ -38,10 +36,9 @@ export default class Map {
         // Store references to specific layers
         this.backgroundLayer = this.layers[Map.BACKGROUND_LAYER];
         this.collisionLayer = this.layers[Map.COLLISION_LAYER];
-        //this.bottomLayer = this.layers[Map.BOTTOM_LAYER];
         
-        // Position Sonic: Y = 192 - 40 (his height) = 152
-        this.player = new Player(32, 192, 32, 40, this);
+        // Position Sonic - adjust this number: try 186, 188, 190, 192, or 194
+        this.player = new Player(32, 188, 32, 40, this);
     }
     
     update(dt) {
@@ -49,14 +46,9 @@ export default class Map {
     }
     
     render() {
-        // Render in order: Bottom -> Background -> Player
-        //this.bottomLayer.render();
-		this.collisionLayer.render();
-		this.player.render(context);
+        this.collisionLayer.render();
+        this.player.render(context);
         this.backgroundLayer.render();
-        
-        // Uncomment for debugging
-        //Map.renderGrid();
     }
     
     static renderGrid() {
@@ -83,17 +75,11 @@ export default class Map {
         return this.layers[layerIndex]?.getTile(col, row);
     }
     
-    /**
-     * Checks if there's a solid tile at the specified column and row.
-     * IMPORTANT: Only checks the CollisionLayer!
-     */
     isSolidTileAt(col, row) {
-        // Check bounds
         if (col < 0 || col >= this.width || row < 0 || row >= this.height) {
             return false;
         }
         
-        // Check COLLISION LAYER, not background
         const tile = this.collisionLayer.getTile(col, row);
         
         return tile !== null && tile.id !== undefined && tile.id !== -1;

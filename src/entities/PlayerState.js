@@ -65,7 +65,7 @@ export default class PlayerState extends State {
 
 		// Restore the canvas state to what it was before our changes
 		context.restore();
-
+		debugOptions.playerCollision = true;
 		// If debug mode is enabled, render additional debug information
 		if (debugOptions.playerCollision) {
 			this.renderDebug(context);
