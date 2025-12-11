@@ -1,5 +1,5 @@
 export default class Tile {
-	static SIZE = 16;
+	static SIZE = 32;
 	static GRASS = 6;
 	static DOOR_CLOSED = 1681;
 	static DOOR_OPEN = 2891;

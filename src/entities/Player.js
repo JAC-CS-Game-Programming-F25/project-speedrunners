@@ -1,7 +1,15 @@
-import StateMachine from "../../lib/StateMachine.js";
-import Vector from "../../lib/Vector.js";
-import Entity from "./Entity.js";
 
+import Animation from '../../../lib/Animation.js';
+import Map from '../../services/Map.js';
+import Entity from '../Entity.js';
+import SoundName from '../../enums/SoundName.js';
+import { images } from '../globals.js';
+import ImageName from '../enums/ImageName.js';
+import { loadPlayerSprites, spriteConfig } from '../../config/SpriteConfig.js';
+import StateMachine from '../../lib/StateMachine.js';
+import PlayerIdlingState from './PlayerIdlingState.js';
+import PlayerWalkingState from './PlayerWalkingState.js';
+import Vector from '../../lib/Vector.js';
 
 /**
  * Represents the player character in the game.
@@ -44,14 +52,14 @@ export default class Player extends Entity {
 		this.stateMachine = new StateMachine();
 
 		// Add states to the state machine
-        // this.stateMachine.add(
-		// 	PlayerStateName.Walking,
-		// 	new PlayerWalkingState(this)
-		// );
-		// this.stateMachine.add(
-		// 	PlayerStateName.Idling,
-		// 	new PlayerIdlingState(this)
-		// );
+        this.stateMachine.add(
+			PlayerStateName.Walking,
+			new PlayerWalkingState(this)
+		);
+		this.stateMachine.add(
+			PlayerStateName.Idling,
+			new PlayerIdlingState(this)
+		);
 	}
 
 	/**

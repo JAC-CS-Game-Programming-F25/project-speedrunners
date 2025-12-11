@@ -1,5 +1,5 @@
-import Vector from "../../lib/Vector.js";
-import { context } from "../globals.js";
+import { getCollisionDirection, isAABBCollision } from '../../lib/Collision.js';
+import Vector from '../../lib/Vector.js';
 
 /**
  * Represents a game entity with position, dimensions, and velocity.
