@@ -45,7 +45,7 @@ images.load(assetDefinition.images);
 export const debugOptions = {
 	mapGrid: false,
 	cameraCrosshair: false,
-	playerCollision: false,
+	playerCollision: true,
 	watchPanel: false,
 };
 

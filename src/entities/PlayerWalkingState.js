@@ -32,12 +32,12 @@ export default class PlayerWalkingState extends PlayerState {
 	 * Updates the walking state.
 	 * @param {number} dt - The time passed since the last update.
 	 */
-	update(dt) {
-		super.update(dt);
-		this.checkTransitions();
-		this.handleInput();
-		this.handleHorizontalMovement();
-	}
+update(dt) {
+    this.handleInput();         // Read input FIRST
+    this.handleHorizontalMovement();  // Update velocity SECOND
+    super.update(dt);           // Apply physics and movement THIRD
+    this.checkTransitions();    // Check state changes LAST
+}
 
 	/**
 	 * Handles player input.

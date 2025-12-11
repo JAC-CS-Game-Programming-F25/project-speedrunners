@@ -14,103 +14,88 @@ import {
 
 
 export default class Map {
-
-	/**
-	 * The index of the foreground layer in the layers array.
-	 * @type {number}
-	 */
-	static FOREGROUND_LAYER = 0;
-	
-
-	/**
-	 * The collection of layers, sprites,
-	 * and characters that comprises the world.
-	 *
-	 * @param {object} mapDefinition JSON from Tiled map editor.
-	 */
-	constructor(mapDefinition) {
-    this.width = mapDefinition.width;
-    this.height = mapDefinition.height;
-    this.tilesets = mapDefinition.tilesets;
+    static BACKGROUND_LAYER = 1;
+    static COLLISION_LAYER = 0;
+    //static BOTTOM_LAYER = 0;
     
-    // Generate sprites with 16px margin (from tileset.tsx)
-    const sprites = Sprite.generateSpritesFromSpriteSheet(
-        images.get(ImageName.Tiles),
-        Tile.SIZE,
-        Tile.SIZE,
-        16  
-    );
+    constructor(mapDefinition) {
+        this.width = mapDefinition.width;
+        this.height = mapDefinition.height;
+        this.tilesets = mapDefinition.tilesets;
+        
+        const sprites = Sprite.generateSpritesFromSpriteSheet(
+            images.get(ImageName.Tiles),
+            Tile.SIZE,
+            Tile.SIZE,
+            16  
+        );
+        
+        // Map all layers
+        this.layers = mapDefinition.layers.map(
+            (layerData) => new Layer(layerData, sprites)
+        );
+        
+        // Store references to specific layers
+        this.backgroundLayer = this.layers[Map.BACKGROUND_LAYER];
+        this.collisionLayer = this.layers[Map.COLLISION_LAYER];
+        //this.bottomLayer = this.layers[Map.BOTTOM_LAYER];
+        
+        // Position Sonic: Y = 192 - 40 (his height) = 152
+        this.player = new Player(32, 192, 32, 40, this);
+    }
     
-    this.player = new Player(32, 192, 32, 40, this);
-
-    this.layers = mapDefinition.layers.map(
-        (layerData) => new Layer(layerData, sprites)
-    );
+    update(dt) {
+        this.player.update(dt);
+    }
     
-    this.foregroundLayer = this.layers[Map.FOREGROUND_LAYER];
-}
-
-	update(dt) {
-		this.player.update(dt);
-	}
-
-	render() {
-		this.foregroundLayer.render();
-		//this.collisionLayer.render();
+    render() {
+        // Render in order: Bottom -> Background -> Player
+        //this.bottomLayer.render();
+		this.collisionLayer.render();
 		this.player.render(context);
-		//Map.renderGrid();
-		//this.topLayer.render();
-
-		// if (DEBUG) {
-		// 	Map.renderGrid();
-		// }
-	}
-
-	/**
-	 * Draws a grid of squares on the screen to help with debugging.
-	 */
-	static renderGrid() {
-		context.save();
-		context.strokeStyle = Colour.White;
-
-		for (let y = 1; y < CANVAS_HEIGHT / Tile.SIZE; y++) {
-			context.beginPath();
-			context.moveTo(0, y * Tile.SIZE);
-			context.lineTo(CANVAS_WIDTH, y * Tile.SIZE);
-			context.closePath();
-			context.stroke();
-
-			for (let x = 1; x < CANVAS_WIDTH / Tile.SIZE; x++) {
-				context.beginPath();
-				context.moveTo(x * Tile.SIZE, 0);
-				context.lineTo(x * Tile.SIZE, CANVAS_HEIGHT);
-				context.closePath();
-				context.stroke();
-			}
-		}
-
-		context.restore();
-	}
-
-	/**
-	 * Gets a tile from a specific layer at the given column and row.
-	 * @param {number} layerIndex - The index of the layer.
-	 * @param {number} col - The column of the tile.
-	 * @param {number} row - The row of the tile.
-	 * @returns {Tile|null} The tile at the specified position, or null if no tile exists.
-	 */
-	getTileAt(layerIndex, col, row) {
-		return this.bottomLayer.getTile(col, row);
-	}
-
-	/**
-	 * Checks if there's a solid tile at the specified column and row.
-	 * @param {number} col - The column to check.
-	 * @param {number} row - The row to check.
-	 * @returns {boolean} True if there's a solid tile, false otherwise.
-	 */
-	isSolidTileAt(col, row) {
-		const tile = this.foregroundLayer.getTile(col, row);
-		return tile !== null && tile.id !== -1;
-	}
+        this.backgroundLayer.render();
+        
+        // Uncomment for debugging
+        //Map.renderGrid();
+    }
+    
+    static renderGrid() {
+        context.save();
+        context.strokeStyle = Colour.White;
+        for (let y = 1; y < CANVAS_HEIGHT / Tile.SIZE; y++) {
+            context.beginPath();
+            context.moveTo(0, y * Tile.SIZE);
+            context.lineTo(CANVAS_WIDTH, y * Tile.SIZE);
+            context.closePath();
+            context.stroke();
+            for (let x = 1; x < CANVAS_WIDTH / Tile.SIZE; x++) {
+                context.beginPath();
+                context.moveTo(x * Tile.SIZE, 0);
+                context.lineTo(x * Tile.SIZE, CANVAS_HEIGHT);
+                context.closePath();
+                context.stroke();
+            }
+        }
+        context.restore();
+    }
+    
+    getTileAt(layerIndex, col, row) {
+        return this.layers[layerIndex]?.getTile(col, row);
+    }
+    
+    /**
+     * Checks if there's a solid tile at the specified column and row.
+     * IMPORTANT: Only checks the CollisionLayer!
+     */
+    isSolidTileAt(col, row) {
+        // Check bounds
+        if (col < 0 || col >= this.width || row < 0 || row >= this.height) {
+            return false;
+        }
+        
+        // Check COLLISION LAYER, not background
+        const tile = this.collisionLayer.getTile(col, row);
+        
+        return tile !== null && tile.id !== undefined && tile.id !== -1;
+    }
 }

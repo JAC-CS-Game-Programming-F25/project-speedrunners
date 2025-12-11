@@ -119,6 +119,7 @@ export default class CollisionDetector {
 	isSolidTileInRow(y, xStart, xEnd) {
 		for (let x = xStart; x <= xEnd; x++) {
 			if (this.map.isSolidTileAt(x, y)) {
+				console.log(`high`);
 				return true;
 			}
 		}
