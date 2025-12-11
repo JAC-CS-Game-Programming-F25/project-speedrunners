@@ -2,7 +2,6 @@ import Layer from "./Layer.js";
 import Colour from "../enums/Colour.js";        
 import Player from "../entities/Player.js";       
 import Sprite from "../../lib/Sprite.js";        
-import Vector from "../../lib/Vector.js";          
 import Tile from "./Tile.js";                     
 import { ImageName } from "../enums/ImageName.js";  
 import {
@@ -10,7 +9,9 @@ import {
     CANVAS_WIDTH,
     context,
     images,
+	canvas
 } from "../globals.js";  
+import Camera from "./Camera.js";
 
 export default class Map {
     static BACKGROUND_LAYER = 1;
@@ -39,16 +40,26 @@ export default class Map {
         
         // Position Sonic - adjust this number: try 186, 188, 190, 192, or 194
         this.player = new Player(32, 188, 32, 40, this);
-    }
+		this.camera = new Camera(
+			this.player,
+			canvas.width,
+			canvas.height,
+			this.width * Tile.SIZE,
+			this.height * Tile.SIZE
+		);
+	}
     
     update(dt) {
         this.player.update(dt);
+		this.camera.update(dt)
     }
     
     render() {
+		this.camera.applyTransform(context);
         this.collisionLayer.render();
         this.player.render(context);
         this.backgroundLayer.render();
+		this.camera.resetTransform(context);
     }
     
     static renderGrid() {
