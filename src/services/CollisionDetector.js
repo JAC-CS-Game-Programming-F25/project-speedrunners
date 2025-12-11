@@ -33,7 +33,7 @@ export default class CollisionDetector {
 		if (entity.velocity.x > 0) {
 			// Moving right
 			// By checking if there isn't a platform tile, the player can phase through the platform tile when he moves to the right
-			if (this.isSolidTileInColumn(tileRight, tileTop, tileBottom) && !this.isPlatformTileInColumn(tileRight, tileTop, tileBottom)) {
+			if (this.isSolidTileInColumn(tileRight, tileTop, tileBottom) ) {
 				// Collision on the right side
 				entity.position.x = tileRight * tileSize - entity.dimensions.x;
 				entity.velocity.x = 0;
@@ -41,7 +41,7 @@ export default class CollisionDetector {
 		} else if (entity.velocity.x < 0) {
 			// Moving left
 			// By checking if there isn't a platform tile, the player can phase through the platform tile when he moves to the left
-			if (this.isSolidTileInColumn(tileLeft, tileTop, tileBottom) && !this.isPlatformTileInColumn(tileLeft, tileTop, tileBottom)) {
+			if (this.isSolidTileInColumn(tileLeft, tileTop, tileBottom)) {
 				// Collision on the left side
 				entity.position.x = (tileLeft + 1) * tileSize;
 				entity.velocity.x = 0;

@@ -1,7 +1,7 @@
 import Sprite from "../../lib/Sprite.js";
 
 export default class Tile {
-	static SIZE = 32;
+	static SIZE = 16;
 
 	/**
 	 * Represents one tile in a Layer and on the screen.

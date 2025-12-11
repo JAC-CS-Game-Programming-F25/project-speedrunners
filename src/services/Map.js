@@ -39,7 +39,7 @@ export default class Map {
 			Tile.SIZE,
 		);
 
-		this.player = new Player(7, 5, 16, 16, this);
+		this.player = new Player(32, 200, 16, 16, this);
 		// this.bottomLayer = new Layer(mapDefinition.layers[Layer.BOTTOM], sprites);
 		//this.collisionLayer = new Layer(mapDefinition.layers[Layer.COLLISION], sprites);
 		//this.topLayer = new Layer(mapDefinition.layers[Layer.TOP], sprites);
@@ -56,7 +56,7 @@ export default class Map {
 	render() {
 		this.foregroundLayer.render();
 		//this.collisionLayer.render();
-		this.player.render();
+		this.player.render(context);
 		//this.topLayer.render();
 
 		// if (DEBUG) {
@@ -109,6 +109,7 @@ export default class Map {
 	 */
 	isSolidTileAt(col, row) {
 		const tile = this.foregroundLayer.getTile(col, row);
+		console.log(tile);
 		return tile !== null && tile.id !== -1;
 	}
 }

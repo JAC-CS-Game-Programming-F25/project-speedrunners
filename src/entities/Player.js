@@ -1,6 +1,6 @@
 
 import Animation from '../../../lib/Animation.js';
-import { images } from '../globals.js';
+import { images, context } from '../globals.js';
 import ImageName from '../enums/ImageName.js';
 import { loadPlayerSprites, spriteConfig } from '../../config/SpriteConfig.js';
 import StateMachine from '../../lib/StateMachine.js';
