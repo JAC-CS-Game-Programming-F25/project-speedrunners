@@ -1,6 +1,6 @@
 
 import Animation from '../../../lib/Animation.js';
-import Map from '../../services/Map.js';
+import Map from '../services/Map.js';
 import Entity from '../Entity.js';
 import SoundName from '../../enums/SoundName.js';
 import { images } from '../globals.js';
