@@ -8,10 +8,14 @@ import Input from '../lib/Input.js';
 export const canvas = document.createElement('canvas');
 export const context =
 	canvas.getContext('2d') || new CanvasRenderingContext2D();
+const assetDefinition = await fetch('./config/assets.json').then((response) =>
+	response.json()
+);
+
 
 // Replace these values according to how big you want your canvas.
-export const CANVAS_WIDTH = 0;
-export const CANVAS_HEIGHT = 0;
+export const CANVAS_WIDTH = 480;
+export const CANVAS_HEIGHT = 352;
 
 const resizeCanvas = () => {
 	const scaleX = window.innerWidth / CANVAS_WIDTH;
@@ -34,3 +38,45 @@ export const stateMachine = new StateMachine();
 export const timer = new Timer();
 export const input = new Input(canvas);
 export const sounds = new Sounds();
+
+images.load(assetDefinition.images);
+sounds.load(assetDefinition.sounds);
+
+// Debug options
+export const debugOptions = {
+	mapGrid: true,
+	cameraCrosshair: false,
+	playerCollision: true,
+	watchPanel: false,
+};
+
+// Function to toggle a debug option
+export function toggleDebugOption(option) {
+	debugOptions[option] = !debugOptions[option];
+	localStorage.setItem(`debug_${option}`, debugOptions[option]);
+}
+
+// Function to initialize debug options from localStorage
+function initializeDebugOptions() {
+	Object.keys(debugOptions).forEach((option) => {
+		const storedValue = localStorage.getItem(`debug_${option}`);
+		if (storedValue !== null) {
+			debugOptions[option] = storedValue === 'true';
+		}
+	});
+}
+
+// Event listener for debug checkboxes
+initializeDebugOptions();
+
+const debugCheckboxes = document.querySelectorAll(
+	'#controlPanel .debug input[type="checkbox"]'
+);
+
+debugCheckboxes.forEach((checkbox) => {
+	checkbox.checked = debugOptions[checkbox.name];
+
+	checkbox.addEventListener('change', () => {
+		toggleDebugOption(checkbox.name);
+	});
+});

@@ -1,0 +1,30 @@
+{
+	"images": [
+		{
+			"name": "sonic",
+			"path": "./assets/images/Sonic.png",
+			"width": 690,
+			"height": 1558
+		},
+		{
+			"name": "tiles",
+			"path": "./assets/sprites/tilesets.png",
+			"width": 1360,
+			"height": 3184
+		},
+		{
+			"name": "gameObjects",
+			"path": "./assets/sprites/objects-common-no-bg.png",
+			"width": 712,
+			"height": 1014
+		}
+	],
+	"sounds":[
+		{
+			"name": "ring",
+			"path": "./assets/sounds/ring.wav",
+			"size": 2,
+			"volume":1
+		}
+	]
+} 
