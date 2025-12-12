@@ -1,6 +1,6 @@
 import Layer from "./Layer.js";              
 import Colour from "../enums/Colour.js";        
-import Player from "../entities/Player.js";       
+import Player from "../entities/player/Player.js";       
 import Sprite from "../../lib/Sprite.js";        
 import Tile from "./Tile.js";                     
 import { ImageName } from "../enums/ImageName.js";  

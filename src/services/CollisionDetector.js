@@ -77,14 +77,7 @@ export default class CollisionDetector {
 		} else if (entity.velocity.y < 0) {
 			// Jumping or moving upwards
 			// By checking if there isn't a platform tile, the player can phase through the platform tile from above. So no collision is detected.
-			if (
-				this.checkBlockCollisionFromBelow(
-					entity,
-					tileTop,
-					tileLeft,
-					tileRight
-				) ||
-				this.isSolidTileInRow(tileTop, tileLeft, tileRight) && !this.isPlatformTileInRow(tileTop, tileLeft, tileRight)
+			if (this.isSolidTileInRow(tileTop, tileLeft, tileRight) && !this.isPlatformTileInRow(tileTop, tileLeft, tileRight)
 			) {
 				// Collision above
 				entity.position.y = (tileTop + 1) * tileSize;
@@ -119,7 +112,6 @@ export default class CollisionDetector {
 	isSolidTileInRow(y, xStart, xEnd) {
 		for (let x = xStart; x <= xEnd; x++) {
 			if (this.map.isSolidTileAt(x, y)) {
-				console.log(`high`);
 				return true;
 			}
 		}
