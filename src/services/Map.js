@@ -14,6 +14,7 @@ import Camera from "./Camera.js";
 import RingManager from "./RingManager.js";
 import SpikeManager from "./SpikeManager.js";
 import PowerUpManager from "./PowerUpManager.js";
+import EnemyManager from "./EnemyManager.js";
 
 export default class Map {
     static BACKGROUND_LAYER = 1;
@@ -43,8 +44,9 @@ export default class Map {
         // Position Sonic
         this.player = new Player(32, 188, 32, 40, this);
         
-        // Player damage flag (placeholder for damage state implementation)
         this.playerIsHit = false;
+        this.playerDamageTimer = 0;
+        this.playerDamageCooldown = 1.0;
         
         // Create camera
         this.camera = new Camera(
@@ -67,30 +69,27 @@ export default class Map {
         this.powerUpManager = new PowerUpManager();
         this.setupPowerUps();
         
-        // Give player access to powerUpManager for collision checks
+        // Create enemy manager and add some enemies
+        this.enemyManager = new EnemyManager();
+        this.setupEnemies();
+        
+        // Give player access to managers for collision checks
         this.player.powerUpManager = this.powerUpManager;
+        this.player.spikeManager = this.spikeManager;
+        this.player.enemyManager = this.enemyManager;
     }
     
     setupRings() {
         // Add some example rings - adjust positions as needed
         
-        // Line of rings at y=160
-        this.ringManager.addRingLine(100, 160, 8, 25);
-        
-        // Arc of rings
         this.ringManager.addRingArc(300, 180, 40, 7);
         
-        // Single rings
-        this.ringManager.addRing(450, 170);
-        this.ringManager.addRing(480, 150);
-        this.ringManager.addRing(510, 170);
+        this.ringManager.addRing(450, 192);
+        this.ringManager.addRing(480, 192);
+        this.ringManager.addRing(510, 192);
     }
     
     setupSpikes() {
-        // Add some example spikes - adjust positions as needed
-        
-        // Line of spikes on ground
-        //this.spikeManager.addSpikeLine(200, 224, 5, 16);
         
         // Single spikes as obstacles
         this.spikeManager.addSpike(400, 192);
@@ -98,25 +97,40 @@ export default class Map {
     }
     
     setupPowerUps() {
-        // Add powerup boxes with random powerups
         
         // Random powerup boxes (will randomly choose between speed, invincibility, and rings)
-        this.powerUpManager.addBox(100, 192, 'random');
-        this.powerUpManager.addBox(500, 192, 'random');
-        this.powerUpManager.addBox(700, 192, 'random');
+        this.powerUpManager.addBox(500, 192, 'speed');
+        this.powerUpManager.addBox(700, 192, 'invincibility');
         
-        // You can still specify exact types if needed:
-        // this.powerUpManager.addBox(300, 180, 'speed');
-        // this.powerUpManager.addBox(500, 180, 'invincibility');
-        // this.powerUpManager.addBox(700, 180, 'rings');
+    }
+    
+    setupEnemies() {
+        // Add some example enemies - adjust positions as needed
+        
+        this.enemyManager.addEnemy('buzzbomber', 300, 192);
+        this.enemyManager.addEnemy('buzzbomber', 600, 192);
+        
+        this.enemyManager.addEnemy('crab', 250, 192);
+        this.enemyManager.addEnemy('crab', 550, 192);
+        
     }
     
     update(dt) {
+        // Player update now handles spike/enemy solid collisions internally
         this.player.update(dt);
+        
         this.camera.update(dt);
         this.ringManager.update(dt);
         this.spikeManager.update(dt);
         this.powerUpManager.update(dt, this.player);
+        
+        // Pass spike and powerup managers so enemies can check collisions
+        this.enemyManager.update(dt, this.spikeManager, this.powerUpManager);
+        
+        // Update damage timer
+        if (this.playerDamageTimer > 0) {
+            this.playerDamageTimer -= dt;
+        }
         
         // Check ring collisions
         this.ringManager.checkCollisions(this.player);
@@ -128,40 +142,59 @@ export default class Map {
             this.ringManager.totalRingsCollected += ringAmount;
         });
         
-        // Check spike collisions (only if not invincible)
-        if (!this.player.isInvincible && this.spikeManager.checkCollisions(this.player)) {
-            if (!this.playerIsHit) {
-                this.playerIsHit = true;
-                // Make rings bounce out when hit!
-                this.ringManager.loseRings(
-                    this.player.position.x + this.player.dimensions.x / 2,
-                    this.player.position.y + this.player.dimensions.y / 2,
-                    10  // Lose up to 10 rings
-                );
-                console.log("Player hit a spike!");
+        // Check spike collisions (only if not invincible and not recently damaged)
+        if (!this.player.isInvincible && this.playerDamageTimer <= 0) {
+            if (this.spikeManager.checkCollisions(this.player)) {
+                if (!this.playerIsHit) {
+                    this.playerIsHit = true;
+                    this.playerDamageTimer = this.playerDamageCooldown;
+                    
+                    // Make rings bounce out when hit!
+                    this.ringManager.loseRings(
+                        this.player.position.x + this.player.dimensions.x / 2,
+                        this.player.position.y + this.player.dimensions.y / 2,
+                        10  
+                    );
+                    console.log("Player hit a spike!");
+                }
+            } else {
+                // Reset hit flag when not touching spike
+                this.playerIsHit = false;
             }
-        } else {
-            // Reset hit flag when not touching spike
-            this.playerIsHit = false;
+        }
+        
+        // Check enemy collisions
+        if (this.player.isInvincible || this.playerDamageTimer <= 0) {
+            const enemyCollision = this.enemyManager.checkCollisions(this.player, this.ringManager);
+            
+            // Only apply damage if NOT invincible
+            if (enemyCollision.tookDamage && !this.player.isInvincible) {
+                this.playerDamageTimer = this.playerDamageCooldown;
+                console.log("Player hit by enemy!");
+            }
+            
+            if (enemyCollision.killedEnemy) {
+                console.log("Enemy destroyed!");
+            }
         }
     }
     
-  render() {
-    this.camera.applyTransform(context);
-    this.collisionLayer.render();
-    this.spikeManager.render(context);
-    this.powerUpManager.render(context); // Renders boxes only
-    this.ringManager.render(context);
-    this.player.render(context);
-    
-    // Render powerups AFTER player so they appear on top
-    this.powerUpManager.renderPowerUps(context); // NEW METHOD
-    
-    this.backgroundLayer.render();
-    this.camera.resetTransform(context);
-    
-    this.renderUI();
-}
+    render() {
+        this.camera.applyTransform(context);
+        this.collisionLayer.render();
+        this.spikeManager.render(context);
+        this.powerUpManager.render(context); 
+        this.enemyManager.render(context); 
+        this.ringManager.render(context);
+        this.player.render(context);
+        
+        this.powerUpManager.renderPowerUps(context);
+        
+        this.backgroundLayer.render();
+        this.camera.resetTransform(context);
+        
+        this.renderUI();
+    }
     
     renderUI() {
         context.save();
@@ -170,7 +203,7 @@ export default class Map {
         context.fillText(`Rings: ${this.ringManager.getRingCount()}`, 10, 25);
         
         // Show hit indicator (placeholder)
-        if (this.playerIsHit) {
+        if (this.playerIsHit || this.playerDamageTimer > 0) {
             context.fillStyle = '#FF0000';
             context.fillText('HIT!', 10, 50);
         }
@@ -190,6 +223,10 @@ export default class Map {
             context.fillText(`Invincible: ${Math.ceil(timeLeft)}s`, 10, yOffset);
             yOffset += 25;
         }
+        
+        // Show enemy count
+        context.fillStyle = '#FF6B6B';
+        context.fillText(`Enemies: ${this.enemyManager.getActiveCount()}`, 10, yOffset);
         
         context.restore();
     }

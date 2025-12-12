@@ -17,7 +17,14 @@
 			"path": "./assets/sprites/objects-common-no-bg.png",
 			"width": 712,
 			"height": 1014
+		},
+		{
+			"name": "badniks",
+			"path": "./assets/sprites/Badniks-no-bg.png",
+			"width": 1430,
+			"height": 1087
 		}
+
 	],
 	"sounds":[
 		{

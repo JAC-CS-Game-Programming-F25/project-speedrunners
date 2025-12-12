@@ -4,20 +4,17 @@ import { images } from "../globals.js";
 import { ImageName } from "../enums/ImageName.js";
 
 export default class Spike extends Entity {
-    static WIDTH = 16;
-    static HEIGHT = 16;
-
-    /**
-     * @param {number} x 
-     * @param {number} y 
-     */
+    static WIDTH = 39;  // Actual sprite width
+    static HEIGHT = 32; // Actual sprite height
+    
     constructor(x, y) {
         super(x, y, Spike.WIDTH, Spike.HEIGHT);
         
         this.sprite = Spike.generateSprite();
         this.isActive = true;
+        this.isSolid = true; // Spikes are solid objects
     }
-
+    
     static generateSprite() {
         const spriteSheet = images.get(ImageName.GameObjects);
         
@@ -29,10 +26,10 @@ export default class Spike extends Entity {
             32      
         );
     }
-
+    
     update(dt) {
     }
-
+    
     render(context) {
         if (!this.isActive) return;
         
@@ -41,9 +38,9 @@ export default class Spike extends Entity {
             Math.floor(this.position.y)
         );
     }
-
+    
     /**
-     * Check if player hit the spike
+     * Check if player hit the spike (damage collision, not solid collision)
      * @param {Player} player
      * @returns {boolean}
      */
@@ -51,4 +48,4 @@ export default class Spike extends Entity {
         if (!this.isActive) return false;
         return this.collidesWith(player);
     }
-}           
+}
