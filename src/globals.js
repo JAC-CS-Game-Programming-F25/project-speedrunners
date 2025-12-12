@@ -46,7 +46,7 @@ sounds.load(assetDefinition.sounds);
 export const debugOptions = {
 	mapGrid: true,
 	cameraCrosshair: false,
-	playerCollision: true,
+	playerCollision: false,
 	watchPanel: false,
 };
 

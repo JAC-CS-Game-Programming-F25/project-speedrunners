@@ -26,12 +26,16 @@ export default class PlayerJumpingState extends PlayerState {
 
     exit() {}
 
-    update(dt) {
-        super.update(dt);
-        this.handleInput();
-        this.handleHorizontalMovement();
-        this.checkTransitions();
-    }
+	/**
+	 * Updates the jumping state.
+	 * @param {number} dt - The time passed since the last update.
+	 */
+	update(dt) {
+		super.update(dt);
+		this.handleInput();
+		this.handleHorizontalMovement();
+		this.checkTransitions();
+	}
 
     handleInput() {
         // Only cut if: (1) space was held when jump started, (2) space is now released, (3) still ascending
