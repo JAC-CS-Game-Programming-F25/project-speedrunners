@@ -13,7 +13,7 @@ export const PlayerConfig = {
 	skidThreshold: 100,
 	slideFriction: 0.95,
 	bounceVelocity: -200, // Upward velocity when bouncing off an enemy
-	runThreshold: 350
+	runThreshold: 300
 };
 
 // Function to update PlayerConfig based on slider values

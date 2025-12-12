@@ -87,6 +87,9 @@
             this.player.stateMachine.change(PlayerStateName.Running);
         }
     }
+			if (this.shouldIdle()) {
+				this.player.stateMachine.change(PlayerStateName.Idling);
+			}
 
 
 		
