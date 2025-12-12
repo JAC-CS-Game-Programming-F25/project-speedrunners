@@ -1,6 +1,6 @@
 import Sprite from '../lib/Sprite.js';
 
-export const spriteConfig = {
+export const playerSpriteConfig = {
     idle: [{ x: 43, y: 257, width: 32, height: 40 }],
     walk: [
         // { x: 46, y: 349, width: 24, height: 40 },
@@ -18,17 +18,36 @@ export const spriteConfig = {
 		{ x: 323, y: 625, width: 32, height: 32},
 	],
 	run: [
-		{ x: 39, y: 532, width: 32, height: 40},
-		{ x: 109, y: 532, width: 32, height: 40},
-		{ x: 179, y: 533, width: 32, height: 39},
-		{ x: 249, y: 532, width: 32, height: 40},
+		{ x: 39, y: 532, width: 32, height: 38},
+		{ x: 109, y: 532, width: 32, height: 38},
+		{ x: 179, y: 533, width: 32, height: 37},
+		{ x: 249, y: 532, width: 32, height: 38},
+	],
+	damage: [
+		{ x: 39, y: 807, width: 40, height: 32 },
+		{ x: 109, y: 807, width: 40, height: 32 },
+	],
+	death: [
+		{ x: 287, y: 798, width: 34, height: 43}
 	]
 }
 
-export function loadPlayerSprites(spriteSheet, spriteConfig) {
+export const objectSpriteConfig = {
+	ring: [
+		{ x: 8, y: 182, width: 16, height: 16 },   // Frame 1
+		{ x: 32, y: 182, width: 16, height: 16 },  // Frame 2
+		{ x: 56, y: 182, width: 8, height: 16 },  // Frame 3
+		{ x: 72, y: 182, width: 16, height: 16 }   // Frame 4
+	],
+	spike: [
+		{ x: 308, y: 182, width: 39, height: 32 }
+	]
+}
+
+export function loadPlayerSprites(spriteSheet, playerSpriteConfig) {
 	const sprites = {};
 
-	for (const [animationName, frames] of Object.entries(spriteConfig)) {
+	for (const [animationName, frames] of Object.entries(playerSpriteConfig)) {
 		sprites[animationName] = frames.map(
 			(frame) =>
 				new Sprite(

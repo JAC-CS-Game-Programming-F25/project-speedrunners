@@ -1,9 +1,9 @@
 // PlayerConfig object to hold our adjustable values
 export const PlayerConfig = {
 	maxSpeed: 300,
-	acceleration: 6,
-	deceleration: 5,
-	jumpPower: -300,
+	acceleration: 4,
+	deceleration: 3,
+	jumpPower: -350,
 	gravity: 800,
 	maxFallSpeed: 600,
 	maxJumpTime: 0.3,
@@ -13,7 +13,8 @@ export const PlayerConfig = {
 	skidThreshold: 100,
 	slideFriction: 0.95,
 	bounceVelocity: -200, // Upward velocity when bouncing off an enemy
-	runThreshold: 300
+	runThreshold: 300,
+	walk_speed: -100
 };
 
 // Function to update PlayerConfig based on slider values

@@ -1,8 +1,8 @@
 
 import Animation from '../../../lib/Animation.js';
-import { images, context } from '../../globals.js';
+import { images, context, timer } from '../../globals.js';
 import ImageName from '../../enums/ImageName.js';
-import { loadPlayerSprites, spriteConfig } from '../../../config/SpriteConfig.js';
+import { loadPlayerSprites, playerSpriteConfig } from '../../../config/SpriteConfig.js';
 import StateMachine from '../../../lib/StateMachine.js';
 import PlayerIdlingState from './PlayerIdlingState.js';
 
@@ -13,6 +13,8 @@ import PlayerStateName from '../../enums/PlayerStateName.js';
 import PlayerWalkingState from './PlayerWalkingState.js';
 import PlayerJumpingState from './PlayerJumpingState.js';
 import PlayerRunningState from './PlayerRunningState.js';
+import PlayerDamageState from './PlayerDamageState.js';
+import PlayerDeathState from './PlayerDeathState.js';
 
 /**
  * Represents the player character in the game.
@@ -35,19 +37,24 @@ export default class Player extends Entity {
 		this.velocity = new Vector(0, 0);
 		this.map = map;
 		this.facingRight = true;
+		this.isInvincible = false; // invincibility frames
+		this.invincibilityDuration = 3;
+		this.flickerInterval = 0.1
 
 		// Load player sprites
         this.sprites = loadPlayerSprites(
             images.get(ImageName.Sonic),
-            spriteConfig
+            playerSpriteConfig
         )
 
 		// Create animations for different player states
 		this.animations = {
 			idle: new Animation(this.sprites.idle),
 			walk: new Animation(this.sprites.walk, 0.1),
-			jump: new Animation(this.sprites.jump, 0.1),
-			run: new Animation(this.sprites.run, 0.1)
+			jump: new Animation(this.sprites.jump, 0.08),
+			run: new Animation(this.sprites.run, 0.1),
+			damage: new Animation(this.sprites.damage, 0.1),
+			death: new Animation(this.sprites.death)
 		};
 
 		this.currentAnimation = this.animations.idle;
@@ -69,6 +76,14 @@ export default class Player extends Entity {
 			new PlayerJumpingState(this)
 		)
 		this.stateMachine.add(
+			PlayerStateName.Damage,
+			new PlayerDamageState(this)
+		);
+		this.stateMachine.add(
+			PlayerStateName.Death,
+			new PlayerDeathState(this)
+		);
+		this.stateMachine.add(
 			PlayerStateName.Idling,
 			new PlayerIdlingState(this)
 		);
@@ -80,7 +95,6 @@ export default class Player extends Entity {
 	 */
 	update(dt) {
 		this.stateMachine.update(dt);
-		console.log(this.stateMachine.currentState)
 	}
 
 	/**
@@ -89,8 +103,40 @@ export default class Player extends Entity {
 	 */
 	render(context) {
 		context.save();
+		context.globalAlpha = this.isInvincible ? this.flicker : 1;
 		this.stateMachine.render(context);
 		context.restore();
+	}
+
+	hit() {
+		this.stateMachine.change(PlayerStateName.Damage)
+	}
+
+	die() {
+		if (this.stateMachine.currentState.name !== PlayerStateName.Death) {
+			this.stateMachine.change(PlayerStateName.Death)
+		}
+	}
+
+	/**
+	 * Handles player cooldown
+	 */
+	startInvincibility() {
+		this.isInvincible = true;
+		this.flicker = 1;
+
+		timer.addTask(
+			() => {
+				this.flicker = this.flicker === 1 ? 0.5 : 1;
+			},
+			this.flickerInterval,
+			this.invincibilityDuration,
+			() => {
+				// Stop invincibility and reset the flicker to normal
+				this.isInvincible = false;
+				this.flicker = 1;
+			}
+    	);
 	}
 
 }

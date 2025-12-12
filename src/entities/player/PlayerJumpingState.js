@@ -37,7 +37,6 @@ export default class PlayerJumpingState extends PlayerState {
 	 */
 	update(dt) {
 		super.update(dt);
-		console.log(this.player.velocity.y)
 		this.handleInput();
 		this.handleHorizontalMovement();
 		this.checkTransitions();

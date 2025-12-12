@@ -2,6 +2,7 @@ import Entity from "../entities/Entity.js";
 import Sprite from "../../lib/Sprite.js";
 import { images } from "../globals.js";
 import { ImageName } from "../enums/ImageName.js";
+import { objectSpriteConfig } from "../../config/SpriteConfig.js";
 
 export default class Spike extends Entity {
     static WIDTH = 16;
@@ -19,14 +20,13 @@ export default class Spike extends Entity {
     }
 
     static generateSprite() {
-        const spriteSheet = images.get(ImageName.GameObjects);
-        
+        const frame = objectSpriteConfig.spike[0]
         return new Sprite(
-            spriteSheet,
-            308,     
-            182,   
-            39,     
-            32      
+            images.get(ImageName.GameObjects),
+            frame.x,
+            frame.y,
+            frame.width,
+            frame.height
         );
     }
 

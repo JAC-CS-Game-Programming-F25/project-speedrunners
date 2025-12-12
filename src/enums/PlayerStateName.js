@@ -2,7 +2,9 @@ const PlayerStateName = {
 	Idling: 'idling',
 	Walking: 'walking',
 	Jumping: 'jumping',
-	Running: 'running'
+	Running: 'running',
+	Damage: 'damage',
+	Death: 'death'
 };
 
 export default PlayerStateName;

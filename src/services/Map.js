@@ -96,15 +96,21 @@ export default class Map {
         
         // Check spike collisions (placeholder - implement damage later)
         if (this.spikeManager.checkCollisions(this.player)) {
-            if (!this.playerIsHit) {
+            if (!this.playerIsHit && !this.player.isInvincible) {
                 this.playerIsHit = true;
-                // Make rings bounce out when hit!
-                this.ringManager.loseRings(
-                    this.player.position.x + this.player.dimensions.x / 2,
-                    this.player.position.y + this.player.dimensions.y / 2,
-                    10  // Lose up to 10 rings
-                );
-                console.log("Player hit a spike!");
+                if (this.ringManager.getRingCount() > 0) {
+                    this.player.hit()
+                    // Make rings bounce out when hit!
+                    this.ringManager.loseRings(
+                        this.player.position.x + this.player.dimensions.x / 2,
+                        this.player.position.y + this.player.dimensions.y / 2,
+                        20  // Lose up to 20 rings
+                    );
+                    console.log("Player hit a spike!");
+                } else {
+                    this.player.die();
+                }
+
             }
         } else {
             // Reset hit flag when not touching spike

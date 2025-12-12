@@ -37,36 +37,35 @@ export default class PlayerState extends State {
 	 * @param {CanvasRenderingContext2D} context - The 2D rendering context of the canvas.
 	 */
 	render(context) {
-		// Call the parent class's render method
 		super.render();
 
-		// Save the current canvas state
 		context.save();
 
-		// Handle player orientation (facing right or left)
+		// Handle orientation
 		if (!this.player.facingRight) {
-			// If facing left, flip the sprite horizontally
 			context.scale(-1, 1);
-			// Adjust position to account for the flip
 			context.translate(
 				Math.floor(-this.player.position.x - this.player.dimensions.x),
 				Math.floor(this.player.position.y)
 			);
 		} else {
-			// If facing right, just translate to the player's position
 			context.translate(
 				Math.floor(this.player.position.x),
 				Math.floor(this.player.position.y)
 			);
 		}
 
-		// Render the current frame of the player's animation
-		this.player.currentAnimation.getCurrentFrame().render(0, 0);
+		// Get current frame
+		const frame = this.player.currentAnimation.getCurrentFrame();
 
-		// Restore the canvas state to what it was before our changes
+		// Align sprite bottom to hitbox bottom
+		const offsetY = this.player.dimensions.y - frame.height;
+
+		// Render sprite at (0, offsetY)
+		frame.render(0, offsetY);
+
 		context.restore();
 
-		// If debug mode is enabled, render additional debug information
 		if (debugOptions.playerCollision) {
 			this.renderDebug(context);
 		}
@@ -170,17 +169,33 @@ export default class PlayerState extends State {
 	}
 
 	moveRight() {
-		this.player.velocity.x = Math.min(
-			this.player.velocity.x + PlayerConfig.acceleration,
-			PlayerConfig.maxSpeed
-		);
+		const WALK_SPEED = PlayerConfig.walk_speed
+		if (this.player.velocity.x < WALK_SPEED) {
+			this.player.velocity.x = Math.min(
+				this.player.velocity.x + PlayerConfig.acceleration,
+				WALK_SPEED
+			);
+		} else {
+			this.player.velocity.x = Math.min(
+				this.player.velocity.x + PlayerConfig.acceleration * 0.5, // slower increment
+				PlayerConfig.maxSpeed
+			);
+		}
 	}
 
 	moveLeft() {
-		this.player.velocity.x = Math.max(
-			this.player.velocity.x - PlayerConfig.acceleration,
-			-PlayerConfig.maxSpeed
-		);
+		const WALK_SPEED = PlayerConfig.walk_speed
+		if (this.player.velocity.x > WALK_SPEED) {
+			this.player.velocity.x = Math.max(
+				this.player.velocity.x - PlayerConfig.acceleration,
+				WALK_SPEED
+			);
+		} else {
+			this.player.velocity.x = Math.max(
+				this.player.velocity.x - PlayerConfig.acceleration * 0.5,
+				-PlayerConfig.maxSpeed
+			);
+		}
 	}
 
 	slowDown() {

@@ -3,6 +3,7 @@ import Animation from "../../lib/Animation.js";
 import Sprite from "../../lib/Sprite.js";
 import { images } from "../globals.js";
 import { ImageName } from "../enums/ImageName.js";
+import { objectSpriteConfig } from "../../config/SpriteConfig.js";
 
 export default class Ring extends Entity {
     static WIDTH = 16;
@@ -19,7 +20,6 @@ export default class Ring extends Entity {
     constructor(x, y, isBouncing = false) {
         super(x, y, Ring.WIDTH, Ring.HEIGHT);
         
-        this.sprites = Ring.generateSprites();
         this.isCollected = false;
         this.isBouncing = isBouncing;
         this.bounceTimer = 0;
@@ -27,32 +27,21 @@ export default class Ring extends Entity {
         this.groundLevel = 224; 
         
         // Create animation for spinning ring effect
-        this.animation = new Animation([0, 1, 2, 3], 0.15);
+        this.animation = new Animation(
+            objectSpriteConfig.ring.map(
+				(frame) =>
+					new Sprite(
+						images.get(ImageName.GameObjects),
+						frame.x,
+						frame.y,
+						frame.width,
+						frame.height
+					)
+			), 0.15);
+
+            
     }
 
-    static generateSprites() {
-        const spriteSheet = images.get(ImageName.GameObjects);
-        const sprites = [];
-        
-       const ringFrames = [
-            { x: 8, y: 182, width: 16, height: 16 },   // Frame 1
-            { x: 32, y: 182, width: 16, height: 16 },  // Frame 2
-            { x: 56.197, y: 182, width: 7, height: 16 },  // Frame 3
-            { x: 72, y: 182, width: 16, height: 16 }   // Frame 4
-        ];
-
-        ringFrames.forEach(frame => {
-            sprites.push(new Sprite(
-                spriteSheet,
-                frame.x,
-                frame.y,
-                frame.width,
-                frame.height
-            ));
-        });
-
-        return sprites;
-    }
 
     update(dt) {
         if (this.isCollected) return;
@@ -88,21 +77,27 @@ export default class Ring extends Entity {
 
     render(context) {
         if (this.isCollected) return;
-        
-        const currentFrame = this.animation.getCurrentFrame();
-        const sprite = this.sprites[currentFrame];
+
+        context.save()
         
         if (this.isBouncing && this.bounceTimer > this.bounceDuration * 0.8) {
             const fadeAmount = 1 - ((this.bounceTimer - this.bounceDuration * 0.8) / (this.bounceDuration * 0.2));
             context.globalAlpha = Math.max(0, fadeAmount);
         }
         
-        sprite.render(
+        context.translate(
             Math.floor(this.position.x),
             Math.floor(this.position.y)
         );
 
+        const frame = this.animation.getCurrentFrame();
+        const offsetX = Math.floor((this.dimensions.x - frame.width) / 2);
+        const offsetY = this.dimensions.y - frame.height; 
+        frame.render(offsetX, offsetY);
+
         context.globalAlpha = 1.0;
+
+        context.restore()
     }
 
     collect() {
