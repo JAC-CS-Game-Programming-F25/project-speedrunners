@@ -5,6 +5,8 @@ import { debugOptions, input } from '../../globals.js';
 import Input from '../../../lib/Input.js';
 import { PlayerConfig } from '../../../config/PlayerConfig.js';
 import Tile from '../../services/Tile.js';
+import SpikeCollisionHandler from '../../services/SpikeCollisionHandler.js';
+import EnemyCollisionHandler from '../../services/EnemyCollisionHandler.js';
 
 /**
  * Base class for all player states.
@@ -27,14 +29,80 @@ export default class PlayerState extends State {
 	update(dt) {
 		this.applyGravity(dt);
 		this.updatePosition(dt);
+		
+		// Check solid collisions after position update
+		if (this.player.powerUpManager) {
+			this.checkBoxCollisions();
+		}
+		if (this.player.spikeManager) {
+			SpikeCollisionHandler.checkCollisions(this.player, this.player.spikeManager);
+		}
+		if (this.player.enemyManager) {
+			EnemyCollisionHandler.checkCollisions(this.player, this.player.enemyManager);
+		}
+		
 		this.player.currentAnimation.update(dt);
+	}
+
+	checkBoxCollisions() {
+		if (!this.player.powerUpManager) return;
+		
+		const boxes = this.player.powerUpManager.boxes;
+		
+		for (const box of boxes) {
+			if (box.collidesWith(this.player)) {
+				const overlapLeft = (this.player.position.x + this.player.dimensions.x) - box.position.x;
+				const overlapRight = (box.position.x + box.dimensions.x) - this.player.position.x;
+				const overlapTop = (this.player.position.y + this.player.dimensions.y) - box.position.y;
+				const overlapBottom = (box.position.y + box.dimensions.y) - this.player.position.y;
+				
+				const minOverlap = Math.min(overlapLeft, overlapRight, overlapTop, overlapBottom);
+				
+				// Trigger box when landing on TOP
+				if (minOverlap === overlapTop && this.player.velocity.y > 0 && !box.isHit) {
+					const powerUp = box.hit();
+					
+					if (powerUp) {
+						// Activate powerup IMMEDIATELY
+						if (powerUp.duration === 0) {
+							// Instant powerup (rings)
+							powerUp.activate(this.player);
+							this.player.map.ringManager.totalRingsCollected += powerUp.getRingAmount();
+						} else {
+							// Timed powerup (speed, invincibility)
+							powerUp.activate(this.player);
+							this.player.powerUpManager.activePowerUps.push(powerUp);
+						}
+					}
+					
+					// Add bounce effect
+					this.player.velocity.y = -200;
+				}
+				
+				// Resolve solid collision only if box is still solid
+				if (box.isSolid) {
+					if (minOverlap === overlapTop) {
+						this.player.position.y = box.position.y - this.player.dimensions.y;
+						this.player.velocity.y = 0;
+						this.player.isOnGround = true;  
+					}
+					else if (minOverlap === overlapBottom) {
+						this.player.position.y = box.position.y + box.dimensions.y;
+						this.player.velocity.y = 0;
+					}
+					else if (minOverlap === overlapLeft) {
+						this.player.position.x = box.position.x - this.player.dimensions.x;
+					}
+					else if (minOverlap === overlapRight) {
+						this.player.position.x = box.position.x + box.dimensions.x;
+					}
+				}
+			}
+		}
 	}
 
 	/**
 	 * Renders the player on the canvas.
-	 * This method handles the player's orientation, animation, and optional debug rendering.
-	 *
-	 * @param {CanvasRenderingContext2D} context - The 2D rendering context of the canvas.
 	 */
 	render(context) {
 		super.render();
@@ -71,52 +139,24 @@ export default class PlayerState extends State {
 		}
 	}
 
-	/**
-	 * Renders debug information for the player and surrounding tiles.
-	 * This method visualizes the player's bounding box and nearby tiles,
-	 * highlighting potential collision areas.
-	 *
-	 * @param {CanvasRenderingContext2D} context - The rendering context.
-	 */
 	renderDebug(context) {
-		// Calculate the tile coordinates of the area around the player
 		const left = Math.floor(this.player.position.x / Tile.SIZE) - 1;
 		const top = Math.floor(this.player.position.y / Tile.SIZE) - 1;
-		const right =
-			Math.floor(
-				(this.player.position.x + this.player.dimensions.x) / Tile.SIZE
-			) + 1;
-		const bottom =
-			Math.floor(
-				(this.player.position.y + this.player.dimensions.y - 1) /
-					Tile.SIZE
-			) + 1;
+		const right = Math.floor((this.player.position.x + this.player.dimensions.x) / Tile.SIZE) + 1;
+		const bottom = Math.floor((this.player.position.y + this.player.dimensions.y - 1) / Tile.SIZE) + 1;
 
-		// Render a semi-transparent yellow rectangle for each tile in the calculated area
 		context.fillStyle = 'rgba(255, 255, 0, 0.3)';
 		for (let y = top; y <= bottom; y++) {
 			for (let x = left; x <= right; x++) {
-				context.fillRect(
-					x * Tile.SIZE,
-					y * Tile.SIZE,
-					Tile.SIZE,
-					Tile.SIZE
-				);
+				context.fillRect(x * Tile.SIZE, y * Tile.SIZE, Tile.SIZE, Tile.SIZE);
 			}
 		}
 
-		// Render semi-transparent red rectangles for tiles that the player is colliding with
 		context.fillStyle = 'rgba(255, 0, 0, 0.5)';
 		this.getCollidingTiles(left, top, right, bottom).forEach((tile) => {
-			context.fillRect(
-				tile.x * Tile.SIZE,
-				tile.y * Tile.SIZE,
-				Tile.SIZE,
-				Tile.SIZE
-			);
+			context.fillRect(tile.x * Tile.SIZE, tile.y * Tile.SIZE, Tile.SIZE, Tile.SIZE);
 		});
 
-		// Render a blue outline around the player's bounding box
 		context.strokeStyle = 'blue';
 		context.strokeRect(
 			this.player.position.x,
@@ -126,14 +166,6 @@ export default class PlayerState extends State {
 		);
 	}
 
-	/**
-	 * Gets the tiles that the player is colliding with.
-	 * @param {number} left - Leftmost tile x-coordinate.
-	 * @param {number} top - Topmost tile y-coordinate.
-	 * @param {number} right - Rightmost tile x-coordinate.
-	 * @param {number} bottom - Bottommost tile y-coordinate.
-	 * @returns {Array} Array of colliding tile coordinates.
-	 */
 	getCollidingTiles(left, top, right, bottom) {
 		const collidingTiles = [];
 		for (let y = top; y <= bottom; y++) {
@@ -146,11 +178,6 @@ export default class PlayerState extends State {
 		return collidingTiles;
 	}
 
-	/**
-	 * Handles horizontal movement of the player.
-	 * This method updates the player's horizontal velocity based on input
-	 * and applies acceleration, deceleration, and speed limits.
-	 */
 	handleHorizontalMovement() {
 		if (input.isKeyHeld(Input.KEYS.A) && input.isKeyHeld(Input.KEYS.D)) {
 			this.slowDown();
@@ -164,7 +191,6 @@ export default class PlayerState extends State {
 			this.slowDown();
 		}
 
-		// Set speed to zero if it's close to zero to stop the player
 		if (Math.abs(this.player.velocity.x) < 0.1) this.player.velocity.x = 0;
 	}
 
@@ -200,28 +226,14 @@ export default class PlayerState extends State {
 
 	slowDown() {
 		if (this.player.velocity.x > 0) {
-			this.player.velocity.x = Math.max(
-				0,
-				this.player.velocity.x - PlayerConfig.deceleration
-			);
+			this.player.velocity.x = Math.max(0, this.player.velocity.x - PlayerConfig.deceleration);
 		} else if (this.player.velocity.x < 0) {
-			this.player.velocity.x = Math.min(
-				0,
-				this.player.velocity.x + PlayerConfig.deceleration
-			);
+			this.player.velocity.x = Math.min(0, this.player.velocity.x + PlayerConfig.deceleration);
 		}
 	}
 
-	/**
-	 * Applies gravity to the player.
-	 * This method increases the player's vertical velocity when they're not on the ground,
-	 * simulating the effect of gravity.
-	 *
-	 * @param {number} dt - Delta time (time since last update).
-	 */
 	applyGravity(dt) {
 		if (!this.player.isOnGround) {
-			// Increase downward velocity, but don't exceed max fall speed
 			this.player.velocity.y = Math.min(
 				this.player.velocity.y + PlayerConfig.gravity * dt,
 				PlayerConfig.maxFallSpeed
@@ -229,26 +241,16 @@ export default class PlayerState extends State {
 		}
 	}
 
-	/**
-	 * Updates the player's position based on their current velocity.
-	 * This method also handles collision detection and keeps the player within the map boundaries.
-	 *
-	 * @param {number} dt - Delta time (time since last update).
-	 */
 	updatePosition(dt) {
-		// Calculate position change
 		const dx = this.player.velocity.x * dt;
 		const dy = this.player.velocity.y * dt;
 
-		// Update horizontal position and check for collisions
 		this.player.position.x += dx;
 		this.collisionDetector.checkHorizontalCollisions(this.player);
 
-		// Update vertical position and check for collisions
 		this.player.position.y += dy;
 		this.collisionDetector.checkVerticalCollisions(this.player);
 
-		// Keep player within horizontal map boundaries
 		this.player.position.x = Math.max(
 			0,
 			Math.min(
@@ -257,8 +259,6 @@ export default class PlayerState extends State {
 			)
 		);
 
-
-		// Round vertical position to avoid sub-pixel rendering
 		this.player.position.y = Math.round(this.player.position.y);
 	}
 }

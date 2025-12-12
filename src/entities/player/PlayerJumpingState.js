@@ -10,26 +10,21 @@ import PlayerStateName from '../../enums/PlayerStateName.js';
  * @extends PlayerState
  */
 export default class PlayerJumpingState extends PlayerState {
-	/**
-	 * Creates a new PlayerJumpingState instance.
-	 * @param {Player} player - The player object.
-	 */
-	constructor(player) {
-		super(player);
-	}
+    constructor(player) {
+        super(player);
+        this.jumpCut = false;
+        this.spaceWasHeld = false; // Track if space was held at jump start
+    }
 
-	/**
-	 * Called when entering the jumping state.
-	 */
-	enter() {
-		this.player.velocity.y = PlayerConfig.jumpPower;
-		this.player.currentAnimation = this.player.animations.jump;
-	}
+    enter() {
+        this.player.velocity.y = PlayerConfig.jumpPower;
+        this.player.currentAnimation = this.player.animations.jump;
+        this.player.currentAnimation.refresh();
+        this.jumpCut = false;
+        this.spaceWasHeld = input.isKeyHeld(Input.KEYS.SPACE); // Check on entry
+    }
 
-	/**
-	 * Called when exiting the jumping state.
-	 */
-	exit() {}
+    exit() {}
 
 	/**
 	 * Updates the jumping state.
@@ -42,27 +37,25 @@ export default class PlayerJumpingState extends PlayerState {
 		this.checkTransitions();
 	}
 
-	/**
-	 * Handles player input.
-	 */
-	handleInput() {
-		// if (!input.isKeyHeld(Input.KEYS.SPACE) && this.player.velocity.y < 0) {
-		// 	this.player.velocity.y *= 0.5;
-		// }
-	}
+    handleInput() {
+        // Only cut if: (1) space was held when jump started, (2) space is now released, (3) still ascending
+        if (this.spaceWasHeld && 
+            !input.isKeyHeld(Input.KEYS.SPACE) && 
+            this.player.velocity.y < 0 && 
+            !this.jumpCut) {
+            this.player.velocity.y *= 0.5;
+            this.jumpCut = true;
+        }
+    }
 
-	/**
-	 * Checks for state transitions.
-	 */
-	checkTransitions() {
-		if (this.player.isOnGround) {
-			if (Math.abs(this.player.velocity.x) > 0.1) {
-				this.player.stateMachine.change(PlayerStateName.Walking);
-			}
-			else {
-				this.player.stateMachine.change(PlayerStateName.Idling);
-			}
-			
-		}
-	}
+    checkTransitions() {
+        if (this.player.isOnGround) {
+            if (Math.abs(this.player.velocity.x) > 0.1) {
+                this.player.stateMachine.change(PlayerStateName.Walking);
+            }
+            else {
+                this.player.stateMachine.change(PlayerStateName.Idling);
+            }
+        }
+    }
 }

@@ -1,9 +1,10 @@
 import Entity from "../entities/Entity.js";
 import Animation from "../../lib/Animation.js";
 import Sprite from "../../lib/Sprite.js";
-import { images } from "../globals.js";
+import { images, sounds } from "../globals.js";
 import { ImageName } from "../enums/ImageName.js";
 import { objectSpriteConfig } from "../../config/SpriteConfig.js";
+import {SoundName} from "../enums/SoundName.js";
 
 export default class Ring extends Entity {
     static WIDTH = 16;
@@ -11,20 +12,18 @@ export default class Ring extends Entity {
     static RING_VALUE = 1;
     static GRAVITY = 600;
     static BOUNCE_DAMPING = 0.6;
+    static COLLECTION_DELAY = 0.5;
 
-    /**
-     * @param {number} x - X position in pixels
-     * @param {number} y - Y position in pixels
-     * @param {boolean} isBouncing - If true, ring is lost from player and bouncing
-     */
     constructor(x, y, isBouncing = false) {
         super(x, y, Ring.WIDTH, Ring.HEIGHT);
         
         this.isCollected = false;
         this.isBouncing = isBouncing;
         this.bounceTimer = 0;
-        this.bounceDuration = 2.5;
-        this.groundLevel = 224; 
+        this.bounceDuration = 5;
+        this.groundLevel = 224;
+        this.canBeCollected = !isBouncing;
+        this.isLostRing = isBouncing; // Track if this was a lost ring
         
         // Create animation for spinning ring effect
         this.animation = new Animation(
@@ -46,12 +45,26 @@ export default class Ring extends Entity {
     update(dt) {
         if (this.isCollected) return;
         
-        // Update animation
         this.animation.update(dt);
 
-        if (this.isBouncing) {
+        // Timer runs for all lost rings, even after they stop bouncing
+        if (this.isLostRing) {
             this.bounceTimer += dt;
 
+            // Enable collection after delay
+            if (this.bounceTimer >= Ring.COLLECTION_DELAY) {
+                this.canBeCollected = true;
+            }
+
+            // Disappear after 5 seconds
+            if (this.bounceTimer > this.bounceDuration) {
+                this.isCollected = true;
+                return;
+            }
+        }
+
+        // Physics only while actively bouncing
+        if (this.isBouncing) {
             this.velocity.y += Ring.GRAVITY * dt;
 
             this.position.x += this.velocity.x * dt;
@@ -64,13 +77,10 @@ export default class Ring extends Entity {
                 this.velocity.x *= 0.9;
                 
                 if (Math.abs(this.velocity.y) < 30) {
+                    this.isBouncing = false; // Stop physics, but timer keeps running
                     this.velocity.y = 0;
-                    this.velocity.x *= 0.85;
+                    this.velocity.x = 0;
                 }
-            }
-
-            if (this.bounceTimer > this.bounceDuration) {
-                this.isCollected = true;
             }
         }
     }
@@ -80,7 +90,8 @@ export default class Ring extends Entity {
 
         context.save()
         
-        if (this.isBouncing && this.bounceTimer > this.bounceDuration * 0.8) {
+        // Fade effect in last second for lost rings
+        if (this.isLostRing && this.bounceTimer > this.bounceDuration * 0.8) {
             const fadeAmount = 1 - ((this.bounceTimer - this.bounceDuration * 0.8) / (this.bounceDuration * 0.2));
             context.globalAlpha = Math.max(0, fadeAmount);
         }
@@ -101,21 +112,19 @@ export default class Ring extends Entity {
     }
 
     collect() {
-        if (!this.isCollected && !this.isBouncing) {
+        if (!this.isCollected && this.canBeCollected) {
             this.isCollected = true;
+            sounds.play(SoundName.Ring);
             return Ring.RING_VALUE;
         }
         return 0;
     }
 
-    /**
-     * Initialize ring as a lost ring with scatter velocity
-     * @param {number} sourceX - X position of player (where rings scatter from)
-     * @param {number} sourceY - Y position of player
-     */
     initializeAsLostRing(sourceX, sourceY) {
         this.isBouncing = true;
+        this.isLostRing = true;
         this.bounceTimer = 0;
+        this.canBeCollected = false;
         
         this.position.x = sourceX;
         this.position.y = sourceY;

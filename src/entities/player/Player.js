@@ -1,11 +1,9 @@
-
 import Animation from '../../../lib/Animation.js';
 import { images, context, timer } from '../../globals.js';
 import ImageName from '../../enums/ImageName.js';
 import { loadPlayerSprites, playerSpriteConfig } from '../../../config/SpriteConfig.js';
 import StateMachine from '../../../lib/StateMachine.js';
 import PlayerIdlingState from './PlayerIdlingState.js';
-
 import Vector from '../../../lib/Vector.js';
 import Entity from '../Entity.js';
 import Map from '../../services/Map.js';
@@ -15,6 +13,7 @@ import PlayerJumpingState from './PlayerJumpingState.js';
 import PlayerRunningState from './PlayerRunningState.js';
 import PlayerDamageState from './PlayerDamageState.js';
 import PlayerDeathState from './PlayerDeathState.js';
+import InvincibilitySparkles from '../../objects/PowerUps/InvincibilitySparkles.js';
 
 /**
  * Represents the player character in the game.
@@ -40,6 +39,10 @@ export default class Player extends Entity {
 		this.isInvincible = false; // invincibility frames
 		this.invincibilityDuration = 3;
 		this.flickerInterval = 0.1
+    this.powerUpManager = null;
+    this.spikeManager = null;  // NEW
+    this.enemyManager = null;  // NEW
+    this.sparkles = new InvincibilitySparkles();
 
 		// Load player sprites
         this.sprites = loadPlayerSprites(
@@ -95,6 +98,9 @@ export default class Player extends Entity {
 	 */
 	update(dt) {
 		this.stateMachine.update(dt);
+    if (this.isInvincible) {
+        this.sparkles.update(dt);
+    }
 	}
 
 	/**
@@ -105,6 +111,15 @@ export default class Player extends Entity {
 		context.save();
 		context.globalAlpha = this.isInvincible ? this.flicker : 1;
 		this.stateMachine.render(context);
+    if (this.isInvincible) {
+          this.sparkles.render(
+              context,
+              this.position.x,
+              this.position.y,
+              this.dimensions.x,
+              this.dimensions.y
+          );
+    }
 		context.restore();
 	}
 
