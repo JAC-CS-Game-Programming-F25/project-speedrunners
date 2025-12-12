@@ -2,8 +2,8 @@ import PlayerState from './PlayerState.js';
 import Input from '../../../lib/Input.js';
 
 import Player from './Player.js';
-import PlayerStateName from '../enums/PlayerStateName.js';
-import { input } from '../globals.js';
+import PlayerStateName from '../../enums/PlayerStateName.js';
+import { input } from '../../globals.js';
 
 /**
  * Represents the idling state of the player.

@@ -1,10 +1,10 @@
 import State from '../../../lib/State.js';
 import Player from './Player.js';
-import CollisionDetector from '../services/CollisionDetector.js';
-import { debugOptions, input } from '../globals.js';
-import Input from '../../lib/Input.js';
-import { PlayerConfig } from '../../config/PlayerConfig.js';
-import Tile from '../services/Tile.js';
+import CollisionDetector from '../../services/CollisionDetector.js';
+import { debugOptions, input } from '../../globals.js';
+import Input from '../../../lib/Input.js';
+import { PlayerConfig } from '../../../config/PlayerConfig.js';
+import Tile from '../../services/Tile.js';
 
 /**
  * Base class for all player states.
@@ -65,7 +65,7 @@ export default class PlayerState extends State {
 
 		// Restore the canvas state to what it was before our changes
 		context.restore();
-		debugOptions.playerCollision = true;
+
 		// If debug mode is enabled, render additional debug information
 		if (debugOptions.playerCollision) {
 			this.renderDebug(context);

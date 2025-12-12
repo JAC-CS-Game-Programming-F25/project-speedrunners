@@ -1,6 +1,6 @@
 import Layer from "./Layer.js";              
 import Colour from "../enums/Colour.js";        
-import Player from "../entities/Player.js";       
+import Player from "../entities/player/Player.js";       
 import Sprite from "../../lib/Sprite.js";        
 import Vector from "../../lib/Vector.js";          
 import Tile from "./Tile.js";                     
@@ -37,7 +37,6 @@ export default class Map {
         this.backgroundLayer = this.layers[Map.BACKGROUND_LAYER];
         this.collisionLayer = this.layers[Map.COLLISION_LAYER];
         
-        // Position Sonic - adjust this number: try 186, 188, 190, 192, or 194
         this.player = new Player(32, 188, 32, 40, this);
     }
     

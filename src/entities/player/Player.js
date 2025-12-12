@@ -1,15 +1,18 @@
 
-import Animation from '../../lib/Animation.js';
-import { images, context } from '../globals.js';
-import ImageName from '../enums/ImageName.js';
-import { loadPlayerSprites, spriteConfig } from '../../config/SpriteConfig.js';
-import StateMachine from '../../lib/StateMachine.js';
+import Animation from '../../../lib/Animation.js';
+import { images, context } from '../../globals.js';
+import ImageName from '../../enums/ImageName.js';
+import { loadPlayerSprites, spriteConfig } from '../../../config/SpriteConfig.js';
+import StateMachine from '../../../lib/StateMachine.js';
 import PlayerIdlingState from './PlayerIdlingState.js';
+
+import Vector from '../../../lib/Vector.js';
+import Entity from '../Entity.js';
+import Map from '../../services/Map.js';
+import PlayerStateName from '../../enums/PlayerStateName.js';
 import PlayerWalkingState from './PlayerWalkingState.js';
-import Vector from '../../lib/Vector.js';
-import Entity from './Entity.js';
-import Map from '../services/Map.js';
-import PlayerStateName from '../enums/PlayerStateName.js';
+import PlayerJumpingState from './PlayerJumpingState.js';
+import PlayerRunningState from './PlayerRunningState.js';
 
 /**
  * Represents the player character in the game.
@@ -43,6 +46,8 @@ export default class Player extends Entity {
 		this.animations = {
 			idle: new Animation(this.sprites.idle),
 			walk: new Animation(this.sprites.walk, 0.1),
+			jump: new Animation(this.sprites.jump, 0.1),
+			run: new Animation(this.sprites.run, 0.1)
 		};
 
 		this.currentAnimation = this.animations.idle;
@@ -55,6 +60,14 @@ export default class Player extends Entity {
 			PlayerStateName.Walking,
 			new PlayerWalkingState(this)
 		);
+		this.stateMachine.add(
+			PlayerStateName.Running,
+			new PlayerRunningState(this)
+		)
+		this.stateMachine.add(
+			PlayerStateName.Jumping,
+			new PlayerJumpingState(this)
+		)
 		this.stateMachine.add(
 			PlayerStateName.Idling,
 			new PlayerIdlingState(this)

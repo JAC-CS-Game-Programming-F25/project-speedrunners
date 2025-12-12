@@ -1,6 +1,6 @@
 import State from "../../lib/State.js";
 import Vector from "../../lib/Vector.js";
-import Player from "../entities/Player.js";
+import Player from "../entities/player/Player.js";
 import Map from "../services/Map.js";
 
 export default class PlayState extends State {
