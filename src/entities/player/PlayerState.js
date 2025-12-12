@@ -18,6 +18,7 @@ export default class PlayerState extends State {
 		super();
 		this.player = player;
 		this.collisionDetector = new CollisionDetector(player.map);
+
 	}
 
 	/**
@@ -27,8 +28,68 @@ export default class PlayerState extends State {
 	update(dt) {
 		this.applyGravity(dt);
 		this.updatePosition(dt);
+		if (this.player.powerUpManager) {
+        this.checkBoxCollisions();
+    	}
 		this.player.currentAnimation.update(dt);
 	}
+
+checkBoxCollisions() {
+    if (!this.player.powerUpManager) return;
+    
+    const boxes = this.player.powerUpManager.boxes;
+    
+    for (const box of boxes) {
+        if (box.collidesWith(this.player)) {
+            const overlapLeft = (this.player.position.x + this.player.dimensions.x) - box.position.x;
+            const overlapRight = (box.position.x + box.dimensions.x) - this.player.position.x;
+            const overlapTop = (this.player.position.y + this.player.dimensions.y) - box.position.y;
+            const overlapBottom = (box.position.y + box.dimensions.y) - this.player.position.y;
+            
+            const minOverlap = Math.min(overlapLeft, overlapRight, overlapTop, overlapBottom);
+            
+            // Trigger box when landing on TOP
+            if (minOverlap === overlapTop && this.player.velocity.y > 0 && !box.isHit) {
+                const powerUp = box.hit();
+                
+                if (powerUp) {
+                    // Activate powerup IMMEDIATELY
+                    if (powerUp.duration === 0) {
+                        // Instant powerup (rings)
+                        powerUp.activate(this.player);
+                        this.player.map.ringManager.totalRingsCollected += powerUp.getRingAmount();
+                    } else {
+                        // Timed powerup (speed, invincibility)
+                        powerUp.activate(this.player);
+                        this.player.powerUpManager.activePowerUps.push(powerUp);
+                    }
+                }
+                
+                // Add bounce effect
+                this.player.velocity.y = -200;
+            }
+            
+            // Resolve solid collision only if box is still solid
+            if (box.isSolid) {
+                if (minOverlap === overlapTop) {
+                    this.player.position.y = box.position.y - this.player.dimensions.y;
+                    this.player.velocity.y = 0;
+                    this.player.isOnGround = true;  
+                }
+                else if (minOverlap === overlapBottom) {
+                    this.player.position.y = box.position.y + box.dimensions.y;
+                    this.player.velocity.y = 0;
+                }
+                else if (minOverlap === overlapLeft) {
+                    this.player.position.x = box.position.x - this.player.dimensions.x;
+                }
+                else if (minOverlap === overlapRight) {
+                    this.player.position.x = box.position.x + box.dimensions.x;
+                }
+            }
+        }
+    }
+}
 
 	/**
 	 * Renders the player on the canvas.

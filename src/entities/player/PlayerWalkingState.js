@@ -18,15 +18,17 @@
 			super(player);
 			this.isMovingRight = false;
 			this.isMovingLeft = false;
+			this.idleTimer = 0;
 		}
 
 		/**
 		 * Called when entering the walking state.
 		 */
 		enter() {
-			this.player.isOnGround = true;
-			this.player.currentAnimation = this.player.animations.walk;
-		}
+        this.player.isOnGround = true;
+        this.player.currentAnimation = this.player.animations.walk;
+        this.player.currentAnimation.refresh(); 
+    }
 
 		/**
 		 * Updates the walking state.
@@ -34,9 +36,9 @@
 		 */
 		update(dt) {
 			super.update(dt);  
-			this.checkTransitions();   
 			this.handleInput();         
-			this.handleHorizontalMovement();  
+			this.handleHorizontalMovement(); 
+			this.checkTransitions();   
 	
 		}
 
@@ -65,25 +67,56 @@
 		 * Checks for state transitions.
 		 */
 		checkTransitions() {
-			console.log(this.player.isOnGround)
-			if (this.shouldIdle()) {
-				this.player.stateMachine.change(PlayerStateName.Idling);
-			}
+        // Force immediate stop when not pressing movement keys
+        if (!this.isMovingLeft && !this.isMovingRight) {
+            // If velocity is low, snap to 0 and transition immediately
+            if (Math.abs(this.player.velocity.x) < 1.0) {  // Higher threshold
+                this.player.velocity.x = 0;  // Force stop
+                this.player.stateMachine.change(PlayerStateName.Idling);
+                return;
+            }
+        }
+        
+        if (!this.player.isOnGround) {
+            if (this.player.velocity.y < 0) {
+                this.player.stateMachine.change(PlayerStateName.Jumping);
+            } 
+        }
+        
+        if (Math.abs(this.player.velocity.x) >= PlayerConfig.runThreshold) {
+            this.player.stateMachine.change(PlayerStateName.Running);
+        }
+    }
 
-			// if (this.shouldSkid()) {
-			// 	this.player.facingRight = !this.player.facingRight;
-			// 	this.player.stateMachine.change(PlayerStateName.Skidding);
-			// }
 
-			if (!this.player.isOnGround) {
-				if (this.player.velocity.y < 0) {
-					this.player.stateMachine.change(PlayerStateName.Jumping);
-				} 
-			}
-			if (Math.abs(this.player.velocity.x) >= PlayerConfig.runThreshold) {
-        		this.player.stateMachine.change(PlayerStateName.Running);
-    		}
-		}
+		
+// checkTransitions(dt) {
+//     // Check if should idle
+//     if (!this.isMovingLeft && !this.isMovingRight && Math.abs(this.player.velocity.x) < 0.1) {
+//         this.idleTimer += dt;
+        
+//         // Force velocity to 0 while waiting to transition
+//         this.player.velocity.x = 0; // ADD THIS LINE
+        
+//         // Only transition after 0.1 seconds of being still
+//         if (this.idleTimer >= 0.1) {
+//             this.player.stateMachine.change(PlayerStateName.Idling);
+//             return;
+//         }
+//     } else {
+//         this.idleTimer = 0;
+//     }
+
+//     if (!this.player.isOnGround) {
+//         if (this.player.velocity.y < 0) {
+//             this.player.stateMachine.change(PlayerStateName.Jumping);
+//         } 
+//     }
+    
+//     if (Math.abs(this.player.velocity.x) >= PlayerConfig.runThreshold) {
+//         this.player.stateMachine.change(PlayerStateName.Running);
+//     }
+// }
 
 		/**
 		 * Determines if the player should transition to the skidding state.
@@ -106,7 +139,7 @@
 			return (
 				!this.isMovingLeft &&
 				!this.isMovingRight &&
-				Math.abs(this.player.velocity.x) < 0.25
+				Math.abs(this.player.velocity.x) < 0.1
 			);
 		}
 	}

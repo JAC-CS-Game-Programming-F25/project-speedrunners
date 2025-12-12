@@ -13,6 +13,7 @@ import {
 import Camera from "./Camera.js";
 import RingManager from "./RingManager.js";
 import SpikeManager from "./SpikeManager.js";
+import PowerUpManager from "./PowerUpManager.js";
 
 export default class Map {
     static BACKGROUND_LAYER = 1;
@@ -61,6 +62,13 @@ export default class Map {
         // Create spike manager and add some spikes
         this.spikeManager = new SpikeManager();
         this.setupSpikes();
+        
+        // Create powerup manager and add some boxes
+        this.powerUpManager = new PowerUpManager();
+        this.setupPowerUps();
+        
+        // Give player access to powerUpManager for collision checks
+        this.player.powerUpManager = this.powerUpManager;
     }
     
     setupRings() {
@@ -82,7 +90,25 @@ export default class Map {
         // Add some example spikes - adjust positions as needed
         
         // Line of spikes on ground
-        this.spikeManager.addSpikeLine(230, 195, 5, 16);
+        //this.spikeManager.addSpikeLine(200, 224, 5, 16);
+        
+        // Single spikes as obstacles
+        this.spikeManager.addSpike(400, 192);
+        this.spikeManager.addSpike(450, 192);
+    }
+    
+    setupPowerUps() {
+        // Add powerup boxes with random powerups
+        
+        // Random powerup boxes (will randomly choose between speed, invincibility, and rings)
+        this.powerUpManager.addBox(100, 192, 'random');
+        this.powerUpManager.addBox(500, 192, 'random');
+        this.powerUpManager.addBox(700, 192, 'random');
+        
+        // You can still specify exact types if needed:
+        // this.powerUpManager.addBox(300, 180, 'speed');
+        // this.powerUpManager.addBox(500, 180, 'invincibility');
+        // this.powerUpManager.addBox(700, 180, 'rings');
     }
     
     update(dt) {
@@ -90,12 +116,20 @@ export default class Map {
         this.camera.update(dt);
         this.ringManager.update(dt);
         this.spikeManager.update(dt);
+        this.powerUpManager.update(dt, this.player);
         
         // Check ring collisions
         this.ringManager.checkCollisions(this.player);
         
-        // Check spike collisions (placeholder - implement damage later)
-        if (this.spikeManager.checkCollisions(this.player)) {
+        // Handle instant powerups (extra rings)
+        const instantPowerUps = this.powerUpManager.getInstantPowerUps();
+        instantPowerUps.forEach(powerUp => {
+            const ringAmount = powerUp.getRingAmount();
+            this.ringManager.totalRingsCollected += ringAmount;
+        });
+        
+        // Check spike collisions (only if not invincible)
+        if (!this.player.isInvincible && this.spikeManager.checkCollisions(this.player)) {
             if (!this.playerIsHit) {
                 this.playerIsHit = true;
                 // Make rings bounce out when hit!
@@ -112,18 +146,22 @@ export default class Map {
         }
     }
     
-    render() {
-        this.camera.applyTransform(context);
-        this.collisionLayer.render();
-        this.spikeManager.render(context);
-        this.ringManager.render(context);
-        this.player.render(context);
-        this.backgroundLayer.render();
-        this.camera.resetTransform(context);
-        
-        // Render ring counter in top-left (not affected by camera)
-        this.renderUI();
-    }
+  render() {
+    this.camera.applyTransform(context);
+    this.collisionLayer.render();
+    this.spikeManager.render(context);
+    this.powerUpManager.render(context); // Renders boxes only
+    this.ringManager.render(context);
+    this.player.render(context);
+    
+    // Render powerups AFTER player so they appear on top
+    this.powerUpManager.renderPowerUps(context); // NEW METHOD
+    
+    this.backgroundLayer.render();
+    this.camera.resetTransform(context);
+    
+    this.renderUI();
+}
     
     renderUI() {
         context.save();
@@ -136,6 +174,23 @@ export default class Map {
             context.fillStyle = '#FF0000';
             context.fillText('HIT!', 10, 50);
         }
+        
+        // Show active powerups
+        let yOffset = 75;
+        if (this.player.hasSpeedShoes) {
+            const timeLeft = this.powerUpManager.getPowerUpTimeRemaining('speed');
+            context.fillStyle = '#00FFFF';
+            context.fillText(`Speed: ${Math.ceil(timeLeft)}s`, 10, yOffset);
+            yOffset += 25;
+        }
+        
+        if (this.player.isInvincible) {
+            const timeLeft = this.powerUpManager.getPowerUpTimeRemaining('invincibility');
+            context.fillStyle = '#FFD700';
+            context.fillText(`Invincible: ${Math.ceil(timeLeft)}s`, 10, yOffset);
+            yOffset += 25;
+        }
+        
         context.restore();
     }
     

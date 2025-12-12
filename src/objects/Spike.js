@@ -51,4 +51,4 @@ export default class Spike extends Entity {
         if (!this.isActive) return false;
         return this.collidesWith(player);
     }
-}
+}           

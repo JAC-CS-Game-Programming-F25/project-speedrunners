@@ -13,6 +13,8 @@ import PlayerStateName from '../../enums/PlayerStateName.js';
 import PlayerWalkingState from './PlayerWalkingState.js';
 import PlayerJumpingState from './PlayerJumpingState.js';
 import PlayerRunningState from './PlayerRunningState.js';
+import InvincibilitySparkles from '../../objects/PowerUps/InvincibilitySparkles.js';
+
 
 /**
  * Represents the player character in the game.
@@ -35,6 +37,8 @@ export default class Player extends Entity {
 		this.velocity = new Vector(0, 0);
 		this.map = map;
 		this.facingRight = true;
+		this.powerUpManager = null;
+		this.sparkles = new InvincibilitySparkles();
 
 		// Load player sprites
         this.sprites = loadPlayerSprites(
@@ -80,7 +84,12 @@ export default class Player extends Entity {
 	 */
 	update(dt) {
 		this.stateMachine.update(dt);
+		
+		if (this.isInvincible) {
+        this.sparkles.update(dt);
+    }
 	}
+
 
 	/**
 	 * Renders the player.
@@ -89,6 +98,15 @@ export default class Player extends Entity {
 	render(context) {
 		context.save();
 		this.stateMachine.render(context);
+		if (this.isInvincible) {
+        this.sparkles.render(
+            context,
+            this.position.x,
+            this.position.y,
+            this.dimensions.x,
+            this.dimensions.y
+        );
+    }
 		context.restore();
 	}
 

@@ -26,6 +26,7 @@
 		enter() {
 			this.player.isOnGround = true;
 			this.player.currentAnimation = this.player.animations.run;
+			this.player.currentAnimation.refresh();
 		}
 
 		/**
