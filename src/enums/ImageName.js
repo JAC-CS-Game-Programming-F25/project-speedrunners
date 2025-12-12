@@ -3,6 +3,7 @@ export const ImageName = {
 	Sonic: 'sonic',
 	Background: 'background',
 	GameObjects: "gameObjects",
+	Badniks: "badniks"
 };
 
 export default ImageName;

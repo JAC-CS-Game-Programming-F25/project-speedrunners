@@ -1,4 +1,4 @@
-import Spike from "../objects/Spike.js";
+import GameObjectFactory from "./GameObjectFactory.js";
 
 export default class SpikeManager {
     constructor() {
@@ -11,7 +11,7 @@ export default class SpikeManager {
      * @param {number} y - Y position
      */
     addSpike(x, y) {
-        this.spikes.push(new Spike(x, y));
+        this.spikes.push(GameObjectFactory.createSpike(x, y));
     }
 
     /**

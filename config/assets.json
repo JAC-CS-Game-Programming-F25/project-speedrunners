@@ -17,12 +17,25 @@
 			"path": "./assets/sprites/objects-common-no-bg.png",
 			"width": 712,
 			"height": 1014
+		},
+		{
+			"name": "badniks",
+			"path": "./assets/sprites/Badniks-no-bg.png",
+			"width": 1430,
+			"height": 1087
 		}
+
 	],
 	"sounds":[
 		{
 			"name": "ring",
 			"path": "./assets/sounds/ring.wav",
+			"size": 2,
+			"volume":1
+		},
+		{
+			"name": "loseRings",
+			"path": "./assets/sounds/looseRings.wav",
 			"size": 2,
 			"volume":1
 		}
