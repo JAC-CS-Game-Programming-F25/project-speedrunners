@@ -80,6 +80,7 @@ export default class Player extends Entity {
 	 */
 	update(dt) {
 		this.stateMachine.update(dt);
+		console.log(this.stateMachine.currentState)
 	}
 
 	/**

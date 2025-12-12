@@ -37,7 +37,6 @@
 			this.checkTransitions();   
 			this.handleInput();         
 			this.handleHorizontalMovement();  
-	
 		}
 
 		/**
@@ -65,7 +64,6 @@
 		 * Checks for state transitions.
 		 */
 		checkTransitions() {
-			console.log(this.player.isOnGround)
 			if (this.shouldIdle()) {
 				this.player.stateMachine.change(PlayerStateName.Idling);
 			}
