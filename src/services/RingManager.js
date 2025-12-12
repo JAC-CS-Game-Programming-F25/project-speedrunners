@@ -66,11 +66,33 @@ export default class RingManager {
     }
 
     /**
+     * Make player lose rings when hit by spike
+     * Creates bouncing rings that scatter from player position
+     * @param {number} playerX - Player's X position
+     * @param {number} playerY - Player's Y position
+     * @param {number} maxRingsToLose - Maximum number of rings to lose (default 10)
+     */
+    loseRings(playerX, playerY, maxRingsToLose = 10) {
+        const ringsToLose = Math.min(this.totalRingsCollected, maxRingsToLose);
+        
+        if (ringsToLose === 0) return; 
+        
+        for (let i = 0; i < ringsToLose; i++) {
+            const lostRing = new Ring(playerX, playerY, true);
+            lostRing.initializeAsLostRing(playerX, playerY);
+            this.rings.push(lostRing);
+        }
+        
+        this.totalRingsCollected = 0;
+    }
+
+    /**
      * Update all rings
      * @param {number} dt - Delta time
      */
     update(dt) {
         this.rings.forEach(ring => ring.update(dt));
+        this.cleanupCollectedRings();
     }
 
     /**
@@ -87,12 +109,12 @@ export default class RingManager {
      */
     checkCollisions(player) {
         this.rings.forEach(ring => {
-            if (!ring.isCollected && ring.collidesWith(player)) {
+            // Only collect rings that aren't bouncing (lost rings can't be collected immediately)
+            if (!ring.isCollected && !ring.isBouncing && ring.collidesWith(player)) {
                 const value = ring.collect();
                 this.totalRingsCollected += value;
                 
-                // Optional: Play sound effect here
-                // sounds.get('ring').play();
+                // Play sound effect here
             }
         });
     }
