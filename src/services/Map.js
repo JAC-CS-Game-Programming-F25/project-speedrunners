@@ -98,13 +98,13 @@ export default class Map {
     setupEnemies() {
         this.enemyManager.addEnemy('buzzbomber', 300, 192);
         //this.enemyManager.addEnemy('buzzbomber', 600, 192);
-        this.enemyManager.addEnemy('crab', 250, 192);
+        this.enemyManager.addEnemy('crab', 850, 192);
         this.enemyManager.addEnemy('crab', 250, 192);
     }
     
     setupSprings() {
-        this.springManager.addSpring(200, 208);
-        this.springManager.addSpring(400, 208);
+        this.springManager.addSpring(600, 208);
+        //this.springManager.addSpring(400, 208);
     }
     
     update(dt) {
