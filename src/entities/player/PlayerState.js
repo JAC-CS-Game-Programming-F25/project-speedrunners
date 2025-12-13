@@ -40,6 +40,7 @@ export default class PlayerState extends State {
 
 		context.save();
 
+		// Handle orientation
 		if (!this.player.facingRight) {
 			context.scale(-1, 1);
 			context.translate(
@@ -53,7 +54,15 @@ export default class PlayerState extends State {
 			);
 		}
 
-		this.player.currentAnimation.getCurrentFrame().render(0, 0);
+		// Get current frame
+		const frame = this.player.currentAnimation.getCurrentFrame();
+
+		// Align sprite bottom to hitbox bottom
+		const offsetY = this.player.dimensions.y - frame.height;
+
+		// Render sprite at (0, offsetY)
+		frame.render(0, offsetY);
+
 		context.restore();
 
 		if (debugOptions.playerCollision) {
