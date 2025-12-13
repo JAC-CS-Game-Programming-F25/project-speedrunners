@@ -7,6 +7,7 @@ import { PlayerConfig } from '../../../config/PlayerConfig.js';
 import Tile from '../../services/Tile.js';
 import SpikeCollisionHandler from '../../services/SpikeCollisionHandler.js';
 import EnemyCollisionHandler from '../../services/EnemyCollisionHandler.js';
+import SpringCollisionHandler from '../../services/SpringCollisionHandler.js';
 
 /**
  * Base class for all player states.
@@ -39,6 +40,12 @@ export default class PlayerState extends State {
 		}
 		if (this.player.enemyManager) {
 			EnemyCollisionHandler.checkCollisions(this.player, this.player.enemyManager);
+		}
+		if (this.player.springManager) {
+			console.log("PlayerState: Calling SpringCollisionHandler");
+			SpringCollisionHandler.checkCollisions(this.player, this.player.springManager);
+		} else {
+			console.log("PlayerState: No springManager on player!");
 		}
 		
 		this.player.currentAnimation.update(dt);
@@ -109,7 +116,6 @@ export default class PlayerState extends State {
 
 		context.save();
 
-		// Handle orientation
 		if (!this.player.facingRight) {
 			context.scale(-1, 1);
 			context.translate(
@@ -123,15 +129,7 @@ export default class PlayerState extends State {
 			);
 		}
 
-		// Get current frame
-		const frame = this.player.currentAnimation.getCurrentFrame();
-
-		// Align sprite bottom to hitbox bottom
-		const offsetY = this.player.dimensions.y - frame.height;
-
-		// Render sprite at (0, offsetY)
-		frame.render(0, offsetY);
-
+		this.player.currentAnimation.getCurrentFrame().render(0, 0);
 		context.restore();
 
 		if (debugOptions.playerCollision) {
@@ -195,33 +193,17 @@ export default class PlayerState extends State {
 	}
 
 	moveRight() {
-		const WALK_SPEED = PlayerConfig.walk_speed
-		if (this.player.velocity.x < WALK_SPEED) {
-			this.player.velocity.x = Math.min(
-				this.player.velocity.x + PlayerConfig.acceleration,
-				WALK_SPEED
-			);
-		} else {
-			this.player.velocity.x = Math.min(
-				this.player.velocity.x + PlayerConfig.acceleration * 0.5, // slower increment
-				PlayerConfig.maxSpeed
-			);
-		}
+		this.player.velocity.x = Math.min(
+			this.player.velocity.x + PlayerConfig.acceleration,
+			PlayerConfig.maxSpeed
+		);
 	}
 
 	moveLeft() {
-		const WALK_SPEED = PlayerConfig.walk_speed
-		if (this.player.velocity.x > WALK_SPEED) {
-			this.player.velocity.x = Math.max(
-				this.player.velocity.x - PlayerConfig.acceleration,
-				WALK_SPEED
-			);
-		} else {
-			this.player.velocity.x = Math.max(
-				this.player.velocity.x - PlayerConfig.acceleration * 0.5,
-				-PlayerConfig.maxSpeed
-			);
-		}
+		this.player.velocity.x = Math.max(
+			this.player.velocity.x - PlayerConfig.acceleration,
+			-PlayerConfig.maxSpeed
+		);
 	}
 
 	slowDown() {

@@ -15,6 +15,7 @@ import RingManager from "./RingManager.js";
 import SpikeManager from "./SpikeManager.js";
 import PowerUpManager from "./PowerUpManager.js";
 import EnemyManager from "./EnemyManager.js";
+import SpringManager from "./SpringManager.js";
 
 export default class Map {
     static BACKGROUND_LAYER = 1;
@@ -47,7 +48,7 @@ export default class Map {
         // Player damage flag (placeholder for damage state implementation)
         this.playerIsHit = false;
         this.playerDamageTimer = 0;
-        this.playerDamageCooldown = 1.0;
+        this.playerDamageCooldown = 1.0; // 1 second invulnerability after hit
         
         // Create camera
         this.camera = new Camera(
@@ -74,23 +75,37 @@ export default class Map {
         this.enemyManager = new EnemyManager();
         this.setupEnemies();
         
+        // Create spring manager and add some springs
+        this.springManager = new SpringManager();
+        this.setupSprings();
+        
         // Give player access to managers for collision checks
         this.player.powerUpManager = this.powerUpManager;
         this.player.spikeManager = this.spikeManager;
         this.player.enemyManager = this.enemyManager;
+        this.player.springManager = this.springManager;
     }
     
     setupRings() {
         // Add some example rings - adjust positions as needed
         
+        // Line of rings at y=160
+        this.ringManager.addRingLine(100, 160, 8, 25);
+        
+        // Arc of rings
         this.ringManager.addRingArc(300, 180, 40, 7);
         
-        this.ringManager.addRing(450, 192);
-        this.ringManager.addRing(480, 192);
-        this.ringManager.addRing(510, 192);
+        // Single rings
+        this.ringManager.addRing(450, 170);
+        this.ringManager.addRing(480, 150);
+        this.ringManager.addRing(510, 170);
     }
     
     setupSpikes() {
+        // Add some example spikes - adjust positions as needed
+        
+        // Line of spikes on ground
+        //this.spikeManager.addSpikeLine(200, 224, 5, 16);
         
         // Single spikes as obstacles
         this.spikeManager.addSpike(400, 192);
@@ -98,22 +113,43 @@ export default class Map {
     }
     
     setupPowerUps() {
+        // Add powerup boxes with random powerups
         
         // Random powerup boxes (will randomly choose between speed, invincibility, and rings)
-        this.powerUpManager.addBox(500, 192, 'speed');
-        this.powerUpManager.addBox(700, 192, 'invincibility');
+        this.powerUpManager.addBox(100, 192, 'random');
+        this.powerUpManager.addBox(500, 192, 'random');
+        this.powerUpManager.addBox(700, 192, 'random');
         
+        // You can still specify exact types if needed:
+        // this.powerUpManager.addBox(300, 180, 'speed');
+        // this.powerUpManager.addBox(500, 180, 'invincibility');
+        // this.powerUpManager.addBox(700, 180, 'rings');
     }
     
     setupEnemies() {
         // Add some example enemies - adjust positions as needed
         
+        // BuzzBombers (flying enemies)
         this.enemyManager.addEnemy('buzzbomber', 300, 192);
         this.enemyManager.addEnemy('buzzbomber', 600, 192);
         
+        // Crab (ground enemies)
         this.enemyManager.addEnemy('crab', 250, 192);
         this.enemyManager.addEnemy('crab', 550, 192);
         
+        // Line of enemies
+        // this.enemyManager.addEnemyLine('crab', 400, 192, 3, 80);
+    }
+    
+    setupSprings() {
+        // Add some example springs - adjust positions as needed
+        
+        // Single springs
+        this.springManager.addSpring(200, 208); // On ground (224 - 16)
+        this.springManager.addSpring(400, 208);
+        
+        // Line of springs
+        // this.springManager.addSpringLine(500, 208, 3, 32);
     }
     
     update(dt) {
@@ -127,6 +163,9 @@ export default class Map {
         
         // Pass spike and powerup managers so enemies can check collisions
         this.enemyManager.update(dt, this.spikeManager, this.powerUpManager);
+        
+        // Update springs
+        this.springManager.update(dt);
         
         // Update damage timer
         if (this.playerDamageTimer > 0) {
@@ -154,7 +193,7 @@ export default class Map {
                     this.ringManager.loseRings(
                         this.player.position.x + this.player.dimensions.x / 2,
                         this.player.position.y + this.player.dimensions.y / 2,
-                        10  
+                        10  // Lose up to 10 rings
                     );
                     console.log("Player hit a spike!");
                 }
@@ -165,11 +204,13 @@ export default class Map {
         }
         
         // Check enemy collisions
+        // Allow collisions when invincible (to kill enemies) or when not in damage cooldown
         if (this.player.isInvincible || this.playerDamageTimer <= 0) {
             const enemyCollision = this.enemyManager.checkCollisions(this.player, this.ringManager);
             
             // Only apply damage if NOT invincible
             if (enemyCollision.tookDamage && !this.player.isInvincible) {
+                // Start damage cooldown
                 this.playerDamageTimer = this.playerDamageCooldown;
                 console.log("Player hit by enemy!");
             }
@@ -184,11 +225,13 @@ export default class Map {
         this.camera.applyTransform(context);
         this.collisionLayer.render();
         this.spikeManager.render(context);
-        this.powerUpManager.render(context); 
-        this.enemyManager.render(context); 
+        this.springManager.render(context); // Render springs
+        this.powerUpManager.render(context); // Renders boxes only
+        this.enemyManager.render(context); // Render enemies
         this.ringManager.render(context);
         this.player.render(context);
         
+        // Render powerups AFTER player so they appear on top
         this.powerUpManager.renderPowerUps(context);
         
         this.backgroundLayer.render();
