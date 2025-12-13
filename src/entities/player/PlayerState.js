@@ -39,7 +39,8 @@ export default class PlayerState extends State {
 			SpikeCollisionHandler.checkCollisions(this.player, this.player.spikeManager);
 		}
 		if (this.player.enemyManager) {
-			EnemyCollisionHandler.checkCollisions(this.player, this.player.enemyManager);
+			// Now handles killing, damage, AND solid collision
+			EnemyCollisionHandler.checkCollisions(this.player, this.player.enemyManager, this.player.ringManager);
 		}
 		if (this.player.springManager) {
 			console.log("PlayerState: Calling SpringCollisionHandler");

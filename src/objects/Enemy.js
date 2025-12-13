@@ -55,50 +55,6 @@ export default class Enemy extends Entity {
         this.explosionAnimation = new Animation([0, 1], Enemy.EXPLOSION_DURATION);
     }
 
-    /**
-     * Check if player jumped on enemy (collision from above)
-     * @param {Player} player 
-     * @returns {boolean}
-     */
-    checkTopCollision(player) {
-        if (!this.isActive || this.isDying) return false;
-        
-        if (this.collidesWith(player)) {
-            // Check if player is coming from above
-            const playerBottom = player.position.y + player.dimensions.y;
-            const enemyTop = this.position.y;
-            const overlapTop = playerBottom - enemyTop;
-            
-            // Player must be falling and overlap should be small (hitting from top)
-            if (player.velocity.y > 0 && overlapTop < 15) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    /**
-     * Check if player collided from side (damage)
-     * @param {Player} player 
-     * @returns {boolean}
-     */
-    checkSideCollision(player) {
-        if (!this.isActive || this.isDying) return false;
-        
-        if (this.collidesWith(player)) {
-            // Check if NOT from top
-            const playerBottom = player.position.y + player.dimensions.y;
-            const enemyTop = this.position.y;
-            const overlapTop = playerBottom - enemyTop;
-            
-            // Side collision if overlap is large or player not falling
-            if (player.velocity.y <= 0 || overlapTop >= 15) {
-                return true;
-            }
-        }
-        return false;
-    }
-
     update(dt) {
         if (this.explosionComplete) {
             this.isActive = false;
@@ -152,8 +108,9 @@ export default class Enemy extends Entity {
         
         // Check for collisions with solid objects and reverse if needed
         if (this.checkSolidCollisions()) {
-            this.position.x = oldX; 
-            this.movingRight = !this.movingRight; 
+            // Hit something solid, reverse direction
+            this.position.x = oldX; // Reset position
+            this.movingRight = !this.movingRight; // Reverse direction
         }
     }
     
@@ -162,6 +119,8 @@ export default class Enemy extends Entity {
      * @returns {boolean} True if colliding with solid object
      */
     checkSolidCollisions() {
+        // This will be called by subclasses if they have access to managers
+        // For now, return false (subclasses can override or we check in manager)
         return false;
     }
 

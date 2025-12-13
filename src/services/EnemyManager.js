@@ -35,6 +35,8 @@ export default class EnemyManager {
     /**
      * Update all enemies
      * @param {number} dt - Delta time
+     * @param {SpikeManager} spikeManager - For enemy collision with spikes
+     * @param {PowerUpManager} powerUpManager - For enemy collision with boxes
      */
     update(dt, spikeManager = null, powerUpManager = null) {
         this.enemies.forEach(enemy => {
@@ -90,65 +92,6 @@ export default class EnemyManager {
      */
     render(context) {
         this.enemies.forEach(enemy => enemy.render(context));
-    }
-
-    /**
-     * Check collisions with player
-     * @param {Player} player
-     * @param {RingManager} ringManager
-     * @returns {Object} { tookDamage: boolean, killedEnemy: boolean }
-     */
-    checkCollisions(player, ringManager) {
-        let result = {
-            tookDamage: false,
-            killedEnemy: false
-        };
-
-        for (const enemy of this.enemies) {
-            if (!enemy.isActive || enemy.isDying) continue;
-
-            // Check for collision
-            if (enemy.collidesWith(player)) {
-                // If player is invincible, kill enemy from any direction
-                if (player.isInvincible) {
-                    enemy.die();
-                    result.killedEnemy = true;
-                    console.log(`${enemy.constructor.name} destroyed by invincible Sonic!`);
-                    continue;
-                }
-
-                if (enemy.checkTopCollision(player)) {
-                    enemy.die();
-                    result.killedEnemy = true;
-                    
-                    // Give player a bounce
-                    player.velocity.y = -300;
-                    
-                    console.log(`${enemy.constructor.name} destroyed!`);
-                    continue; 
-                }
-
-                // Check if player hit enemy from side (take damage)
-                if (enemy.checkSideCollision(player)) {
-                    result.tookDamage = true;
-                    
-                    console.log("PLACEHOLDER: Player damage state triggered");
-                    
-                    // Lose rings if not already damaged this frame
-                    if (ringManager && ringManager.getRingCount() > 0) {
-                        ringManager.loseRings(
-                            player.position.x + player.dimensions.x / 2,
-                            player.position.y + player.dimensions.y / 2,
-                            10
-                        );
-                    }
-                    
-                    break; 
-                }
-            }
-        }
-
-        return result;
     }
 
     /**

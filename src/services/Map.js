@@ -84,6 +84,7 @@ export default class Map {
         this.player.spikeManager = this.spikeManager;
         this.player.enemyManager = this.enemyManager;
         this.player.springManager = this.springManager;
+        this.player.ringManager = this.ringManager; // For enemy damage
     }
     
     setupRings() {
@@ -203,22 +204,8 @@ export default class Map {
             }
         }
         
-        // Check enemy collisions
-        // Allow collisions when invincible (to kill enemies) or when not in damage cooldown
-        if (this.player.isInvincible || this.playerDamageTimer <= 0) {
-            const enemyCollision = this.enemyManager.checkCollisions(this.player, this.ringManager);
-            
-            // Only apply damage if NOT invincible
-            if (enemyCollision.tookDamage && !this.player.isInvincible) {
-                // Start damage cooldown
-                this.playerDamageTimer = this.playerDamageCooldown;
-                console.log("Player hit by enemy!");
-            }
-            
-            if (enemyCollision.killedEnemy) {
-                console.log("Enemy destroyed!");
-            }
-        }
+        // Enemy collisions now handled in PlayerState via EnemyCollisionHandler
+        // (includes killing, damage, and solid collision)
     }
     
     render() {
