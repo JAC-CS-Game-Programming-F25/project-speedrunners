@@ -324,7 +324,7 @@ export default class CollisionDetector {
                 const minOverlap = Math.min(overlapLeft, overlapRight, overlapTop, overlapBottom);
                 
                 if (minOverlap === overlapTop) {
-                    if (player.canHit() && !box.isHit) {
+                    if (player.canHitBox() && !box.isHit) {
                         const powerUp = box.hit();
                         
                         if (powerUp) {
