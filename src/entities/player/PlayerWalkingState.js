@@ -35,9 +35,9 @@ export default class PlayerWalkingState extends PlayerState {
 	 * @param {number} dt - The time passed since the last update.
 	 */
 	update(dt) {
-		super.update(dt);  
-		this.handleInput();         
+		this.handleInput();
 		this.handleHorizontalMovement(); 
+		super.update(dt);  
 		this.checkTransitions();   
 
 	}
