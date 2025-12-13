@@ -29,6 +29,10 @@ export const playerSpriteConfig = {
 	],
 	death: [
 		{ x: 287, y: 798, width: 34, height: 43}
+	],
+	skid: [
+		{ x: 479, y: 352, width: 32, height: 36 },
+		{ x: 547, y: 352, width: 34, height: 36 },
 	]
 }
 

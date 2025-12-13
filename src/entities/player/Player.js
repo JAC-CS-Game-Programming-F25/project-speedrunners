@@ -15,6 +15,7 @@ import PlayerDamageState from './PlayerDamageState.js';
 import PlayerDeathState from './PlayerDeathState.js';
 import InvincibilitySparkles from '../../objects/PowerUps/InvincibilitySparkles.js';
 import RingManager from '../../services/RingManager.js';
+import PlayerSkiddingState from './PlayerSkiddingState.js';
 
 /**
  * Represents the player character in the game.
@@ -61,7 +62,8 @@ export default class Player extends Entity {
 			jump: new Animation(this.sprites.jump, 0.08),
 			run: new Animation(this.sprites.run, 0.1),
 			damage: new Animation(this.sprites.damage, 0.1),
-			death: new Animation(this.sprites.death)
+			death: new Animation(this.sprites.death),
+			skid: new Animation(this.sprites.skid, 0.08)
 		};
 
 		this.currentAnimation = this.animations.idle;
@@ -91,6 +93,10 @@ export default class Player extends Entity {
 			new PlayerDeathState(this)
 		);
 		this.stateMachine.add(
+			PlayerStateName.Skidding,
+			new PlayerSkiddingState(this)
+		)
+		this.stateMachine.add(
 			PlayerStateName.Idling,
 			new PlayerIdlingState(this)
 		);
@@ -105,6 +111,7 @@ export default class Player extends Entity {
 		if (this.isInvincible) {
 			this.sparkles.update(dt);
 		}
+		console.log(Math.abs(this.velocity.x))
 	}
 
 	/**

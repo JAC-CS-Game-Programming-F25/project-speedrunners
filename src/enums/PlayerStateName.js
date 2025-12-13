@@ -4,7 +4,8 @@ const PlayerStateName = {
 	Jumping: 'jumping',
 	Running: 'running',
 	Damage: 'damage',
-	Death: 'death'
+	Death: 'death',
+	Skidding: 'skidding'
 };
 
 export default PlayerStateName;

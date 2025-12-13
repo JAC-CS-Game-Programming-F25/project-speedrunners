@@ -3,7 +3,7 @@ export const PlayerConfig = {
 	maxSpeed: 300,
 	walkAcceleration: 3.5,    
 	runAcceleration: 1.2,
-	deceleration: 2,
+	deceleration: 1.5,
 	jumpPower: -350,
 	gravity: 800,
 	maxFallSpeed: 600,

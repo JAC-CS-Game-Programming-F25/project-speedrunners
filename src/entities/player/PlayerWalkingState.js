@@ -67,7 +67,6 @@ export default class PlayerWalkingState extends PlayerState {
 	 * Checks for state transitions.
 	 */
 	checkTransitions() {
-		// Force immediate stop when not pressing movement keys
 		if (this.shouldIdle()) {
 			this.player.stateMachine.change(PlayerStateName.Idling);
 			return;
@@ -87,35 +86,6 @@ export default class PlayerWalkingState extends PlayerState {
 		}
 	}
 
-
-	
-// checkTransitions(dt) {
-//     // Check if should idle
-//     if (!this.isMovingLeft && !this.isMovingRight && Math.abs(this.player.velocity.x) < 0.1) {
-//         this.idleTimer += dt;
-	
-//         // Force velocity to 0 while waiting to transition
-//         this.player.velocity.x = 0; // ADD THIS LINE
-	
-//         // Only transition after 0.1 seconds of being still
-//         if (this.idleTimer >= 0.1) {
-//             this.player.stateMachine.change(PlayerStateName.Idling);
-//             return;
-//         }
-//     } else {
-//         this.idleTimer = 0;
-//     }
-
-//     if (!this.player.isOnGround) {
-//         if (this.player.velocity.y < 0) {
-//             this.player.stateMachine.change(PlayerStateName.Jumping);
-//         } 
-//     }
-
-//     if (Math.abs(this.player.velocity.x) >= PlayerConfig.runThreshold) {
-//         this.player.stateMachine.change(PlayerStateName.Running);
-//     }
-// }
 
 	/**
 	 * Determines if the player should transition to the skidding state.
