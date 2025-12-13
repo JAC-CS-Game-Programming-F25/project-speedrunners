@@ -153,8 +153,9 @@ export default class Enemy extends Entity {
         
         // Check for collisions with solid objects and reverse if needed
         if (this.checkSolidCollisions()) {
-            this.position.x = oldX; 
-            this.movingRight = !this.movingRight; 
+            // Hit something solid, reverse direction
+            this.position.x = oldX; // Reset position
+            this.movingRight = !this.movingRight; // Reverse direction
         }
     }
     
@@ -163,6 +164,8 @@ export default class Enemy extends Entity {
      * @returns {boolean} True if colliding with solid object
      */
     checkSolidCollisions() {
+        // This will be called by subclasses if they have access to managers
+        // For now, return false (subclasses can override or we check in manager)
         return false;
     }
 

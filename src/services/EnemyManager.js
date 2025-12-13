@@ -35,6 +35,8 @@ export default class EnemyManager {
     /**
      * Update all enemies
      * @param {number} dt - Delta time
+     * @param {SpikeManager} spikeManager - For enemy collision with spikes
+     * @param {PowerUpManager} powerUpManager - For enemy collision with boxes
      */
     update(dt, spikeManager = null, powerUpManager = null) {
         this.enemies.forEach(enemy => {
@@ -93,6 +95,8 @@ export default class EnemyManager {
     }
 
     /**
+<<<<<<< HEAD
+=======
      * Check collisions with player
      * @param {Player} player
      * @param {RingManager} ringManager
@@ -149,6 +153,7 @@ export default class EnemyManager {
     }
 
     /**
+>>>>>>> origin/FixingCollisions
      * Remove dead enemies from array
      */
     cleanupDeadEnemies() {
