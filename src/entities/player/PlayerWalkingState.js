@@ -61,6 +61,10 @@ export default class PlayerWalkingState extends PlayerState {
 		if (input.isKeyPressed(Input.KEYS.SPACE)) {
 			this.player.stateMachine.change(PlayerStateName.Jumping);
 		}
+
+		if (input.isKeyPressed(Input.KEYS.S)) {
+			this.player.stateMachine.change(PlayerStateName.Rolling);
+		}
 	}
 
 	/**

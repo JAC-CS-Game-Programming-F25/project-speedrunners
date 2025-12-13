@@ -6,12 +6,12 @@ import PlayerStateName from '../../enums/PlayerStateName.js';
 import { input } from '../../globals.js';
 
 /**
- * Represents the idling state of the player.
+ * Represents the crouching state of the player.
  * @extends PlayerState
  */
-export default class PlayerIdlingState extends PlayerState {
+export default class PlayerCrouchingState extends PlayerState {
 	/**
-	 * Creates a new PlayerIdlingState instance.
+	 * Creates a new PlayerCrouchingState instance.
 	 * @param {Player} player - The player object.
 	 */
 	constructor(player) {
@@ -19,17 +19,15 @@ export default class PlayerIdlingState extends PlayerState {
 	}
 
 	/**
-	 * Called when entering the idling state.
+	 * Called when entering the crouching state.
 	 */
 	enter() {
-		this.player.velocity.x = 0;
-		this.player.velocity.y = 0;
-		this.player.currentAnimation = this.player.animations.idle;
+		this.player.currentAnimation = this.player.animations.crouch;
 		this.player.currentAnimation.refresh();
 	}
 
 	/**
-	 * Updates the idling state.
+	 * Updates the crouching state.
 	 * @param {number} dt - The time passed since the last update.
 	 */
 	update(dt) {
@@ -45,13 +43,9 @@ export default class PlayerIdlingState extends PlayerState {
 			this.player.stateMachine.change(PlayerStateName.Jumping);
 		}
 
-		if (input.isKeyPressed(Input.KEYS.S)) {
-			this.player.stateMachine.change(PlayerStateName.Crouching);
-		}
-
-		// If the player is pressing A or D, not both, change to the walking state.
-		if (input.isKeyHeld(Input.KEYS.A) !== input.isKeyHeld(Input.KEYS.D)) {
-			this.player.stateMachine.change(PlayerStateName.Walking);
+		// If the player releases S, change to the idling state.
+		if (!input.isKeyHeld(Input.KEYS.S)) {
+			this.player.stateMachine.change(PlayerStateName.Idling);
 		}
 	}
 }
