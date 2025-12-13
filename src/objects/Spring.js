@@ -2,6 +2,7 @@ import Entity from "../entities/Entity.js";
 import { images } from "../globals.js";
 import { ImageName } from "../enums/ImageName.js";
 import { objectSpriteConfig, loadObjectSprites } from "../../config/SpriteConfig.js";
+import PlayerStateName from "../enums/PlayerStateName.js";
 
 export default class Spring extends Entity {
     static WIDTH = 32;
@@ -47,7 +48,7 @@ export default class Spring extends Entity {
         
         // PLACEHOLDER: Future bounce state implementation
         // TODO: Create PlayerBouncingState for spring bounces
-        // player.stateMachine.change(PlayerStateName.Bouncing);
+        player.stateMachine.change(PlayerStateName.Bounce);
         
         console.log("Spring activated! Player bouncing with velocity:", Spring.BOUNCE_FORCE);
     }

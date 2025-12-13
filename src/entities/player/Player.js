@@ -18,6 +18,7 @@ import RingManager from '../../services/RingManager.js';
 import PlayerSkiddingState from './PlayerSkiddingState.js';
 import PlayerCrouchingState from './PlayerCrouchingState.js';
 import PlayerRollingState from './PlayerRollingState.js';
+import PlayerBouncingState from './PlayerBouncingState.js';
 
 export default class Player extends Entity {
     constructor(x, y, width, height, map) {
@@ -40,6 +41,7 @@ export default class Player extends Entity {
         this.hitSpikeTop = false;
         this.knockbackRight = undefined; // Set by CollisionDetector for knockback direction
         this.sparkles = new InvincibilitySparkles();
+		this.isBouncing = false;
         this.sprites = loadPlayerSprites(
             images.get(ImageName.Sonic),
             playerSpriteConfig
@@ -55,7 +57,8 @@ export default class Player extends Entity {
 			death: new Animation(this.sprites.death),
 			skid: new Animation(this.sprites.skid, 0.08),
 			crouch: new Animation(this.sprites.crouch),
-			roll: new Animation(this.sprites.roll, 0.08)
+			roll: new Animation(this.sprites.roll, 0.08),
+			bounce: new Animation(this.sprites.bounce)
 		};
 
 		this.currentAnimation = this.animations.idle;
@@ -95,6 +98,10 @@ export default class Player extends Entity {
 		this.stateMachine.add(
 			PlayerStateName.Rolling,
 			new PlayerRollingState(this)
+		)
+		this.stateMachine.add(
+			PlayerStateName.Bounce,
+			new PlayerBouncingState(this)
 		)
 		this.stateMachine.add(
 			PlayerStateName.Idling,
