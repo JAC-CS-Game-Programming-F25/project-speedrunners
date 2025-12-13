@@ -109,6 +109,7 @@ export default class PlayerState extends State {
 
 		context.save();
 
+		// Handle orientation
 		if (!this.player.facingRight) {
 			context.scale(-1, 1);
 			context.translate(
@@ -122,7 +123,15 @@ export default class PlayerState extends State {
 			);
 		}
 
-		this.player.currentAnimation.getCurrentFrame().render(0, 0);
+		// Get current frame
+		const frame = this.player.currentAnimation.getCurrentFrame();
+
+		// Align sprite bottom to hitbox bottom
+		const offsetY = this.player.dimensions.y - frame.height;
+
+		// Render sprite at (0, offsetY)
+		frame.render(0, offsetY);
+
 		context.restore();
 
 		if (debugOptions.playerCollision) {
@@ -186,17 +195,33 @@ export default class PlayerState extends State {
 	}
 
 	moveRight() {
-		this.player.velocity.x = Math.min(
-			this.player.velocity.x + PlayerConfig.acceleration,
-			PlayerConfig.maxSpeed
-		);
+		const WALK_SPEED = PlayerConfig.walk_speed
+		if (this.player.velocity.x < WALK_SPEED) {
+			this.player.velocity.x = Math.min(
+				this.player.velocity.x + PlayerConfig.acceleration,
+				WALK_SPEED
+			);
+		} else {
+			this.player.velocity.x = Math.min(
+				this.player.velocity.x + PlayerConfig.acceleration * 0.5, // slower increment
+				PlayerConfig.maxSpeed
+			);
+		}
 	}
 
 	moveLeft() {
-		this.player.velocity.x = Math.max(
-			this.player.velocity.x - PlayerConfig.acceleration,
-			-PlayerConfig.maxSpeed
-		);
+		const WALK_SPEED = PlayerConfig.walk_speed
+		if (this.player.velocity.x > WALK_SPEED) {
+			this.player.velocity.x = Math.max(
+				this.player.velocity.x - PlayerConfig.acceleration,
+				WALK_SPEED
+			);
+		} else {
+			this.player.velocity.x = Math.max(
+				this.player.velocity.x - PlayerConfig.acceleration * 0.5,
+				-PlayerConfig.maxSpeed
+			);
+		}
 	}
 
 	slowDown() {
