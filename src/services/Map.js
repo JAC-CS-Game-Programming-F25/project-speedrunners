@@ -44,6 +44,7 @@ export default class Map {
         // Position Sonic
         this.player = new Player(32, 188, 32, 40, this);
         
+        // Player damage flag (placeholder for damage state implementation)
         this.playerIsHit = false;
         this.playerDamageTimer = 0;
         this.playerDamageCooldown = 1.0;
