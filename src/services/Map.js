@@ -58,13 +58,13 @@ export default class Map {
         this.setupRings();
         
         this.spikeManager = new SpikeManager();
-        // this.setupSpikes();
+        this.setupSpikes();
         
         this.powerUpManager = new PowerUpManager();
-        // this.setupPowerUps();
+        this.setupPowerUps();
         
         this.enemyManager = new EnemyManager();
-        // this.setupEnemies();
+        this.setupEnemies();
         
         this.springManager = new SpringManager();
         this.setupSprings();
@@ -105,8 +105,8 @@ export default class Map {
     }
     
     setupSprings() {
-        //this.springManager.addSpring(200, 208);
-        //this.springManager.addSpring(400, 208);
+        this.springManager.addSpring(200, 208);
+        this.springManager.addSpring(400, 208);
     }
     
     update(dt) {

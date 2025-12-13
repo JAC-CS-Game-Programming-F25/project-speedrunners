@@ -43,6 +43,9 @@ export const playerSpriteConfig = {
 		{ x: 183, y: 625, width: 32, height: 32},
 		{ x: 253, y: 625, width: 32, height: 32},
 		{ x: 323, y: 625, width: 32, height: 32},
+	],
+	bounce: [
+		{ x: 597, y: 255, width: 24, height: 45}
 	]
 }
 

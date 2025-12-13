@@ -38,14 +38,14 @@ export default class PlayerJumpingState extends PlayerState {
 	}
 
     handleInput() {
-        // Only cut if: (1) space was held when jump started, (2) space is now released, (3) still ascending
-        if (this.spaceWasHeld && 
-            !input.isKeyHeld(Input.KEYS.SPACE) && 
-            this.player.velocity.y < 0 && 
-            !this.jumpCut) {
-            this.player.velocity.y *= 0.5;
-            this.jumpCut = true;
-        }
+        // // Only cut if: (1) space was held when jump started, (2) space is now released, (3) still ascending
+        // if (this.spaceWasHeld && 
+        //     !input.isKeyHeld(Input.KEYS.SPACE) && 
+        //     this.player.velocity.y < 0 && 
+        //     !this.jumpCut) {
+        //     this.player.velocity.y *= 0.5;
+        //     this.jumpCut = true;
+        // }
     }
 
     checkTransitions() {

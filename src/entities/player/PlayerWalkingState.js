@@ -28,6 +28,10 @@ export default class PlayerWalkingState extends PlayerState {
 		this.player.isOnGround = true;
 		this.player.currentAnimation = this.player.animations.walk;
 		this.player.currentAnimation.refresh(); 
+
+		if (this.player.justBounced && this.player.isOnGround) {
+			this.player.justBounced = false;
+		}
 	}
 
 	/**
@@ -76,15 +80,16 @@ export default class PlayerWalkingState extends PlayerState {
 			return;
 		}
 		
-		if (!this.player.isOnGround) {
-			if (this.player.velocity.y < 0) {
-				this.player.stateMachine.change(PlayerStateName.Jumping);
-			} 
-		}
+		// if (!this.player.isOnGround) {
+		// 	if (this.player.velocity.y < 0) {
+		// 		this.player.stateMachine.change(PlayerStateName.Jumping);
+		// 	} 
+		// }
 
 		if (
 			(input.isKeyHeld(Input.KEYS.D) || input.isKeyHeld(Input.KEYS.A)) &&
-			Math.abs(this.player.velocity.x) >= PlayerConfig.runThreshold
+			Math.abs(this.player.velocity.x) >= PlayerConfig.runThreshold &&
+			(!this.player.isBouncing || this.player.isOnGround)
 		) {
 			this.player.stateMachine.change(PlayerStateName.Running);
 		}
@@ -110,6 +115,7 @@ export default class PlayerWalkingState extends PlayerState {
 	 */
 	shouldIdle() {
 		return (
+			this.player.isOnGround &&
 			!this.isMovingLeft &&
 			!this.isMovingRight &&
 			Math.abs(this.player.velocity.x) < 0.1
