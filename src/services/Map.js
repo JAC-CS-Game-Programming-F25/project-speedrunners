@@ -85,21 +85,28 @@ export default class Map {
     }
     
     setupSpikes() {
-        this.spikeManager.addSpike(400, 192);
-        this.spikeManager.addSpike(450, 192);
+        this.spikeManager.addSpike(1000, 192);
+        //this.spikeManager.addSpike(450, 192);
     }
     
     setupPowerUps() {
-        this.powerUpManager.addBox(700, 192, 'random');
+        this.powerUpManager.addBox(100, 192, 'invincibility');
+        // this.powerUpManager.addBox(500, 192, 'random');
+        // this.powerUpManager.addBox(700, 192, 'random');
     }
     
     setupEnemies() {
         this.enemyManager.addEnemy('buzzbomber', 300, 192);
+        //this.enemyManager.addEnemy('buzzbomber', 600, 192);
+        this.enemyManager.addEnemy('crab', 250, 192);
+                //this.enemyManager.addEnemy('crab', 250, 192);
+
         this.enemyManager.addEnemy('crab', 550, 192);
     }
     
     setupSprings() {
-        this.springManager.addSpring(900, 208);
+        this.springManager.addSpring(200, 208);
+        //this.springManager.addSpring(400, 208);
     }
     
     update(dt) {
@@ -133,11 +140,6 @@ export default class Map {
               if (!this.playerIsHit) {
                   this.playerIsHit = true;
                   this.player.hit();
-                    this.ringManager.loseRings(
-                        this.player.position.x + this.player.dimensions.x / 2,
-                        this.player.position.y + this.player.dimensions.y / 2,
-                        10
-                    );
                     console.log("Player hit spike from top!");
                 }
             } else {
@@ -145,18 +147,6 @@ export default class Map {
             }
             
             this.player.hitSpikeTop = false;
-        }
-        
-        if ((this.player.isInvincible || this.playerDamageTimer <= 0)) {
-            const enemyCollision = this.enemyManager.checkCollisions(this.player, this.ringManager);
-            if (enemyCollision.tookDamage && !this.player.isInvincible) {
-                this.playerDamageTimer = this.playerDamageCooldown;
-                console.log("Player hit by enemy!");
-            }
-            
-            if (enemyCollision.killedEnemy) {
-                console.log("Enemy destroyed!");
-            }
         }
     }
     

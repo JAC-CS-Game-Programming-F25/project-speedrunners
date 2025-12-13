@@ -7,8 +7,8 @@ export default class Spring extends Entity {
     static WIDTH = 32;
     static HEIGHT_IDLE = 16;
     static HEIGHT_COMPRESSED = 32;
-    static BOUNCE_FORCE = -500; // Upward velocity when bouncing
-    static COMPRESS_DURATION = 0.15; // How long spring stays compressed
+    static BOUNCE_FORCE = -500; 
+    static COMPRESS_DURATION = 0.15;
     
     constructor(x, y) {
         super(x, y, Spring.WIDTH, Spring.HEIGHT_IDLE);

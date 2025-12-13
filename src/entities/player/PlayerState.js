@@ -5,9 +5,6 @@ import { debugOptions, input } from '../../globals.js';
 import Input from '../../../lib/Input.js';
 import { PlayerConfig } from '../../../config/PlayerConfig.js';
 import Tile from '../../services/Tile.js';
-import SpikeCollisionHandler from '../../services/SpikeCollisionHandler.js';
-import EnemyCollisionHandler from '../../services/EnemyCollisionHandler.js';
-import SpringCollisionHandler from '../../services/SpringCollisionHandler.js';
 
 export default class PlayerState extends State {
 	constructor(player) {
@@ -21,75 +18,20 @@ export default class PlayerState extends State {
 		this.updatePosition(dt);
 		
 		if (this.player.powerUpManager) {
-			this.checkBoxCollisions();
+			this.collisionDetector.checkBoxCollisions(this.player, this.player.powerUpManager);
 		}
 		if (this.player.spikeManager) {
-			const spikeResult = SpikeCollisionHandler.checkCollisions(this.player, this.player.spikeManager);
+			const spikeResult = this.collisionDetector.checkSpikeCollisions(this.player, this.player.spikeManager);
 			this.player.hitSpikeTop = spikeResult.hitTop;
 		}
 		if (this.player.enemyManager) {
-			EnemyCollisionHandler.checkCollisions(this.player, this.player.enemyManager, this.player.ringManager);
+			this.collisionDetector.checkEnemyCollisions(this.player, this.player.enemyManager, this.player.ringManager);
 		}
 		if (this.player.springManager) {
-			SpringCollisionHandler.checkCollisions(this.player, this.player.springManager);
+			this.collisionDetector.checkSpringCollisions(this.player, this.player.springManager);
 		}
 		
 		this.player.currentAnimation.update(dt);
-	}
-
-	checkBoxCollisions() {
-		if (!this.player.powerUpManager) return;
-		
-		const boxes = this.player.powerUpManager.boxes;
-		
-		for (const box of boxes) {
-			if (box.collidesWith(this.player)) {
-				const overlapLeft = (this.player.position.x + this.player.dimensions.x) - box.position.x;
-				const overlapRight = (box.position.x + box.dimensions.x) - this.player.position.x;
-				const overlapTop = (this.player.position.y + this.player.dimensions.y) - box.position.y;
-				const overlapBottom = (box.position.y + box.dimensions.y) - this.player.position.y;
-				
-				const minOverlap = Math.min(overlapLeft, overlapRight, overlapTop, overlapBottom);
-				
-				if (minOverlap === overlapTop) {
-
-					if (this.player.canHit() && !box.isHit) {
-						const powerUp = box.hit();
-						
-						if (powerUp) {
-							if (powerUp.duration === 0) {
-								powerUp.activate(this.player);
-								this.player.map.ringManager.totalRingsCollected += powerUp.getRingAmount();
-							} else {
-								powerUp.activate(this.player);
-								this.player.powerUpManager.activePowerUps.push(powerUp);
-							}
-						}
-						
-						this.player.velocity.y = -200;
-					}
-
-				}
-				
-				if (box.isSolid) {
-					if (minOverlap === overlapTop) {
-						this.player.position.y = box.position.y - this.player.dimensions.y;
-						this.player.velocity.y = 0;
-						this.player.isOnGround = true;  
-					}
-					else if (minOverlap === overlapBottom) {
-						this.player.position.y = box.position.y + box.dimensions.y;
-						this.player.velocity.y = 0;
-					}
-					else if (minOverlap === overlapLeft) {
-						this.player.position.x = box.position.x - this.player.dimensions.x;
-					}
-					else if (minOverlap === overlapRight) {
-						this.player.position.x = box.position.x + box.dimensions.x;
-					}
-				}
-			}
-		}
 	}
 
 	render(context) {
