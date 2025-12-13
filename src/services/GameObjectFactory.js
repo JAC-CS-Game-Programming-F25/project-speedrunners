@@ -2,6 +2,7 @@ import Ring from "../objects/Ring.js";
 import Spike from "../objects/Spike.js";
 import PowerUpBox from "../objects/PowerUps/PowerUpBox.js";
 import EnemyFactory from "./EnemyFactory.js";
+import Spring from "../objects/Spring.js";
 
 /**
  * Factory for creating game objects (Rings, Spikes, PowerUpBoxes, Enemies)
@@ -48,5 +49,15 @@ export default class GameObjectFactory {
      */
     static createEnemy(type, x, y) {
         return EnemyFactory.create(type, x, y);
+    }
+
+    /**
+     * Create a spring
+     * @param {number} x
+     * @param {number} y
+     * @returns {Spring}
+     */
+    static createSpring(x, y) {
+        return new Spring(x, y);
     }
 }

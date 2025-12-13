@@ -45,7 +45,30 @@ export const objectSpriteConfig = {
 	],
 	spike: [
 		{ x: 308, y: 182, width: 39, height: 32 }
+	],
+
+	spring: {
+    	idle: { x: 512, y: 470, width: 32, height: 16 },
+    	compressed: { x: 512, y: 494, width: 32, height: 32 }
+	}
+}		
+
+export const enemySpriteConfig = {
+
+	Crab: [
+		{x:8, y:186 , width: 48, height:32},
+		{ x: 64, y: 186, width: 48, height: 32 },  
+		{ x: 120, y: 182, width: 48, height: 40 },  
+		{ x: 176, y: 182, width: 48, height: 40 },
+		{ x: 232, y: 186, width: 48, height: 32 }
+	],
+	BuzzBomber: [
+		{x:157, y: 259, width: 40, height:32},
+		{x: 157, y: 299, width: 40, height:32},
+		{x:213, y: 259, width: 40, height:32},
+		{x:213, y: 299, width: 40, height:32},
 	]
+
 }
 
 export function loadPlayerSprites(spriteSheet, playerSpriteConfig) {
@@ -65,4 +88,59 @@ export function loadPlayerSprites(spriteSheet, playerSpriteConfig) {
 	}
 
 	return sprites;
+}
+
+
+/**
+ * Load object sprites from config (for objects with single or multiple frames)
+ * @param {Image} spriteSheet 
+ * @param {Object} config 
+ * @returns {Array<Sprite>|Object} Array of sprites or object with named sprites
+ */
+export function loadObjectSprites(spriteSheet, config) {
+    // Check if config is an array (simple multi-frame object like ring)
+    if (Array.isArray(config)) {
+        return config.map(
+            (frame) =>
+                new Sprite(
+                    spriteSheet,
+                    frame.x,
+                    frame.y,
+                    frame.width,
+                    frame.height
+                )
+        );
+    }
+    
+    // Otherwise, it's an object with named states (like spring)
+    const sprites = {};
+    for (const [stateName, frame] of Object.entries(config)) {
+        sprites[stateName] = new Sprite(
+            spriteSheet,
+            frame.x,
+            frame.y,
+            frame.width,
+            frame.height
+        );
+    }
+    return sprites;
+}
+
+/**
+ * Load enemy sprites from config
+ * @param {Image} spriteSheet 
+ * @param {Array} config 
+ * @returns {Array<Sprite>} Array of animation frames
+ */
+export function loadEnemySprites(spriteSheet, config) {
+    return config.map(
+        (frame) =>
+            new Sprite(
+                spriteSheet,
+                frame.x,
+                frame.y,
+                frame.width,
+                frame.height
+            )
+    );
 }

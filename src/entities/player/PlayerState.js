@@ -5,116 +5,40 @@ import { debugOptions, input } from '../../globals.js';
 import Input from '../../../lib/Input.js';
 import { PlayerConfig } from '../../../config/PlayerConfig.js';
 import Tile from '../../services/Tile.js';
-import SpikeCollisionHandler from '../../services/SpikeCollisionHandler.js';
-import EnemyCollisionHandler from '../../services/EnemyCollisionHandler.js';
-import PlayerStateName from '../../enums/PlayerStateName.js';
 
-/**
- * Base class for all player states.
- * @extends State
- */
 export default class PlayerState extends State {
-	/**
-	 * @param {Player} player - The player instance.
-	 */
 	constructor(player) {
 		super();
 		this.player = player;
 		this.collisionDetector = new CollisionDetector(player.map);
 	}
 
-	/**
-	 * Updates the player state.
-	 * @param {number} dt - Delta time.
-	 */
 	update(dt) {
 		this.applyGravity(dt);
 		this.updatePosition(dt);
 		
-		// Check solid collisions after position update
 		if (this.player.powerUpManager) {
-			this.checkBoxCollisions();
+			this.collisionDetector.checkBoxCollisions(this.player, this.player.powerUpManager);
 		}
 		if (this.player.spikeManager) {
-			SpikeCollisionHandler.checkCollisions(this.player, this.player.spikeManager);
+			const spikeResult = this.collisionDetector.checkSpikeCollisions(this.player, this.player.spikeManager);
+			this.player.hitSpikeTop = spikeResult.hitTop;
 		}
 		if (this.player.enemyManager) {
-			EnemyCollisionHandler.checkCollisions(this.player, this.player.enemyManager);
+			this.collisionDetector.checkEnemyCollisions(this.player, this.player.enemyManager, this.player.ringManager);
+		}
+		if (this.player.springManager) {
+			this.collisionDetector.checkSpringCollisions(this.player, this.player.springManager);
 		}
 		
 		this.player.currentAnimation.update(dt);
 	}
 
-	checkBoxCollisions() {
-		if (!this.player.powerUpManager) return;
-		
-		const boxes = this.player.powerUpManager.boxes;
-		
-		for (const box of boxes) {
-			if (box.collidesWith(this.player)) {
-				const overlapLeft = (this.player.position.x + this.player.dimensions.x) - box.position.x;
-				const overlapRight = (box.position.x + box.dimensions.x) - this.player.position.x;
-				const overlapTop = (this.player.position.y + this.player.dimensions.y) - box.position.y;
-				const overlapBottom = (box.position.y + box.dimensions.y) - this.player.position.y;
-				
-				const minOverlap = Math.min(overlapLeft, overlapRight, overlapTop, overlapBottom);
-				
-				// Trigger box when landing on TOP
-				if (minOverlap === overlapTop) {
-
-					if (this.player.canHitBox() && !box.isHit) {
-						const powerUp = box.hit();
-						
-						if (powerUp) {
-							// Activate powerup IMMEDIATELY
-							if (powerUp.duration === 0) {
-								// Instant powerup (rings)
-								powerUp.activate(this.player);
-								this.player.map.ringManager.totalRingsCollected += powerUp.getRingAmount();
-							} else {
-								// Timed powerup (speed, invincibility)
-								powerUp.activate(this.player);
-								this.player.powerUpManager.activePowerUps.push(powerUp);
-							}
-						}
-						
-						// Add bounce effect
-						this.player.velocity.y = -200;
-					}
-
-				}
-				
-				// Resolve solid collision only if box is still solid
-				if (box.isSolid) {
-					if (minOverlap === overlapTop) {
-						this.player.position.y = box.position.y - this.player.dimensions.y;
-						this.player.velocity.y = 0;
-						this.player.isOnGround = true;  
-					}
-					else if (minOverlap === overlapBottom) {
-						this.player.position.y = box.position.y + box.dimensions.y;
-						this.player.velocity.y = 0;
-					}
-					else if (minOverlap === overlapLeft) {
-						this.player.position.x = box.position.x - this.player.dimensions.x;
-					}
-					else if (minOverlap === overlapRight) {
-						this.player.position.x = box.position.x + box.dimensions.x;
-					}
-				}
-			}
-		}
-	}
-
-	/**
-	 * Renders the player on the canvas.
-	 */
 	render(context) {
 		super.render();
 
 		context.save();
 
-		// Handle orientation
 		if (!this.player.facingRight) {
 			context.scale(-1, 1);
 			context.translate(
@@ -128,15 +52,7 @@ export default class PlayerState extends State {
 			);
 		}
 
-		// Get current frame
-		const frame = this.player.currentAnimation.getCurrentFrame();
-
-		// Align sprite bottom to hitbox bottom
-		const offsetY = this.player.dimensions.y - frame.height;
-
-		// Render sprite at (0, offsetY)
-		frame.render(0, offsetY);
-
+		this.player.currentAnimation.getCurrentFrame().render(0, 0);
 		context.restore();
 
 		if (debugOptions.playerCollision) {

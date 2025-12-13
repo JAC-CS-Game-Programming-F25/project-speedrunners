@@ -17,39 +17,26 @@ import InvincibilitySparkles from '../../objects/PowerUps/InvincibilitySparkles.
 import RingManager from '../../services/RingManager.js';
 import PlayerSkiddingState from './PlayerSkiddingState.js';
 
-/**
- * Represents the player character in the game.
- * @extends Entity
- */
 export default class Player extends Entity {
-	/**
-	 * Creates a new Player instance.
-	 * @param {number} x - The initial x-coordinate.
-	 * @param {number} y - The initial y-coordinate.
-	 * @param {number} width - The width of the player.
-	 * @param {number} height - The height of the player.
-	 * @param {Map} map - The game map instance.
-	 */
-	constructor(x, y, width, height, map) {
-		super(x, y, width, height);
-		this.initialPosition = new Vector(x, y);
-		this.position = new Vector(x, y);
-		this.dimensions = new Vector(width, height);
-		this.velocity = new Vector(0, 0);
-		this.map = map;
-		this.facingRight = true;
-		this.isInvincible = false; // invincibility frames
-		this.isDamagedInvincible = false; // for cooldown when Sonic gets hit
-		this.invincibilityDuration = 3;
-		this.flickerInterval = 0.1
-		this.powerUpManager = null;
-		this.spikeManager = null;  
-		this.enemyManager = null;  
-		this.ringsManager = null;
-		this.rings = [];
-		this.sparkles = new InvincibilitySparkles();
-
-		// Load player sprites
+    constructor(x, y, width, height, map) {
+        super(x, y, width, height);
+        this.initialPosition = new Vector(x, y);
+        this.position = new Vector(x, y);
+        this.dimensions = new Vector(width, height);
+        this.velocity = new Vector(0, 0);
+        this.map = map;
+        this.facingRight = true;
+        this.isInvincible = false;
+        this.isDamagedInvincible = false;
+        this.invincibilityDuration = 3;
+        this.flickerInterval = 0.1
+        this.powerUpManager = null;
+        this.spikeManager = null;  
+        this.enemyManager = null;  
+        this.ringsManager = null;
+        this.rings = [];
+        this.hitSpikeTop = false;
+        this.sparkles = new InvincibilitySparkles();
         this.sprites = loadPlayerSprites(
             images.get(ImageName.Sonic),
             playerSpriteConfig
@@ -114,25 +101,21 @@ export default class Player extends Entity {
 		console.log(Math.abs(this.velocity.x))
 	}
 
-	/**
-	 * Renders the player.
-	 * @param {CanvasRenderingContext2D} context - The rendering context.
-	 */
-	render(context) {
-		context.save();
-		context.globalAlpha = this.isDamagedInvincible ? this.flicker : 1;
-		this.stateMachine.render(context);
-		if (this.isInvincible) {
-			this.sparkles.render(
-				context,
-				this.position.x,
-				this.position.y,
-				this.dimensions.x,
-				this.dimensions.y
-			);
-		}
-		context.restore();
-	}
+    render(context) {
+        context.save();
+        context.globalAlpha = this.isDamagedInvincible ? this.flicker : 1;
+        this.stateMachine.render(context);
+        if (this.isInvincible) {
+            this.sparkles.render(
+                context,
+                this.position.x,
+                this.position.y,
+                this.dimensions.x,
+                this.dimensions.y
+            );
+        }
+        context.restore();
+    }
 
 	hit() {
 		if (this.rings > 0 && !this.isDamagedInvincible) {
@@ -145,19 +128,15 @@ export default class Player extends Entity {
 		}
 	}
 
-	die() {
-		if (this.stateMachine.currentState.name !== PlayerStateName.Death) {
-			this.stateMachine.change(PlayerStateName.Death)
-		}
-	}
+    die() {
+        if (this.stateMachine.currentState.name !== PlayerStateName.Death) {
+            this.stateMachine.change(PlayerStateName.Death)
+        }
+    }
 
-	/**
-	 * Handles player cooldown
-	 */
-	startInvincibility() {
-		this.isDamagedInvincible = true;
-		this.flicker = 1;
-
+    startInvincibility() {
+        this.isDamagedInvincible = true;
+        this.flicker = 1;
 		timer.addTask(
 			() => {
 				this.flicker = this.flicker === 1 ? 0.5 : 1;
@@ -186,5 +165,5 @@ export default class Player extends Entity {
 			this.velocity.y > 0
 		);
 	}
-
 }
+
