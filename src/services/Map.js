@@ -44,6 +44,7 @@ export default class Map {
         // Position Sonic
         this.player = new Player(32, 188, 32, 40, this);
         
+        // Player damage flag (placeholder for damage state implementation)
         this.playerIsHit = false;
         this.playerDamageTimer = 0;
         this.playerDamageCooldown = 1.0;
@@ -144,12 +145,10 @@ export default class Map {
         
         // Check spike collisions (only if not invincible and not recently damaged)
         if (!this.player.isInvincible && this.playerDamageTimer <= 0) {
-          // Check spike collisions (placeholder - implement damage later)
-          if (this.spikeManager.checkCollisions(this.player)) {
-              if (!this.playerIsHit && !this.player.isInvincible) {
-                  this.playerIsHit = true;
-                  if (this.ringManager.getRingCount() > 0) {
-                      this.player.hit()
+            if (this.spikeManager.checkCollisions(this.player)) {
+                if (!this.playerIsHit) {
+                    this.playerIsHit = true;
+                    this.playerDamageTimer = this.playerDamageCooldown;
                     
                     // Make rings bounce out when hit!
                     this.ringManager.loseRings(
@@ -160,7 +159,8 @@ export default class Map {
                     console.log("Player hit a spike!");
                 }
             } else {
-                this.player.die()
+                // Reset hit flag when not touching spike
+                this.playerIsHit = false;
             }
         }
         
