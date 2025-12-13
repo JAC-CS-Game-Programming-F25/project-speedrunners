@@ -14,6 +14,7 @@ import PlayerRunningState from './PlayerRunningState.js';
 import PlayerDamageState from './PlayerDamageState.js';
 import PlayerDeathState from './PlayerDeathState.js';
 import InvincibilitySparkles from '../../objects/PowerUps/InvincibilitySparkles.js';
+import RingManager from '../../services/RingManager.js';
 
 /**
  * Represents the player character in the game.
@@ -37,12 +38,15 @@ export default class Player extends Entity {
 		this.map = map;
 		this.facingRight = true;
 		this.isInvincible = false; // invincibility frames
+		this.isDamagedInvincible = false; // for cooldown when Sonic gets hit
 		this.invincibilityDuration = 3;
 		this.flickerInterval = 0.1
-    this.powerUpManager = null;
-    this.spikeManager = null;  // NEW
-    this.enemyManager = null;  // NEW
-    this.sparkles = new InvincibilitySparkles();
+		this.powerUpManager = null;
+		this.spikeManager = null;  
+		this.enemyManager = null;  
+		this.ringsManager = null;
+		this.rings = [];
+		this.sparkles = new InvincibilitySparkles();
 
 		// Load player sprites
         this.sprites = loadPlayerSprites(
@@ -98,9 +102,9 @@ export default class Player extends Entity {
 	 */
 	update(dt) {
 		this.stateMachine.update(dt);
-    if (this.isInvincible) {
-        this.sparkles.update(dt);
-    }
+		if (this.isInvincible) {
+			this.sparkles.update(dt);
+		}
 	}
 
 	/**
@@ -109,22 +113,29 @@ export default class Player extends Entity {
 	 */
 	render(context) {
 		context.save();
-		context.globalAlpha = this.isInvincible ? this.flicker : 1;
+		context.globalAlpha = this.isDamagedInvincible ? this.flicker : 1;
 		this.stateMachine.render(context);
-    if (this.isInvincible) {
-          this.sparkles.render(
-              context,
-              this.position.x,
-              this.position.y,
-              this.dimensions.x,
-              this.dimensions.y
-          );
-    }
+		if (this.isInvincible) {
+			this.sparkles.render(
+				context,
+				this.position.x,
+				this.position.y,
+				this.dimensions.x,
+				this.dimensions.y
+			);
+		}
 		context.restore();
 	}
 
 	hit() {
-		this.stateMachine.change(PlayerStateName.Damage)
+		if (this.rings > 0 && !this.isDamagedInvincible) {
+			this.stateMachine.change(PlayerStateName.Damage)
+			this.startInvincibility(); 
+        	this.map.playerDamageTimer = this.map.playerDamageCooldown; 
+		}
+		else {
+			this.die();
+		}
 	}
 
 	die() {
@@ -137,7 +148,7 @@ export default class Player extends Entity {
 	 * Handles player cooldown
 	 */
 	startInvincibility() {
-		this.isInvincible = true;
+		this.isDamagedInvincible = true;
 		this.flicker = 1;
 
 		timer.addTask(
@@ -148,10 +159,25 @@ export default class Player extends Entity {
 			this.invincibilityDuration,
 			() => {
 				// Stop invincibility and reset the flicker to normal
-				this.isInvincible = false;
+				this.isDamagedInvincible = false;
 				this.flicker = 1;
 			}
     	);
+	}
+
+	canHitEnemy() {
+		return (
+			this.stateMachine.currentState.name === PlayerStateName.Jumping &&
+			this.velocity.y > 0 &&
+			!this.isDamagedInvincible
+		);
+	}
+
+	canHitBox() {
+		return (
+			this.stateMachine.currentState.name === PlayerStateName.Jumping &&
+			this.velocity.y > 0
+		);
 	}
 
 }

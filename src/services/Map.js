@@ -78,6 +78,7 @@ export default class Map {
         this.player.powerUpManager = this.powerUpManager;
         this.player.spikeManager = this.spikeManager;
         this.player.enemyManager = this.enemyManager;
+        this.player.ringManager = this.ringManager;
     }
     
     setupRings() {
@@ -124,6 +125,8 @@ export default class Map {
         this.ringManager.update(dt);
         this.spikeManager.update(dt);
         this.powerUpManager.update(dt, this.player);
+
+        this.player.rings = this.ringManager.getRingCount()
         
         // Pass spike and powerup managers so enemies can check collisions
         this.enemyManager.update(dt, this.spikeManager, this.powerUpManager);
@@ -144,12 +147,12 @@ export default class Map {
         });
         
         // Check spike collisions (only if not invincible and not recently damaged)
-        if (!this.player.isInvincible && this.playerDamageTimer <= 0) {
-            if (this.spikeManager.checkCollisions(this.player)) {
-                if (!this.playerIsHit) {
-                    this.playerIsHit = true;
-                    this.playerDamageTimer = this.playerDamageCooldown;
-                    
+        if (!this.player.isInvincible && !this.player.isDamagedInvincible && this.playerDamageTimer <= 0) {
+          // Check spike collisions (placeholder - implement damage later)
+          if (this.spikeManager.checkCollisions(this.player)) {
+              if (!this.playerIsHit) {
+                  this.playerIsHit = true;
+                  this.player.hit();
                     // Make rings bounce out when hit!
                     this.ringManager.loseRings(
                         this.player.position.x + this.player.dimensions.x / 2,
@@ -159,15 +162,13 @@ export default class Map {
                     console.log("Player hit a spike!");
                 }
             } else {
-                // Reset hit flag when not touching spike
                 this.playerIsHit = false;
             }
         }
         
         // Check enemy collisions
-        if (this.player.isInvincible || this.playerDamageTimer <= 0) {
+        if ((this.player.isInvincible || this.playerDamageTimer <= 0)) {
             const enemyCollision = this.enemyManager.checkCollisions(this.player, this.ringManager);
-            
             // Only apply damage if NOT invincible
             if (enemyCollision.tookDamage && !this.player.isInvincible) {
                 this.playerDamageTimer = this.playerDamageCooldown;

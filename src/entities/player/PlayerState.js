@@ -7,6 +7,7 @@ import { PlayerConfig } from '../../../config/PlayerConfig.js';
 import Tile from '../../services/Tile.js';
 import SpikeCollisionHandler from '../../services/SpikeCollisionHandler.js';
 import EnemyCollisionHandler from '../../services/EnemyCollisionHandler.js';
+import PlayerStateName from '../../enums/PlayerStateName.js';
 
 /**
  * Base class for all player states.
@@ -59,24 +60,28 @@ export default class PlayerState extends State {
 				const minOverlap = Math.min(overlapLeft, overlapRight, overlapTop, overlapBottom);
 				
 				// Trigger box when landing on TOP
-				if (minOverlap === overlapTop && this.player.velocity.y > 0 && !box.isHit) {
-					const powerUp = box.hit();
-					
-					if (powerUp) {
-						// Activate powerup IMMEDIATELY
-						if (powerUp.duration === 0) {
-							// Instant powerup (rings)
-							powerUp.activate(this.player);
-							this.player.map.ringManager.totalRingsCollected += powerUp.getRingAmount();
-						} else {
-							// Timed powerup (speed, invincibility)
-							powerUp.activate(this.player);
-							this.player.powerUpManager.activePowerUps.push(powerUp);
+				if (minOverlap === overlapTop) {
+
+					if (this.player.canHitBox() && !box.isHit) {
+						const powerUp = box.hit();
+						
+						if (powerUp) {
+							// Activate powerup IMMEDIATELY
+							if (powerUp.duration === 0) {
+								// Instant powerup (rings)
+								powerUp.activate(this.player);
+								this.player.map.ringManager.totalRingsCollected += powerUp.getRingAmount();
+							} else {
+								// Timed powerup (speed, invincibility)
+								powerUp.activate(this.player);
+								this.player.powerUpManager.activePowerUps.push(powerUp);
+							}
 						}
+						
+						// Add bounce effect
+						this.player.velocity.y = -200;
 					}
-					
-					// Add bounce effect
-					this.player.velocity.y = -200;
+
 				}
 				
 				// Resolve solid collision only if box is still solid
@@ -194,33 +199,55 @@ export default class PlayerState extends State {
 		if (Math.abs(this.player.velocity.x) < 0.1) this.player.velocity.x = 0;
 	}
 
+	
+
 	moveRight() {
-		const WALK_SPEED = PlayerConfig.walk_speed
-		if (this.player.velocity.x < WALK_SPEED) {
-			this.player.velocity.x = Math.min(
-				this.player.velocity.x + PlayerConfig.acceleration,
-				WALK_SPEED
-			);
+		const WALK_CAP = PlayerConfig.walkCap
+		const MAX_SPEED = PlayerConfig.maxSpeed;
+		const MIN_MOVE_SPEED = PlayerConfig.minMoveSpeed
+		
+		// If starting from stop or moving slowly, give instant minimum speed
+		if (this.player.velocity.x < MIN_MOVE_SPEED && this.player.velocity.x >= 0) {
+			this.player.velocity.x = MIN_MOVE_SPEED;
+		}
+
+		// Use different acceleration based on if Sonic is walking or running
+		const isWalking = this.player.stateMachine.currentState === PlayerStateName.Walking;
+		const acceleration = isWalking ? PlayerConfig.walkAcceleration : PlayerConfig.runAcceleration;
+		
+		// Apply the acceleration
+		this.player.velocity.x += acceleration;
+
+		// Clamp the speed depending on walking or running
+		if (isWalking) {
+			this.player.velocity.x = Math.min(this.player.velocity.x, WALK_CAP);
 		} else {
-			this.player.velocity.x = Math.min(
-				this.player.velocity.x + PlayerConfig.acceleration * 0.5, // slower increment
-				PlayerConfig.maxSpeed
-			);
+			this.player.velocity.x = Math.min(this.player.velocity.x, MAX_SPEED);
 		}
 	}
 
 	moveLeft() {
-		const WALK_SPEED = PlayerConfig.walk_speed
-		if (this.player.velocity.x > WALK_SPEED) {
-			this.player.velocity.x = Math.max(
-				this.player.velocity.x - PlayerConfig.acceleration,
-				WALK_SPEED
-			);
+		const WALK_CAP = PlayerConfig.walkCap
+		const MAX_SPEED = PlayerConfig.maxSpeed;
+		const MIN_MOVE_SPEED = PlayerConfig.minMoveSpeed 
+		
+		// If starting from stop or moving slowly, give instant minimum speed
+		if (this.player.velocity.x > -MIN_MOVE_SPEED && this.player.velocity.x <= 0) {
+			this.player.velocity.x = -MIN_MOVE_SPEED;
+		}
+
+		// Use different acceleration based on current state/speed
+		const isWalking = this.player.stateMachine.currentState === PlayerStateName.Walking;
+		const acceleration = isWalking ? PlayerConfig.walkAcceleration : PlayerConfig.runAcceleration;
+		
+		// Apply acceleration (negative for left movement)
+		this.player.velocity.x -= acceleration;
+
+		// Clamp speed depending on state
+		if (isWalking) {
+			this.player.velocity.x = Math.max(this.player.velocity.x, -WALK_CAP);
 		} else {
-			this.player.velocity.x = Math.max(
-				this.player.velocity.x - PlayerConfig.acceleration * 0.5,
-				-PlayerConfig.maxSpeed
-			);
+			this.player.velocity.x = Math.max(this.player.velocity.x, -MAX_SPEED);
 		}
 	}
 

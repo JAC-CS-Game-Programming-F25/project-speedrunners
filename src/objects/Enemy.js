@@ -62,6 +62,7 @@ export default class Enemy extends Entity {
      */
     checkTopCollision(player) {
         if (!this.isActive || this.isDying) return false;
+        if (!player.canHitEnemy()) return false;
         
         if (this.collidesWith(player)) {
             // Check if player is coming from above
