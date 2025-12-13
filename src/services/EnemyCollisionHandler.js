@@ -14,7 +14,7 @@ export default class EnemyCollisionHandler {
             if (!enemy.isActive || enemy.isDying) continue;
             
             if (enemy.collidesWith(player)) {
-                if (player.isInvincible) {
+                if (player.isInvincible ) {
                     continue;
                 }   
                 this.resolveCollision(player, enemy);
