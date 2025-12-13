@@ -6,17 +6,42 @@ export default class SpikeCollisionHandler {
      * Check and resolve collisions between player and spikes
      * @param {Player} player 
      * @param {SpikeManager} spikeManager 
+     * @returns {Object} { hitTop: boolean } - True if player landed on top of spike
      */
     static checkCollisions(player, spikeManager) {
-        if (!spikeManager) return;
+        let result = { hitTop: false };
+        
+        if (!spikeManager) return result;
         
         for (const spike of spikeManager.spikes) {
             if (!spike.isActive || !spike.isSolid) continue;
             
             if (spike.collidesWith(player)) {
+                // Check if landing on top (for damage)
+                if (this.checkTopCollision(player, spike)) {
+                    result.hitTop = true;
+                }
+                
                 this.resolveCollision(player, spike);
             }
         }
+        
+        return result;
+    }
+    
+    /**
+     * Check if player is landing on top of spike
+     * @param {Player} player 
+     * @param {Spike} spike 
+     * @returns {boolean}
+     */
+    static checkTopCollision(player, spike) {
+        const playerBottom = player.position.y + player.dimensions.y;
+        const spikeTop = spike.position.y;
+        const overlapTop = playerBottom - spikeTop;
+        
+        // Player must be falling and hitting from top
+        return player.velocity.y > 0 && overlapTop < 10;
     }
     
     /**

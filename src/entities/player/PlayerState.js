@@ -9,44 +9,29 @@ import SpikeCollisionHandler from '../../services/SpikeCollisionHandler.js';
 import EnemyCollisionHandler from '../../services/EnemyCollisionHandler.js';
 import SpringCollisionHandler from '../../services/SpringCollisionHandler.js';
 
-/**
- * Base class for all player states.
- * @extends State
- */
 export default class PlayerState extends State {
-	/**
-	 * @param {Player} player - The player instance.
-	 */
 	constructor(player) {
 		super();
 		this.player = player;
 		this.collisionDetector = new CollisionDetector(player.map);
 	}
 
-	/**
-	 * Updates the player state.
-	 * @param {number} dt - Delta time.
-	 */
 	update(dt) {
 		this.applyGravity(dt);
 		this.updatePosition(dt);
 		
-		// Check solid collisions after position update
 		if (this.player.powerUpManager) {
 			this.checkBoxCollisions();
 		}
 		if (this.player.spikeManager) {
-			SpikeCollisionHandler.checkCollisions(this.player, this.player.spikeManager);
+			const spikeResult = SpikeCollisionHandler.checkCollisions(this.player, this.player.spikeManager);
+			this.player.hitSpikeTop = spikeResult.hitTop;
 		}
 		if (this.player.enemyManager) {
-			// Now handles killing, damage, AND solid collision
 			EnemyCollisionHandler.checkCollisions(this.player, this.player.enemyManager, this.player.ringManager);
 		}
 		if (this.player.springManager) {
-			console.log("PlayerState: Calling SpringCollisionHandler");
 			SpringCollisionHandler.checkCollisions(this.player, this.player.springManager);
-		} else {
-			console.log("PlayerState: No springManager on player!");
 		}
 		
 		this.player.currentAnimation.update(dt);
@@ -66,32 +51,26 @@ export default class PlayerState extends State {
 				
 				const minOverlap = Math.min(overlapLeft, overlapRight, overlapTop, overlapBottom);
 				
-				// Trigger box when landing on TOP
 				if (minOverlap === overlapTop) {
 
 					if (this.player.canHit() && !box.isHit) {
 						const powerUp = box.hit();
 						
 						if (powerUp) {
-							// Activate powerup IMMEDIATELY
 							if (powerUp.duration === 0) {
-								// Instant powerup (rings)
 								powerUp.activate(this.player);
 								this.player.map.ringManager.totalRingsCollected += powerUp.getRingAmount();
 							} else {
-								// Timed powerup (speed, invincibility)
 								powerUp.activate(this.player);
 								this.player.powerUpManager.activePowerUps.push(powerUp);
 							}
 						}
 						
-						// Add bounce effect
 						this.player.velocity.y = -200;
 					}
 
 				}
 				
-				// Resolve solid collision only if box is still solid
 				if (box.isSolid) {
 					if (minOverlap === overlapTop) {
 						this.player.position.y = box.position.y - this.player.dimensions.y;
@@ -113,9 +92,6 @@ export default class PlayerState extends State {
 		}
 	}
 
-	/**
-	 * Renders the player on the canvas.
-	 */
 	render(context) {
 		super.render();
 

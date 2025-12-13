@@ -16,19 +16,7 @@ import PlayerDeathState from './PlayerDeathState.js';
 import InvincibilitySparkles from '../../objects/PowerUps/InvincibilitySparkles.js';
 import RingManager from '../../services/RingManager.js';
 
-/**
- * Represents the player character in the game.
- * @extends Entity
- */
 export default class Player extends Entity {
-	/**
-	 * Creates a new Player instance.
-	 * @param {number} x - The initial x-coordinate.
-	 * @param {number} y - The initial y-coordinate.
-	 * @param {number} width - The width of the player.
-	 * @param {number} height - The height of the player.
-	 * @param {Map} map - The game map instance.
-	 */
 	constructor(x, y, width, height, map) {
 		super(x, y, width, height);
 		this.initialPosition = new Vector(x, y);
@@ -37,8 +25,8 @@ export default class Player extends Entity {
 		this.velocity = new Vector(0, 0);
 		this.map = map;
 		this.facingRight = true;
-		this.isInvincible = false; // invincibility frames
-		this.isDamagedInvincible = false; // for cooldown when Sonic gets hit
+		this.isInvincible = false;
+		this.isDamagedInvincible = false;
 		this.invincibilityDuration = 3;
 		this.flickerInterval = 0.1
 		this.powerUpManager = null;
@@ -46,15 +34,14 @@ export default class Player extends Entity {
 		this.enemyManager = null;  
 		this.ringsManager = null;
 		this.rings = [];
+		this.hitSpikeTop = false;
 		this.sparkles = new InvincibilitySparkles();
 
-		// Load player sprites
         this.sprites = loadPlayerSprites(
             images.get(ImageName.Sonic),
             playerSpriteConfig
         )
 
-		// Create animations for different player states
 		this.animations = {
 			idle: new Animation(this.sprites.idle),
 			walk: new Animation(this.sprites.walk, 0.1),
@@ -66,10 +53,8 @@ export default class Player extends Entity {
 
 		this.currentAnimation = this.animations.idle;
 
-		// Initialize state machine for player behavior
 		this.stateMachine = new StateMachine();
 
-		// Add states to the state machine
         this.stateMachine.add(
 			PlayerStateName.Walking,
 			new PlayerWalkingState(this)
@@ -96,10 +81,6 @@ export default class Player extends Entity {
 		);
 	}
 
-	/**
-	 * Updates the player's state.
-	 * @param {number} dt - The time passed since the last update.
-	 */
 	update(dt) {
 		this.stateMachine.update(dt);
 		if (this.isInvincible) {
@@ -107,10 +88,6 @@ export default class Player extends Entity {
 		}
 	}
 
-	/**
-	 * Renders the player.
-	 * @param {CanvasRenderingContext2D} context - The rendering context.
-	 */
 	render(context) {
 		context.save();
 		context.globalAlpha = this.isDamagedInvincible ? this.flicker : 1;
@@ -142,9 +119,6 @@ export default class Player extends Entity {
 		}
 	}
 
-	/**
-	 * Handles player cooldown
-	 */
 	startInvincibility() {
 		this.isDamagedInvincible = true;
 		this.flicker = 1;
@@ -156,7 +130,6 @@ export default class Player extends Entity {
 			this.flickerInterval,
 			this.invincibilityDuration,
 			() => {
-				// Stop invincibility and reset the flicker to normal
 				this.isDamagedInvincible = false;
 				this.flicker = 1;
 			}

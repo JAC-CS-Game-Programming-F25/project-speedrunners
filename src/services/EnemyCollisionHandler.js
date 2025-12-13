@@ -20,11 +20,24 @@ export default class EnemyCollisionHandler {
         if (!enemyManager) return result;
         
         for (const enemy of enemyManager.enemies) {
-            if (!enemy.isActive || enemy.isDying) continue;
+            if (!enemy.isActive || enemy.isDying) 
+                continue;
             
             if (enemy.collidesWith(player)) {
-                if (player.isInvincible ) {
+                if (player.isInvincible || player.isDamagedInvincible) {
                     continue;
+                }
+                if (this.checkSideCollision(player, enemy)) {
+                    result.tookDamage = true;
+                    console.log("PLACEHOLDER: Player damage state triggered");
+                    
+                    if (ringManager && ringManager.getRingCount() > 0) {
+                        ringManager.loseRings(
+                            player.position.x + player.dimensions.x / 2,
+                            player.position.y + player.dimensions.y / 2,
+                            10
+                        );
+                    }
                 }   
                 this.resolveCollision(player, enemy);
             }
@@ -68,7 +81,7 @@ export default class EnemyCollisionHandler {
      * @param {Player} player 
      * @param {Enemy} enemy 
      */
-    static resolveCollision(player, enemy) {
+static resolveCollision(player, enemy) {
         const overlapLeft = (player.position.x + player.dimensions.x) - enemy.position.x;
         const overlapRight = (enemy.position.x + enemy.dimensions.x) - player.position.x;
         const overlapTop = (player.position.y + player.dimensions.y) - enemy.position.y;
@@ -76,15 +89,11 @@ export default class EnemyCollisionHandler {
         
         const minOverlap = Math.min(overlapLeft, overlapRight, overlapTop, overlapBottom);
         
-        // Don't block jumping on top of enemies (that's for killing them)
-        // Only resolve side collisions
         if (minOverlap === overlapLeft && player.velocity.x > 0) {
-            // Hit from left - only if moving right
             player.position.x = enemy.position.x - player.dimensions.x;
             player.velocity.x = 0;
         }
         else if (minOverlap === overlapRight && player.velocity.x < 0) {
-            // Hit from right - only if moving left
             player.position.x = enemy.position.x + enemy.dimensions.x;
             player.velocity.x = 0;
         }
