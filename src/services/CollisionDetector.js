@@ -121,8 +121,11 @@ export default class CollisionDetector {
         
         // DAMAGE INVINCIBILITY: Pass through enemies (no solid collision, no damage)
         if (player.isDamagedInvincible) {
-            return result; // Just skip everything - no solid collision, no damage
+            console.log(`[COLLISION] Player is damage invincible - passing through enemies`);
+            return result; // Pass through like a ghost - no solid collision, no damage
         }
+        
+        console.log(`[COLLISION] Player NOT invincible - checking for damage`);
         
         // SECOND PASS: Check side collisions and solid collision (only if no kills and not invincible)
         let hitTakenThisFrame = false;
@@ -134,6 +137,17 @@ export default class CollisionDetector {
                 // Check side collision (damage) - only once per frame
                 if (!hitTakenThisFrame && this.checkSideCollision(player, enemy)) {
                     result.tookDamage = true;
+                    
+                    // Calculate knockback direction based on collision side
+                    const playerCenterX = player.position.x + player.dimensions.x / 2;
+                    const enemyCenterX = enemy.position.x + enemy.dimensions.x / 2;
+                    
+                    // FIXED: If player is to the RIGHT of enemy, knock him RIGHT (away)
+                    // If player is to the LEFT of enemy, knock him LEFT (away)
+                    player.knockbackRight = playerCenterX > enemyCenterX;
+                    
+                    console.log(`[COLLISION] Knockback calculation: playerX=${playerCenterX.toFixed(1)}, enemyX=${enemyCenterX.toFixed(1)}, knockbackRight=${player.knockbackRight}`);
+                    
                     player.hit();
                     hitTakenThisFrame = true;
                     console.log("Player hit by enemy!");

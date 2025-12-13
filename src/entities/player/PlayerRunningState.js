@@ -34,10 +34,11 @@
 		 * @param {number} dt - The time passed since the last update.
 		 */
 		update(dt) {
-			super.update(dt);  
-			this.checkTransitions();   
 			this.handleInput();         
 			this.handleHorizontalMovement();  
+			super.update(dt);  
+			this.checkTransitions();   
+			
 	
 		}
 
@@ -67,11 +68,12 @@
 		 * Checks for state transitions.
 		 */
 		checkTransitions() {
-            // If horizontal velocity drops below run threshold, go to walking
-            if (Math.abs(this.player.velocity.x) < PlayerConfig.runThreshold) {
-                this.player.stateMachine.change(PlayerStateName.Walking);
-                return;
-            }
+           const RUN_EXIT_THRESHOLD = PlayerConfig.runThreshold * 0.8;
+
+if (Math.abs(this.player.velocity.x) < RUN_EXIT_THRESHOLD) {
+    this.player.stateMachine.change(PlayerStateName.Walking);
+    return;
+}
 
             // If velocity is really low, go to idling
             if (!this.isMovingLeft && !this.isMovingRight && Math.abs(this.player.velocity.x) < 0.25) {

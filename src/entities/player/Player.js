@@ -39,6 +39,7 @@ export default class Player extends Entity {
         this.ringsManager = null;
         this.rings = [];
         this.hitSpikeTop = false;
+        this.knockbackRight = undefined; // Set by CollisionDetector for knockback direction
         this.sparkles = new InvincibilitySparkles();
 		this.isBouncing = false;
         this.sprites = loadPlayerSprites(
@@ -108,16 +109,11 @@ export default class Player extends Entity {
 		);
 	}
 
-	/**
-	 * Updates the player's state.
-	 * @param {number} dt - The time passed since the last update.
-	 */
 	update(dt) {
 		this.stateMachine.update(dt);
 		if (this.isInvincible) {
 			this.sparkles.update(dt);
 		}
-		console.log(Math.abs(this.velocity.x))
 	}
 
     render(context) {
@@ -137,19 +133,21 @@ export default class Player extends Entity {
     }
 
 	hit() {
-		 // Safety check: don't take damage if already damaged invincible
+		// Safety check: don't take damage if already damaged invincible
         if (this.isDamagedInvincible) {
+            console.log("Hit blocked: already damaged invincible");
             return;
         }
 
         // Safety check: don't take damage if already in damage state (prevents double-hit)
         if (this.stateMachine.currentState.name === PlayerStateName.Damage) {
+            console.log("Hit blocked: already in damage state");
             return;
         }
 
         // CRITICAL: Check CURRENT ring count from manager, not cached this.rings
-        // this.rings is updated AFTER player.update() but hit() is called DURING player.update()
         const currentRings = this.map && this.map.ringManager ? this.map.ringManager.getRingCount() : 0;
+        console.log(`Hit registered! Rings: ${currentRings}, knockbackRight: ${this.knockbackRight}`);
 
         if (currentRings > 0) {
             // Lose rings
@@ -182,9 +180,9 @@ export default class Player extends Entity {
 			this.flickerInterval,
 			this.invincibilityDuration,
 			() => {
-				// Stop invincibility and reset the flicker to normal
 				this.isDamagedInvincible = false;
 				this.flicker = 1;
+                console.log("Damage invincibility expired");
 			}
     	);
 	}
@@ -204,4 +202,3 @@ export default class Player extends Entity {
 		);
 	}
 }
-

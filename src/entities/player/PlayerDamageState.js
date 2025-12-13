@@ -32,13 +32,33 @@ export default class PlayerDamageState extends PlayerState {
         const knockbackSpeedX = 200; // horizontal speed of knockback
         const knockbackSpeedY = -250; // vertical speed
         
-        // Apply velocity opposite to the direction being faced
-        if (this.player.facingRight) {
-            this.player.velocity.x = -knockbackSpeedX; 
+        console.log(`[DAMAGE STATE] knockbackRight=${this.player.knockbackRight}, facingRight=${this.player.facingRight}`);
+        
+        // Apply velocity based on collision side (not facing direction)
+        // knockbackRight is set by CollisionDetector based on enemy position
+        if (this.player.knockbackRight !== undefined) {
+            // Use collision-based direction
+            if (this.player.knockbackRight) {
+                this.player.velocity.x = knockbackSpeedX;  // Knockback to the right
+                console.log(`[DAMAGE STATE] Knockback RIGHT (${knockbackSpeedX})`);
+            } else {
+                this.player.velocity.x = -knockbackSpeedX; // Knockback to the left
+                console.log(`[DAMAGE STATE] Knockback LEFT (${-knockbackSpeedX})`);
+            }
         } else {
-            this.player.velocity.x = knockbackSpeedX; 
+            // Fallback to facing direction (for spike hits, etc.)
+            if (this.player.facingRight) {
+                this.player.velocity.x = -knockbackSpeedX; 
+                console.log(`[DAMAGE STATE] Fallback knockback LEFT (facing right)`);
+            } else {
+                this.player.velocity.x = knockbackSpeedX; 
+                console.log(`[DAMAGE STATE] Fallback knockback RIGHT (facing left)`);
+            }
         }
         this.player.velocity.y = knockbackSpeedY; // upward push
+        
+        // Reset knockback direction so it doesn't get reused
+        this.player.knockbackRight = undefined;
     }
     
     /**

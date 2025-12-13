@@ -85,23 +85,21 @@ export default class Map {
     }
     
     setupSpikes() {
-        this.spikeManager.addSpike(1000, 192);
-        //this.spikeManager.addSpike(450, 192);
+        this.spikeManager.addSpike(400, 192);
+        this.spikeManager.addSpike(450, 192);
     }
     
     setupPowerUps() {
-        this.powerUpManager.addBox(100, 192, 'invincibility');
-        // this.powerUpManager.addBox(500, 192, 'random');
-        // this.powerUpManager.addBox(700, 192, 'random');
+        //this.powerUpManager.addBox(100, 192, 'random');
+        //this.powerUpManager.addBox(500, 192, 'random');
+        //this.powerUpManager.addBox(700, 192, 'random');
     }
     
     setupEnemies() {
         this.enemyManager.addEnemy('buzzbomber', 300, 192);
         //this.enemyManager.addEnemy('buzzbomber', 600, 192);
         this.enemyManager.addEnemy('crab', 250, 192);
-                //this.enemyManager.addEnemy('crab', 250, 192);
-
-        this.enemyManager.addEnemy('crab', 550, 192);
+        this.enemyManager.addEnemy('crab', 250, 192);
     }
     
     setupSprings() {
@@ -139,6 +137,10 @@ export default class Map {
           if (this.player.hitSpikeTop) {
               if (!this.playerIsHit) {
                   this.playerIsHit = true;
+                  
+                  // For spikes, use facing direction for knockback (spikes are stationary)
+                  this.player.knockbackRight = !this.player.facingRight;
+                  
                   this.player.hit();
                     console.log("Player hit spike from top!");
                 }
