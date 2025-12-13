@@ -60,6 +60,7 @@
 			if (input.isKeyPressed(Input.KEYS.SPACE)) {
 				this.player.stateMachine.change(PlayerStateName.Jumping);
 			}
+			
 		}
 
 		/**
@@ -77,10 +78,9 @@
                 this.player.stateMachine.change(PlayerStateName.Idling);
             }
 
-			// if (this.shouldSkid()) {
-			// 	this.player.facingRight = !this.player.facingRight;
-			// 	this.player.stateMachine.change(PlayerStateName.Skidding);
-			// }
+			if (this.shouldSkid()) {
+				this.player.stateMachine.change(PlayerStateName.Skidding);
+			}
 
 			// if (!this.player.isOnGround) {
 			// 	if (this.player.velocity.y < 0) {
@@ -92,6 +92,7 @@
 			// if (Math.abs(this.player.velocity.x) >= PlayerConfig.runThreshold) {
         	// 	this.player.stateMachine.change(PlayerStateName.Running);
     		// }
+			
 		}
 
 		/**
