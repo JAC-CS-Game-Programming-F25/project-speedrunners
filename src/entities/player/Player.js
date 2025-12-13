@@ -118,13 +118,32 @@ export default class Player extends Entity {
     }
 
 	hit() {
-		if (this.rings > 0 && !this.isDamagedInvincible) {
-			this.stateMachine.change(PlayerStateName.Damage)
-			this.startInvincibility(); 
-        	this.map.playerDamageTimer = this.map.playerDamageCooldown; 
-		}
-		else {
-			this.die();
+		 // Safety check: don't take damage if already damaged invincible
+        if (this.isDamagedInvincible) {
+            return;
+        }
+
+        // Safety check: don't take damage if already in damage state (prevents double-hit)
+        if (this.stateMachine.currentState.name === PlayerStateName.Damage) {
+            return;
+        }
+
+        // CRITICAL: Check CURRENT ring count from manager, not cached this.rings
+        // this.rings is updated AFTER player.update() but hit() is called DURING player.update()
+        const currentRings = this.map && this.map.ringManager ? this.map.ringManager.getRingCount() : 0;
+
+        if (currentRings > 0) {
+            // Lose rings
+            this.map.ringManager.loseRings(
+                this.position.x + this.dimensions.x / 2,
+                this.position.y + this.dimensions.y / 2,
+                10
+            );
+
+            this.stateMachine.change(PlayerStateName.Damage);
+        }
+        else {
+            this.die();
 		}
 	}
 

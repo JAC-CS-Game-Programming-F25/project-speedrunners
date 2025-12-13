@@ -5,6 +5,7 @@ import { debugOptions, input } from '../../globals.js';
 import Input from '../../../lib/Input.js';
 import { PlayerConfig } from '../../../config/PlayerConfig.js';
 import Tile from '../../services/Tile.js';
+import PlayerStateName from '../../enums/PlayerStateName.js';
 
 export default class PlayerState extends State {
 	constructor(player) {
