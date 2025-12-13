@@ -7,6 +7,7 @@ import { PlayerConfig } from '../../../config/PlayerConfig.js';
 import Tile from '../../services/Tile.js';
 import SpikeCollisionHandler from '../../services/SpikeCollisionHandler.js';
 import EnemyCollisionHandler from '../../services/EnemyCollisionHandler.js';
+import PlayerStateName from '../../enums/PlayerStateName.js';
 
 /**
  * Base class for all player states.
@@ -198,18 +199,56 @@ export default class PlayerState extends State {
 		if (Math.abs(this.player.velocity.x) < 0.1) this.player.velocity.x = 0;
 	}
 
+	
+
 	moveRight() {
-		this.player.velocity.x = Math.min(
-			this.player.velocity.x + PlayerConfig.acceleration,
-			PlayerConfig.maxSpeed
-		);
+		const WALK_CAP = PlayerConfig.walkCap
+		const MAX_SPEED = PlayerConfig.maxSpeed;
+		const MIN_MOVE_SPEED = PlayerConfig.minMoveSpeed
+		
+		// If starting from stop or moving slowly, give instant minimum speed
+		if (this.player.velocity.x < MIN_MOVE_SPEED && this.player.velocity.x >= 0) {
+			this.player.velocity.x = MIN_MOVE_SPEED;
+		}
+
+		// Use different acceleration based on if Sonic is walking or running
+		const isWalking = this.player.stateMachine.currentState === PlayerStateName.Walking;
+		const acceleration = isWalking ? PlayerConfig.walkAcceleration : PlayerConfig.runAcceleration;
+		
+		// Apply the acceleration
+		this.player.velocity.x += acceleration;
+
+		// Clamp the speed depending on walking or running
+		if (isWalking) {
+			this.player.velocity.x = Math.min(this.player.velocity.x, WALK_CAP);
+		} else {
+			this.player.velocity.x = Math.min(this.player.velocity.x, MAX_SPEED);
+		}
 	}
 
 	moveLeft() {
-		this.player.velocity.x = Math.max(
-			this.player.velocity.x - PlayerConfig.acceleration,
-			-PlayerConfig.maxSpeed
-		);
+		const WALK_CAP = PlayerConfig.walkCap
+		const MAX_SPEED = PlayerConfig.maxSpeed;
+		const MIN_MOVE_SPEED = PlayerConfig.minMoveSpeed 
+		
+		// If starting from stop or moving slowly, give instant minimum speed
+		if (this.player.velocity.x > -MIN_MOVE_SPEED && this.player.velocity.x <= 0) {
+			this.player.velocity.x = -MIN_MOVE_SPEED;
+		}
+
+		// Use different acceleration based on current state/speed
+		const isWalking = this.player.stateMachine.currentState === PlayerStateName.Walking;
+		const acceleration = isWalking ? PlayerConfig.walkAcceleration : PlayerConfig.runAcceleration;
+		
+		// Apply acceleration (negative for left movement)
+		this.player.velocity.x -= acceleration;
+
+		// Clamp speed depending on state
+		if (isWalking) {
+			this.player.velocity.x = Math.max(this.player.velocity.x, -WALK_CAP);
+		} else {
+			this.player.velocity.x = Math.max(this.player.velocity.x, -MAX_SPEED);
+		}
 	}
 
 	slowDown() {

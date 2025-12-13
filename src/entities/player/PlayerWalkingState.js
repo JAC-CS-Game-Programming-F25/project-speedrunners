@@ -25,9 +25,9 @@ export default class PlayerWalkingState extends PlayerState {
 	 * Called when entering the walking state.
 	 */
 	enter() {
-	this.player.isOnGround = true;
-	this.player.currentAnimation = this.player.animations.walk;
-	this.player.currentAnimation.refresh(); 
+		this.player.isOnGround = true;
+		this.player.currentAnimation = this.player.animations.walk;
+		this.player.currentAnimation.refresh(); 
 	}
 
 	/**
@@ -68,13 +68,9 @@ export default class PlayerWalkingState extends PlayerState {
 	 */
 	checkTransitions() {
 		// Force immediate stop when not pressing movement keys
-		if (!this.isMovingLeft && !this.isMovingRight) {
-			// If velocity is low, snap to 0 and transition immediately
-			if (Math.abs(this.player.velocity.x) < 1.0) {  // Higher threshold
-				this.player.velocity.x = 0;  // Force stop
-				this.player.stateMachine.change(PlayerStateName.Idling);
-				return;
-			}
+		if (this.shouldIdle()) {
+			this.player.stateMachine.change(PlayerStateName.Idling);
+			return;
 		}
 		
 		if (!this.player.isOnGround) {
@@ -82,8 +78,11 @@ export default class PlayerWalkingState extends PlayerState {
 				this.player.stateMachine.change(PlayerStateName.Jumping);
 			} 
 		}
-		console.log(Math.abs(this.player.velocity.x),PlayerConfig.runThreshold)
-		if (Math.abs(this.player.velocity.x) >= PlayerConfig.runThreshold) {
+
+		if (
+			(input.isKeyHeld(Input.KEYS.D) || input.isKeyHeld(Input.KEYS.A)) &&
+			Math.abs(this.player.velocity.x) >= PlayerConfig.runThreshold
+		) {
 			this.player.stateMachine.change(PlayerStateName.Running);
 		}
 	}
