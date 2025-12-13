@@ -33,6 +33,16 @@ export const playerSpriteConfig = {
 	skid: [
 		{ x: 479, y: 352, width: 32, height: 36 },
 		{ x: 547, y: 352, width: 34, height: 36 },
+	],
+	crouch: [
+		{ x: 507, y: 271, width: 34, height: 26 }
+	],
+	roll: [
+		{ x: 43, y: 625, width: 32, height: 32},
+		{ x: 113, y: 625, width: 32, height: 32},
+		{ x: 183, y: 625, width: 32, height: 32},
+		{ x: 253, y: 625, width: 32, height: 32},
+		{ x: 323, y: 625, width: 32, height: 32},
 	]
 }
 

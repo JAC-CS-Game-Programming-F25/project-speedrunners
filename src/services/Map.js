@@ -64,15 +64,15 @@ export default class Map {
         
         // Create spike manager and add some spikes
         this.spikeManager = new SpikeManager();
-        this.setupSpikes();
+        // this.setupSpikes();
         
         // Create powerup manager and add some boxes
         this.powerUpManager = new PowerUpManager();
-        this.setupPowerUps();
+        // this.setupPowerUps();
         
         // Create enemy manager and add some enemies
         this.enemyManager = new EnemyManager();
-        this.setupEnemies();
+        // this.setupEnemies();
         
         // Give player access to managers for collision checks
         this.player.powerUpManager = this.powerUpManager;

@@ -16,6 +16,8 @@ import PlayerDeathState from './PlayerDeathState.js';
 import InvincibilitySparkles from '../../objects/PowerUps/InvincibilitySparkles.js';
 import RingManager from '../../services/RingManager.js';
 import PlayerSkiddingState from './PlayerSkiddingState.js';
+import PlayerCrouchingState from './PlayerCrouchingState.js';
+import PlayerRollingState from './PlayerRollingState.js';
 
 /**
  * Represents the player character in the game.
@@ -63,7 +65,9 @@ export default class Player extends Entity {
 			run: new Animation(this.sprites.run, 0.1),
 			damage: new Animation(this.sprites.damage, 0.1),
 			death: new Animation(this.sprites.death),
-			skid: new Animation(this.sprites.skid, 0.08)
+			skid: new Animation(this.sprites.skid, 0.08),
+			crouch: new Animation(this.sprites.crouch),
+			roll: new Animation(this.sprites.roll, 0.08)
 		};
 
 		this.currentAnimation = this.animations.idle;
@@ -95,6 +99,14 @@ export default class Player extends Entity {
 		this.stateMachine.add(
 			PlayerStateName.Skidding,
 			new PlayerSkiddingState(this)
+		)
+		this.stateMachine.add(
+			PlayerStateName.Crouching,
+			new PlayerCrouchingState(this)
+		)
+		this.stateMachine.add(
+			PlayerStateName.Rolling,
+			new PlayerRollingState(this)
 		)
 		this.stateMachine.add(
 			PlayerStateName.Idling,

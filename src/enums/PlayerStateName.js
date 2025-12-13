@@ -5,7 +5,9 @@ const PlayerStateName = {
 	Running: 'running',
 	Damage: 'damage',
 	Death: 'death',
-	Skidding: 'skidding'
+	Skidding: 'skidding',
+	Crouching: 'crouching',
+	Rolling: 'rolling'
 };
 
 export default PlayerStateName;

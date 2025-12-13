@@ -12,10 +12,12 @@ export const PlayerConfig = {
 	maxJumpBuffer: 0.1,
 	doubleJumpEnabled: false,
 	skidThreshold: 100,
-	slideFriction: 0.95,
+	slideFriction: 0.96,
 	bounceVelocity: -200, // Upward velocity when bouncing off an enemy
 	runThreshold: 300,
 	walkCap: 120,            
-	minMoveSpeed: 30
+	minMoveSpeed: 20,
+	rollFrictionSpeed: 0.98,
+	minRollSpeed: 0.5
 };
 
