@@ -61,7 +61,7 @@ export default class PlayerState extends State {
 				// Trigger box when landing on TOP
 				if (minOverlap === overlapTop) {
 
-					if (this.player.canHit() && !box.isHit) {
+					if (this.player.canHitBox() && !box.isHit) {
 						const powerUp = box.hit();
 						
 						if (powerUp) {
@@ -199,33 +199,17 @@ export default class PlayerState extends State {
 	}
 
 	moveRight() {
-		const WALK_SPEED = PlayerConfig.walk_speed
-		if (this.player.velocity.x < WALK_SPEED) {
-			this.player.velocity.x = Math.min(
-				this.player.velocity.x + PlayerConfig.acceleration,
-				WALK_SPEED
-			);
-		} else {
-			this.player.velocity.x = Math.min(
-				this.player.velocity.x + PlayerConfig.acceleration * 0.5, // slower increment
-				PlayerConfig.maxSpeed
-			);
-		}
+		this.player.velocity.x = Math.min(
+			this.player.velocity.x + PlayerConfig.acceleration,
+			PlayerConfig.maxSpeed
+		);
 	}
 
 	moveLeft() {
-		const WALK_SPEED = PlayerConfig.walk_speed
-		if (this.player.velocity.x > WALK_SPEED) {
-			this.player.velocity.x = Math.max(
-				this.player.velocity.x - PlayerConfig.acceleration,
-				WALK_SPEED
-			);
-		} else {
-			this.player.velocity.x = Math.max(
-				this.player.velocity.x - PlayerConfig.acceleration * 0.5,
-				-PlayerConfig.maxSpeed
-			);
-		}
+		this.player.velocity.x = Math.max(
+			this.player.velocity.x - PlayerConfig.acceleration,
+			-PlayerConfig.maxSpeed
+		);
 	}
 
 	slowDown() {

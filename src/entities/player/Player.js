@@ -130,6 +130,8 @@ export default class Player extends Entity {
 	hit() {
 		if (this.rings > 0 && !this.isDamagedInvincible) {
 			this.stateMachine.change(PlayerStateName.Damage)
+			this.startInvincibility(); 
+        	this.map.playerDamageTimer = this.map.playerDamageCooldown; 
 		}
 		else {
 			this.die();
@@ -163,11 +165,18 @@ export default class Player extends Entity {
     	);
 	}
 
-	canHit() {
+	canHitEnemy() {
 		return (
 			this.stateMachine.currentState.name === PlayerStateName.Jumping &&
 			this.velocity.y > 0 &&
 			!this.isDamagedInvincible
+		);
+	}
+
+	canHitBox() {
+		return (
+			this.stateMachine.currentState.name === PlayerStateName.Jumping &&
+			this.velocity.y > 0
 		);
 	}
 

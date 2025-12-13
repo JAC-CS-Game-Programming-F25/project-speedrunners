@@ -47,11 +47,6 @@ export default class PlayerDamageState extends PlayerState {
 	 */
 	update(dt) {
 		super.update(dt);
-        if (this.player.isOnGround && !this.invincibilityStarted) {
-            this.player.startInvincibility()
-            this.invincibilityStarted = true
-        }
-
 
         if (this.player.isOnGround) {
             this.player.velocity.x = 0

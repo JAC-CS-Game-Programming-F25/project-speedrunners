@@ -82,7 +82,7 @@ export default class PlayerWalkingState extends PlayerState {
 				this.player.stateMachine.change(PlayerStateName.Jumping);
 			} 
 		}
-		
+		console.log(Math.abs(this.player.velocity.x),PlayerConfig.runThreshold)
 		if (Math.abs(this.player.velocity.x) >= PlayerConfig.runThreshold) {
 			this.player.stateMachine.change(PlayerStateName.Running);
 		}
