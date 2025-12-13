@@ -105,12 +105,26 @@ export default class CollisionDetector {
             return result;
         }
         
-        // Skip all collision if invincible
-        if (player.isInvincible || player.isDamagedInvincible) {
-            return result;
+        // POWERUP INVINCIBILITY: Kill enemies from any direction
+        if (player.isInvincible) {
+            for (const enemy of enemyManager.enemies) {
+                if (!enemy.isActive || enemy.isDying) continue;
+                
+                if (enemy.collidesWith(player)) {
+                    enemy.die();
+                    result.killedEnemy = true;
+                    console.log(`${enemy.constructor.name} destroyed by invincibility!`);
+                }
+            }
+            return result; // Don't check damage or solid collision
         }
         
-        // SECOND PASS: Check side collisions and solid collision (only if no kills)
+        // DAMAGE INVINCIBILITY: Pass through enemies (no solid collision, no damage)
+        if (player.isDamagedInvincible) {
+            return result; // Just skip everything - no solid collision, no damage
+        }
+        
+        // SECOND PASS: Check side collisions and solid collision (only if no kills and not invincible)
         let hitTakenThisFrame = false;
         
         for (const enemy of enemyManager.enemies) {

@@ -105,7 +105,7 @@ export default class Map {
     }
     
     setupSprings() {
-        this.springManager.addSpring(200, 208);
+        //this.springManager.addSpring(200, 208);
         //this.springManager.addSpring(400, 208);
     }
     
