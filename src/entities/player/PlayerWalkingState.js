@@ -86,10 +86,12 @@
         if (Math.abs(this.player.velocity.x) >= PlayerConfig.runThreshold) {
             this.player.stateMachine.change(PlayerStateName.Running);
         }
-    }
-			if (this.shouldIdle()) {
+
+		if (this.shouldIdle()) {
 				this.player.stateMachine.change(PlayerStateName.Idling);
 			}
+    }
+			
 
 
 		
