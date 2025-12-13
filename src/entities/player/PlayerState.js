@@ -67,24 +67,28 @@ export default class PlayerState extends State {
 				const minOverlap = Math.min(overlapLeft, overlapRight, overlapTop, overlapBottom);
 				
 				// Trigger box when landing on TOP
-				if (minOverlap === overlapTop && this.player.velocity.y > 0 && !box.isHit) {
-					const powerUp = box.hit();
-					
-					if (powerUp) {
-						// Activate powerup IMMEDIATELY
-						if (powerUp.duration === 0) {
-							// Instant powerup (rings)
-							powerUp.activate(this.player);
-							this.player.map.ringManager.totalRingsCollected += powerUp.getRingAmount();
-						} else {
-							// Timed powerup (speed, invincibility)
-							powerUp.activate(this.player);
-							this.player.powerUpManager.activePowerUps.push(powerUp);
+				if (minOverlap === overlapTop) {
+
+					if (this.player.canHit() && !box.isHit) {
+						const powerUp = box.hit();
+						
+						if (powerUp) {
+							// Activate powerup IMMEDIATELY
+							if (powerUp.duration === 0) {
+								// Instant powerup (rings)
+								powerUp.activate(this.player);
+								this.player.map.ringManager.totalRingsCollected += powerUp.getRingAmount();
+							} else {
+								// Timed powerup (speed, invincibility)
+								powerUp.activate(this.player);
+								this.player.powerUpManager.activePowerUps.push(powerUp);
+							}
 						}
+						
+						// Add bounce effect
+						this.player.velocity.y = -200;
 					}
-					
-					// Add bounce effect
-					this.player.velocity.y = -200;
+
 				}
 				
 				// Resolve solid collision only if box is still solid

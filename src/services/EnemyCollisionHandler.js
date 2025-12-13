@@ -23,45 +23,9 @@ export default class EnemyCollisionHandler {
             if (!enemy.isActive || enemy.isDying) continue;
             
             if (enemy.collidesWith(player)) {
-                // 1. Check if player is invincible - kills from any direction
-                if (player.isInvincible) {
-                    enemy.die();
-                    result.killedEnemy = true;
-                    console.log(`${enemy.constructor.name} destroyed by invincible Sonic!`);
-                    continue; // Skip solid collision when invincible
-                }
-                
-                // 2. Check if player jumped on enemy (top collision = kill)
-                if (this.checkTopCollision(player, enemy)) {
-                    enemy.die();
-                    result.killedEnemy = true;
-                    
-                    // Give player a bounce
-                    player.velocity.y = -300;
-                    
-                    console.log(`${enemy.constructor.name} destroyed!`);
-                    continue; // Skip damage/solid collision if killed
-                }
-                
-                // 3. Check if player hit enemy from side (side collision = damage)
-                if (this.checkSideCollision(player, enemy)) {
-                    result.tookDamage = true;
-                    
-                    console.log("PLACEHOLDER: Player damage state triggered");
-                    
-                    // Lose rings if available
-                    if (ringManager && ringManager.getRingCount() > 0) {
-                        ringManager.loseRings(
-                            player.position.x + player.dimensions.x / 2,
-                            player.position.y + player.dimensions.y / 2,
-                            10
-                        );
-                    }
-                    
-                    // Don't break - still need solid collision resolution
-                }
-                
-                // 4. Resolve solid collision (blocks player from moving through enemy)
+                if (player.isInvincible ) {
+                    continue;
+                }   
                 this.resolveCollision(player, enemy);
             }
         }

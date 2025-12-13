@@ -89,9 +89,9 @@
 			// 		this.player.stateMachine.change(PlayerStateName.Falling);
 			// 	}
 			// }
-			if (Math.abs(this.player.velocity.x) >= PlayerConfig.runThreshold) {
-        		this.player.stateMachine.change(PlayerStateName.Running);
-    		}
+			// if (Math.abs(this.player.velocity.x) >= PlayerConfig.runThreshold) {
+        	// 	this.player.stateMachine.change(PlayerStateName.Running);
+    		// }
 		}
 
 		/**
