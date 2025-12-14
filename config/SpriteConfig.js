@@ -84,26 +84,31 @@ export const enemySpriteConfig = {
 
 }
 
-export const titleSprites = [
-	{ x: 48, y: 807, width: 384, height: 216 },
-	{ x: 540, y: 807, width: 384, height: 216 },
-	{ x: 1032, y: 807, width: 384, height: 216 },
-	{ x: 48, y: 1155, width: 384, height: 216 },
-	{ x: 540, y: 1155, width: 384, height: 216 },
-	{ x: 1032, y: 1155, width: 384, height: 216 },
-	{ x: 48, y: 1503, width: 384, height: 216 },
-	{ x: 540, y: 1503, width: 384, height: 216 },
-	{ x: 1032, y: 1503, width: 384, height: 216 },
-	{ x: 48, y: 1851, width: 384, height: 216 },
-	{ x: 540, y: 1845, width: 384, height: 222 },
-	{ x: 1032, y: 1851, width: 384, height: 216 },
-	{ x: 48, y: 2199, width: 384, height: 216 },
-	{ x: 540, y: 2196, width: 384, height: 219 },
-	{ x: 1032, y: 2193, width: 384, height: 222 },
-	{ x: 48, y: 2538, width: 384, height: 225 },
-	{ x: 540, y: 2538, width: 384, height: 225 },
-	{ x: 1032, y: 2538, width: 384, height: 225 },
-]
+export const titleSpriteConfig = {
+	sonic: [
+		{ x: 32, y: 538, width: 256, height: 144},
+		{ x: 360, y: 538, width: 256, height: 144},
+		{ x: 688, y: 538, width: 256, height: 144},
+		{ x: 32, y: 770, width: 256, height: 144},
+		{ x: 360, y: 770, width: 256, height: 144},
+		{ x: 688, y: 770, width: 256, height: 144},
+		{ x: 32, y: 1002, width: 256, height: 144},
+		{ x: 360, y: 1002, width: 256, height: 144},
+		{ x: 688, y: 1002, width: 256, height: 144},
+		{ x: 32, y: 1234, width: 256, height: 144},
+		{ x: 360, y: 1230, width: 256, height: 148},
+		{ x: 688, y: 1234, width: 256, height: 144},
+		{ x: 32, y: 1466, width: 256, height: 144},
+		{ x: 360, y: 1464, width: 256, height: 146},
+		{ x: 688, y: 1462, width: 256, height: 148},
+		{ x: 32, y: 1692, width: 256, height: 150},
+		{ x: 360, y: 1692, width: 256, height: 150},
+		{ x: 688, y: 1692, width: 256, height: 150},
+	],
+	pressstart: [
+		{ x: 536, y: 1976, width: 144, height: 8 }
+	]
+}
 
 export function loadPlayerSprites(spriteSheet, playerSpriteConfig) {
 	const sprites = {};

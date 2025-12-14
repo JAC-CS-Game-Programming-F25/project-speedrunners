@@ -27,8 +27,8 @@
 		{
 			"name": "titlescreen",
 			"path": "./assets/sprites/title-screens-no-bg.png",
-			"width": 1560,
-			"height": 5072
+			"width": 1040,
+			"height": 3381
 		},
 		{
 			"name": "titlescreen-topbg",
