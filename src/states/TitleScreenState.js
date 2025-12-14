@@ -93,7 +93,7 @@ export default class TitleScreenState extends State {
 		if (this.currentSonicAnimation === this.sonicIntro && this.sonicIntro.isDone()) {
 			this.currentSonicAnimation = this.sonicLoop;
 		}
-		if(input.isKeyHeld(Input.KEYS.ENTER)){
+		if(input.isKeyHeld(Input.KEYS.ENTER) && this.currentSonicAnimation === this.sonicLoop){
 			stateMachine.change(GameStateName.Play);
 		}
 
@@ -123,11 +123,13 @@ export default class TitleScreenState extends State {
 		sonicSprite.render(x, y, { x: TitleScreenState.SONIC_SCALE, y: TitleScreenState.SONIC_SCALE});
 		const pressX = (CANVAS_WIDTH - this.pressStartSprite.width * TitleScreenState.SONIC_SCALE) / 2;
 		const pressY = y + scaledHeight;
+		if (this.currentSonicAnimation === this.sonicLoop) {
+			context.save();
+			context.globalAlpha = this.pressStartAlpha;
+			this.pressStartSprite.render(pressX, pressY, { x: TitleScreenState.SONIC_SCALE, y: TitleScreenState.SONIC_SCALE });
+			context.restore();
+		}
 
-		context.save();
-		context.globalAlpha = this.pressStartAlpha;
-		this.pressStartSprite.render(pressX, pressY, { x: TitleScreenState.SONIC_SCALE, y: TitleScreenState.SONIC_SCALE });
-		context.restore();
 
 	}
 
