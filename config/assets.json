@@ -66,6 +66,13 @@
 			"width": 8192,
 			"height": 40
 		}
+		,
+		{
+			"name": "hud",
+			"path": "./assets/sprites/hud-no-bg.png",
+			"width": 676,
+			"height": 600
+		}
 
 
 

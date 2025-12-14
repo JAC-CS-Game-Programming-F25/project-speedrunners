@@ -4,6 +4,8 @@ export const ImageName = {
 	Background: 'background',
 	GameObjects: "gameObjects",
 	Badniks: "badniks",
+	TitleScreen: "titlescreen&background",
+	Hud: "hud",
 	TitleScreen: "titlescreen",
 	TitleScreenTopBG: 'titlescreen-topbg',
 	TitleScreenBottomBG: 'titlescreen-bottombg',

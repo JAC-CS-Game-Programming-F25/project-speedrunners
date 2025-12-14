@@ -1,6 +1,4 @@
 import State from "../../lib/State.js";
-import Vector from "../../lib/Vector.js";
-import Player from "../entities/player/Player.js";
 import Map from "../services/Map.js";
 import {SoundName} from "../enums/SoundName.js";
 import { CANVAS_HEIGHT, context, sounds } from "../globals.js";

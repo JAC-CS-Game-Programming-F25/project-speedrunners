@@ -62,7 +62,7 @@ export default class PlayerWalkingState extends PlayerState {
 			this.isMovingRight = false;
 		}
 
-		if (input.isKeyPressed(Input.KEYS.SPACE)) {
+		if (input.isKeyPressed(Input.KEYS.SPACE) && this.player.isOnGround) {
 			this.player.stateMachine.change(PlayerStateName.Jumping);
 		}
 
@@ -75,6 +75,9 @@ export default class PlayerWalkingState extends PlayerState {
 	 * Checks for state transitions.
 	 */
 	checkTransitions() {
+		if(this.player.stateMachine.currentState.name === PlayerStateName.Victory){
+			return;
+		}
 		if (this.shouldIdle()) {
 			this.player.stateMachine.change(PlayerStateName.Idling);
 			return;
