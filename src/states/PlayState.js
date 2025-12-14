@@ -42,6 +42,8 @@ export default class PlayState extends State {
 		// Bottom/Water bg
 		// The 50 at the end is auto scroll speed
 		this.bgBottom = new LevelBackground(ImageName.LevelBottomBG, scaledTop + scaledMiddle1 + scaledMiddle2, scale, 1, 50);
+
+		
 	}
 
 	update(dt) {

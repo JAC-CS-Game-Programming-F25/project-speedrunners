@@ -14,8 +14,6 @@ export default class TitleScreenState extends State {
 	static SONIC_MAX_HEIGHT = 150 * this.SONIC_SCALE
 	constructor(mapDefinition) {
 		super();
-
-		this.playState = new PlayState(mapDefinition);
 		
 		// Initialize delay properties
 		this.canStart = false;
@@ -117,9 +115,8 @@ export default class TitleScreenState extends State {
 			return;
 		}
 		
-		// Use isKeyPressed instead of isKeyHeld
 		if (input.isKeyPressed(Input.KEYS.ENTER) && this.currentSonicAnimation === this.sonicLoop) {
-			stateMachine.change(GameStateName.Play);
+			stateMachine.change(GameStateName.TitleTransition, { scene: this.sceneTop });
 		}
 	}
 	

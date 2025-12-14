@@ -12,7 +12,8 @@ export const ImageName = {
 	LevelTopBG: 'level-topbg',
 	LevelBottomBG: 'level-bottombg',
 	LevelMiddleBG1: 'level-middlebg1',
-	LevelMiddleBG2: 'level-middlebg2'
+	LevelMiddleBG2: 'level-middlebg2',
+	TitleCard: 'titlecard'
 };
 
 export default ImageName;
