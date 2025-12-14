@@ -157,3 +157,33 @@ export function loadEnemySprites(spriteSheet, config) {
             )
     );
 }
+
+
+
+
+// Sign Post Sprite Configuration
+export const signPostSpriteConfig = {
+    frame1: { x: 228, y: 662, width: 48, height: 48 },
+    frame2: { x: 284, y: 690, width: 32, height: 48 },
+    frame3: { x: 324, y: 690, width: 8, height: 48 },
+    frame4: { x: 284, y: 690, width: 32, height: 48, flipped: true }, // Same as frame2 but flipped
+    frame5: { x: 228, y: 718, width: 48, height: 48 }
+};
+
+/**
+ * Loads sign post sprites from spritesheet
+ * @param {Image} image - The spritesheet image
+ * @param {Object} config - The sprite configuration
+ * @returns {Object} Object containing sign post sprite arrays
+ */
+export function loadSignPostSprites(image, config) {
+    return {
+        idle: [new Sprite(image, config.frame1.x, config.frame1.y, config.frame1.width, config.frame1.height)],
+        spinning: [
+            new Sprite(image, config.frame2.x, config.frame2.y, config.frame2.width, config.frame2.height),
+            new Sprite(image, config.frame3.x, config.frame3.y, config.frame3.width, config.frame3.height),
+            new Sprite(image, config.frame4.x, config.frame4.y, config.frame4.width, config.frame4.height),
+            new Sprite(image, config.frame5.x, config.frame5.y, config.frame5.width, config.frame5.height)
+        ]
+    };
+}

@@ -16,6 +16,7 @@ import SpikeManager from "./SpikeManager.js";
 import PowerUpManager from "./PowerUpManager.js";
 import EnemyManager from "./EnemyManager.js";
 import SpringManager from "./SpringManager.js";
+import SignPostManager from "./SignPostManager.js";
 
 export default class Map {
     static BACKGROUND_LAYER = 1;
@@ -68,12 +69,22 @@ export default class Map {
         
         this.springManager = new SpringManager();
         this.setupSprings();
+
+        this.signPostManager = new SignPostManager();
+        this.setupSignPosts();
         
         this.player.powerUpManager = this.powerUpManager;
         this.player.spikeManager = this.spikeManager;
         this.player.enemyManager = this.enemyManager;
         this.player.springManager = this.springManager;
+        this.player.signPostManager = this.signPostManager;
         this.player.ringManager = this.ringManager;
+    }
+
+     setupSignPosts() {
+        // Add sign post at end of level
+        // Y position: 176 = ground (208) - signpost height (32)
+        this.signPostManager.addSignPost(200, 180);
     }
     
     setupRings() {
@@ -96,10 +107,10 @@ export default class Map {
     }
     
     setupEnemies() {
-        this.enemyManager.addEnemy('buzzbomber', 300, 192);
+        //this.enemyManager.addEnemy('buzzbomber', 300, 192);
         //this.enemyManager.addEnemy('buzzbomber', 600, 192);
-        this.enemyManager.addEnemy('crab', 850, 192);
-        this.enemyManager.addEnemy('crab', 250, 192);
+       // this.enemyManager.addEnemy('crab', 850, 192);
+       // this.enemyManager.addEnemy('crab', 250, 192);
     }
     
     setupSprings() {
@@ -120,6 +131,7 @@ export default class Map {
         this.enemyManager.update(dt, this.spikeManager, this.powerUpManager);
         
         this.springManager.update(dt);
+        this.signPostManager.update(dt);
         
         if (this.playerDamageTimer > 0) {
             this.playerDamageTimer -= dt;
@@ -160,6 +172,7 @@ export default class Map {
         this.powerUpManager.render(context);
         this.enemyManager.render(context);
         this.ringManager.render(context);
+        this.signPostManager.render(context);
         this.player.render(context);
         
         this.powerUpManager.renderPowerUps(context);
