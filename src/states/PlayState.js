@@ -10,6 +10,7 @@ import {ImageName} from "../enums/ImageName.js";
 export default class PlayState extends State {
 	constructor(mapDefinition) {
 		super();
+		
 		this.map = new Map(mapDefinition);
 		this.backgroundImage = images.get(ImageName.Background);
 

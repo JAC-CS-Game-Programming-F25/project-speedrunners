@@ -84,6 +84,27 @@ export const enemySpriteConfig = {
 
 }
 
+export const titleSprites = [
+	{ x: 48, y: 807, width: 384, height: 216 },
+	{ x: 540, y: 807, width: 384, height: 216 },
+	{ x: 1032, y: 807, width: 384, height: 216 },
+	{ x: 48, y: 1155, width: 384, height: 216 },
+	{ x: 540, y: 1155, width: 384, height: 216 },
+	{ x: 1032, y: 1155, width: 384, height: 216 },
+	{ x: 48, y: 1503, width: 384, height: 216 },
+	{ x: 540, y: 1503, width: 384, height: 216 },
+	{ x: 1032, y: 1503, width: 384, height: 216 },
+	{ x: 48, y: 1851, width: 384, height: 216 },
+	{ x: 540, y: 1845, width: 384, height: 222 },
+	{ x: 1032, y: 1851, width: 384, height: 216 },
+	{ x: 48, y: 2199, width: 384, height: 216 },
+	{ x: 540, y: 2196, width: 384, height: 219 },
+	{ x: 1032, y: 2193, width: 384, height: 222 },
+	{ x: 48, y: 2538, width: 384, height: 225 },
+	{ x: 540, y: 2538, width: 384, height: 225 },
+	{ x: 1032, y: 2538, width: 384, height: 225 },
+]
+
 export function loadPlayerSprites(spriteSheet, playerSpriteConfig) {
 	const sprites = {};
 

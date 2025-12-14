@@ -2,7 +2,7 @@
 	"images": [
 		{
 			"name": "sonic",
-			"path": "./assets/images/Sonic.png",
+			"path": "./assets/sprites/Sonic.png",
 			"width": 690,
 			"height": 1558
 		},
@@ -25,11 +25,24 @@
 			"height": 1087
 		},
 		{
-			"name": "titlescreen&background",
-			"path": "./assets/sprites/TitleScreen&Background.png",
-			"width": 1072,
-			"height": 3413
+			"name": "titlescreen",
+			"path": "./assets/sprites/title-screens-no-bg.png",
+			"width": 1560,
+			"height": 5072
+		},
+		{
+			"name": "titlescreen-topbg",
+			"path": "./assets/images/background-top.png",
+			"width": 1024,
+			"height": 112
+		},
+		{
+			"name": "titlescreen-bottombg",
+			"path": "./assets/images/background-bottom.png",
+			"width": 1024,
+			"height": 144
 		}
+
 
 	],
 	"sounds":[
