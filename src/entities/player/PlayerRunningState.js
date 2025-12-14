@@ -61,6 +61,12 @@
 			if (input.isKeyPressed(Input.KEYS.SPACE)) {
 				this.player.stateMachine.change(PlayerStateName.Jumping);
 			}
+
+			if (input.isKeyPressed(Input.KEYS.S) && 
+        !input.isKeyHeld(Input.KEYS.A) && 
+        !input.isKeyHeld(Input.KEYS.D)) {
+        this.player.stateMachine.change(PlayerStateName.Rolling);
+    }
 			
 		}
 

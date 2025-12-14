@@ -115,6 +115,7 @@ export default class Player extends Entity {
 		if (this.isInvincible) {
 			this.sparkles.update(dt);
 		}
+		console.log(`SONIC POSTION: (${this.position.x}, ${this.position.y})`);
 	}
 
     render(context) {
