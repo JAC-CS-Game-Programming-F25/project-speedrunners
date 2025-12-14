@@ -17,6 +17,7 @@ import PowerUpManager from "./PowerUpManager.js";
 import EnemyManager from "./EnemyManager.js";
 import SpringManager from "./SpringManager.js";
 import SignPostManager from "./SignPostManager.js";
+import UserInterface from "./UserInterface.js";
 
 export default class Map {
     static BACKGROUND_LAYER = 1;
@@ -79,9 +80,11 @@ export default class Map {
         this.player.springManager = this.springManager;
         this.player.signPostManager = this.signPostManager;
         this.player.ringManager = this.ringManager;
+
+        this.ui = new UserInterface(this.player, this.ringManager)
     }
 
-     setupSignPosts() {
+    setupSignPosts() {
         // Add sign post at end of level
         // Y position: 176 = ground (208) - signpost height (32)
         this.signPostManager.addSignPost(3933, 180);
@@ -134,6 +137,7 @@ export default class Map {
         
         this.springManager.update(dt);
         this.signPostManager.update(dt);
+        this.ui.update(dt)
         
         if (this.playerDamageTimer > 0) {
             this.playerDamageTimer -= dt;
@@ -182,39 +186,39 @@ export default class Map {
         this.backgroundLayer.render();
         this.camera.resetTransform(context);
         
-        this.renderUI();
+        this.ui.render()
     }
     
     renderUI() {
-        context.save();
-        context.fillStyle = '#FFD700';
-        context.font = '20px Arial';
-        context.fillText(`Rings: ${this.ringManager.getRingCount()}`, 10, 25);
+        // context.save();
+        // context.fillStyle = '#FFD700';
+        // context.font = '20px Arial';
+        // context.fillText(`Rings: ${this.ringManager.getRingCount()}`, 10, 25);
         
-        if (this.playerIsHit || this.playerDamageTimer > 0) {
-            context.fillStyle = '#FF0000';
-            context.fillText('HIT!', 10, 50);
-        }
+        // if (this.playerIsHit || this.playerDamageTimer > 0) {
+        //     context.fillStyle = '#FF0000';
+        //     context.fillText('HIT!', 10, 50);
+        // }
         
-        let yOffset = 75;
-        if (this.player.hasSpeedShoes) {
-            const timeLeft = this.powerUpManager.getPowerUpTimeRemaining('speed');
-            context.fillStyle = '#00FFFF';
-            context.fillText(`Speed: ${Math.ceil(timeLeft)}s`, 10, yOffset);
-            yOffset += 25;
-        }
+        // let yOffset = 75;
+        // if (this.player.hasSpeedShoes) {
+        //     const timeLeft = this.powerUpManager.getPowerUpTimeRemaining('speed');
+        //     context.fillStyle = '#00FFFF';
+        //     context.fillText(`Speed: ${Math.ceil(timeLeft)}s`, 10, yOffset);
+        //     yOffset += 25;
+        // }
         
-        if (this.player.isInvincible) {
-            const timeLeft = this.powerUpManager.getPowerUpTimeRemaining('invincibility');
-            context.fillStyle = '#FFD700';
-            context.fillText(`Invincible: ${Math.ceil(timeLeft)}s`, 10, yOffset);
-            yOffset += 25;
-        }
+        // if (this.player.isInvincible) {
+        //     const timeLeft = this.powerUpManager.getPowerUpTimeRemaining('invincibility');
+        //     context.fillStyle = '#FFD700';
+        //     context.fillText(`Invincible: ${Math.ceil(timeLeft)}s`, 10, yOffset);
+        //     yOffset += 25;
+        // }
         
-        context.fillStyle = '#FF6B6B';
-        context.fillText(`Enemies: ${this.enemyManager.getActiveCount()}`, 10, yOffset);
+        // context.fillStyle = '#FF6B6B';
+        // context.fillText(`Enemies: ${this.enemyManager.getActiveCount()}`, 10, yOffset);
         
-        context.restore();
+        // context.restore();
     }
     
     static renderGrid() {

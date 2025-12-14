@@ -72,6 +72,7 @@ export default class TitleTransitionState extends State {
 
 	render() {
         context.save();
+        context.imageSmoothingEnabled = false;
         // Draw black 
         context.fillStyle = `rgba(0,0,0,${this.transitionAlpha})`;
         context.fillRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);

@@ -116,13 +116,16 @@ export default class TitleScreenState extends State {
 		}
 		
 		if (input.isKeyPressed(Input.KEYS.ENTER) && this.currentSonicAnimation === this.sonicLoop) {
-			stateMachine.change(GameStateName.TitleTransition, { scene: this.sceneTop });
+			stateMachine.change(GameStateName.Play, { scene: this.sceneTop });
 		}
 	}
 	
 	render(){
+		context.imageSmoothingEnabled = false;
 		this.sceneTop.render();
 		this.sceneBottom.render();
+		// enable for when we render sonic since it looks bad for sonic
+		context.imageSmoothingEnabled = true;
 		context.save();
 		
 		this.renderSonicAnimation();
@@ -142,6 +145,7 @@ export default class TitleScreenState extends State {
 		const y = (CANVAS_HEIGHT - TitleScreenState.SONIC_MAX_HEIGHT) / 2 + (TitleScreenState.SONIC_MAX_HEIGHT - scaledHeight);
 
 		sonicSprite.render(x, y, { x: TitleScreenState.SONIC_SCALE, y: TitleScreenState.SONIC_SCALE});
+		context.imageSmoothingEnabled = false;
 		const pressX = (CANVAS_WIDTH - this.pressStartSprite.width * TitleScreenState.SONIC_SCALE) / 2;
 		const pressY = y + scaledHeight;
 		if (this.currentSonicAnimation === this.sonicLoop) {
