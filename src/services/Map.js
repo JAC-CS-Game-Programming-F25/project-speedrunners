@@ -84,20 +84,20 @@ export default class Map {
      setupSignPosts() {
         // Add sign post at end of level
         // Y position: 176 = ground (208) - signpost height (32)
-        this.signPostManager.addSignPost(200, 180);
+        this.signPostManager.addSignPost(3933, 180);
     }
     
     setupRings() {
-        this.ringManager.addRingLine(100, 160, 8, 25);
-        this.ringManager.addRingArc(300, 180, 40, 7);
-        this.ringManager.addRing(450, 170);
-        this.ringManager.addRing(480, 150);
-        this.ringManager.addRing(510, 170);
+        //this.ringManager.addRingLine(100, 160, 8, 25);
+        //this.ringManager.addRingArc(300, 180, 40, 7);
+        //this.ringManager.addRing(450, 170);
+        //this.ringManager.addRing(480, 150);
+        //this.ringManager.addRing(510, 170);
     }
     
     setupSpikes() {
-        this.spikeManager.addSpike(400, 192);
-        this.spikeManager.addSpike(450, 192);
+       // this.spikeManager.addSpike(400, 192);
+       // this.spikeManager.addSpike(450, 192);
     }
     
     setupPowerUps() {
@@ -114,8 +114,9 @@ export default class Map {
     }
     
     setupSprings() {
-        this.springManager.addSpring(600, 208);
-        //this.springManager.addSpring(400, 208);
+        this.springManager.addSpring(120, 208);
+        this.springManager.addSpring(990, 208);
+        this.springManager.addSpring(1506, 208);
     }
     
     update(dt) {
