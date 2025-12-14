@@ -110,6 +110,10 @@ export const titleSpriteConfig = {
 	]
 }
 
+export const titleCardSprites = [
+	{ x: 91, y: 233, width: 157, height: 56}
+]
+
 export function loadPlayerSprites(spriteSheet, playerSpriteConfig) {
 	const sprites = {};
 
