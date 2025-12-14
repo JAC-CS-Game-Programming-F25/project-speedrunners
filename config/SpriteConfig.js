@@ -213,3 +213,47 @@ export function loadSignPostSprites(image, config) {
         ]
     };
 }
+
+
+
+// Victory Screen Sprite Configuration
+// Victory Screen Sprite Configuration
+export const victorySpriteConfig = {
+    background: { x: 348, y: 184, width: 320, height: 224 },
+    act1: { x: 348, y: 496, width: 40, height: 23, offsetX: 184, offsetY: 90 },
+    score: { x: 348, y: 416, width: 40, height: 16, offsetX: 80, offsetY: 100 },
+    time: { x: 348, y: 440, width: 32, height: 16, offsetX: 80, offsetY: 116 },
+    rings: { x: 348, y: 464, width: 32, height: 16, offsetX: 80, offsetY: 132 }
+};
+
+/**
+ * Loads victory screen sprites from spritesheet
+ * @param {Image} image - The spritesheet image
+ * @param {Object} config - The sprite configuration
+ * @returns {Object} Object containing victory screen sprites
+ */
+export function loadVictorySprites(image, config) {
+    return {
+        background: new Sprite(image, config.background.x, config.background.y, config.background.width, config.background.height),
+        act1: {
+            sprite: new Sprite(image, config.act1.x, config.act1.y, config.act1.width, config.act1.height),
+            offsetX: config.act1.offsetX,
+            offsetY: config.act1.offsetY
+        },
+        score: {
+            sprite: new Sprite(image, config.score.x, config.score.y, config.score.width, config.score.height),
+            offsetX: config.score.offsetX,
+            offsetY: config.score.offsetY
+        },
+        time: {
+            sprite: new Sprite(image, config.time.x, config.time.y, config.time.width, config.time.height),
+            offsetX: config.time.offsetX,
+            offsetY: config.time.offsetY
+        },
+        rings: {
+            sprite: new Sprite(image, config.rings.x, config.rings.y, config.rings.width, config.rings.height),
+            offsetX: config.rings.offsetX,
+            offsetY: config.rings.offsetY
+        }
+    };
+}

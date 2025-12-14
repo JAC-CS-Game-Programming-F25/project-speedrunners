@@ -41,6 +41,9 @@ export default class PlayerIdlingState extends PlayerState {
 	 * Handles player input.
 	 */
 	handleInput() {
+		 if (this.player.stateMachine.currentState.name === PlayerStateName.Victory) {
+        return;
+    }
 		if (input.isKeyPressed(Input.KEYS.SPACE)) {
 			this.player.stateMachine.change(PlayerStateName.Jumping);
 		}

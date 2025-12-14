@@ -85,6 +85,7 @@ export default class Map {
         // Add sign post at end of level
         // Y position: 176 = ground (208) - signpost height (32)
         this.signPostManager.addSignPost(3933, 180);
+        this.signPostManager.addSignPost(100, 180);
     }
     
     setupRings() {

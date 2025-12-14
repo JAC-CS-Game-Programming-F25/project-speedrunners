@@ -1,8 +1,10 @@
 import Animation from '../../lib/Animation.js';
-import { images } from '../globals.js';
+import { images, stateMachine } from '../globals.js';
 import { ImageName } from '../enums/ImageName.js';
 import { loadSignPostSprites, signPostSpriteConfig } from '../../config/SpriteConfig.js';
 import Entity from '../entities/Entity.js';
+import GameStateName from '../enums/GameStateName.js';
+import PlayerStateName from '../enums/PlayerStateName.js';
 
 export default class SignPost extends Entity {
     constructor(x, y) {
@@ -12,11 +14,11 @@ export default class SignPost extends Entity {
         this.isActivated = false;
         this.animationFinished = false;
         
-        // Spin settings
         this.spinCount = 0;
-        this.maxSpins = 3; // Number of times to spin before stopping
+        this.maxSpins = 3;
         
-        // Load sprites
+        this.player = null; // Will be set when activated
+        
         const sprites = loadSignPostSprites(
             images.get(ImageName.GameObjects),
             signPostSpriteConfig
@@ -25,48 +27,53 @@ export default class SignPost extends Entity {
         this.idleSprite = sprites.idle[0];
         this.spinningFrames = sprites.spinning;
         
-        // Create animations
         this.animations = {
             idle: new Animation(sprites.idle),
             spinning: new Animation(sprites.spinning, 0.1)
         };
         
         this.currentAnimation = this.animations.idle;
-        
-        // Frame widths for centering calculation
-        this.frameWidths = [32, 8, 32, 48]; // frame2, frame3, frame4, frame5
+        this.frameWidths = [32, 8, 32, 48];
     }
     
     update(dt) {
-        if (!this.isActive) return;
+    if (!this.isActive) return;
+    
+    if (this.isActivated && !this.animationFinished) {
+        const previousFrame = this.currentAnimation.currentFrame;
+        this.currentAnimation.update(dt);
         
-        if (this.isActivated && !this.animationFinished) {
-            const previousFrame = this.currentAnimation.currentFrame;
-            this.currentAnimation.update(dt);
+        if (previousFrame === 3 && this.currentAnimation.currentFrame === 0) {
+            this.spinCount++;
+            console.log(`Spin ${this.spinCount}/${this.maxSpins} complete`);
             
-            // Check if animation looped (went from last frame back to first)
-            if (previousFrame === 3 && this.currentAnimation.currentFrame === 0) {
-                this.spinCount++;
-                console.log(`Spin ${this.spinCount}/${this.maxSpins} complete`);
+            if (this.spinCount >= this.maxSpins) {
+                this.currentAnimation.currentFrame = 3;
+                this.animationFinished = true;
+                console.log("Sign post animation finished!");
                 
-                // Stop on last frame after completing all spins
-                if (this.spinCount >= this.maxSpins) {
-                    this.currentAnimation.currentFrame = 3;
-                    this.animationFinished = true;
-                    console.log("Sign post animation finished!");
-                }
+                // Pass the map to VictoryState
+                setTimeout(() => {
+                    stateMachine.change(GameStateName.Victory, { map: this.player.map });
+                }, 500);
             }
         }
     }
+}
     
-    activate() {
+    activate(player) {
         if (this.isActivated) return;
         
         this.isActivated = true;
         this.animationFinished = false;
         this.spinCount = 0;
+        this.player = player;
         this.currentAnimation = this.animations.spinning;
         this.currentAnimation.refresh();
+        if (player) {
+            player.stateMachine.change(PlayerStateName.Victory);
+        }
+        
         console.log("Sign post activated!");
     }
     
@@ -80,13 +87,10 @@ export default class SignPost extends Entity {
         context.translate(this.position.x, this.position.y);
         
         if (this.isActivated) {
-            // Calculate horizontal offset to center the frame
             const frameWidth = this.frameWidths[frameIndex];
             const offsetX = (this.dimensions.x - frameWidth) / 2;
             
-            // Frame index 2 is frame4 (flipped version of frame2)
             if (frameIndex === 2) {
-                // Flip horizontally around the center
                 context.translate(this.dimensions.x / 2, 0);
                 context.scale(-1, 1);
                 frame.render(-frameWidth / 2, 0);
@@ -94,7 +98,6 @@ export default class SignPost extends Entity {
                 frame.render(offsetX, 0);
             }
         } else {
-            // Idle frame (48px wide, no offset needed)
             frame.render(0, 0);
         }
         

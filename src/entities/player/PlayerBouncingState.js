@@ -43,6 +43,9 @@ export default class PlayerBouncingState extends PlayerState {
 	 * Checks for state transitions.
 	 */
 	checkTransitions() {
+		 if (this.player.stateMachine.currentState.name === PlayerStateName.Victory) {
+        return;
+    }
 		if (this.player.velocity.y >= 0) {
 			this.player.isOnSpring = false;
 			this.player.stateMachine.change(PlayerStateName.Walking);

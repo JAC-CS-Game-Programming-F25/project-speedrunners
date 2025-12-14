@@ -374,21 +374,18 @@ checkEnemyCollisions(player, enemyManager, ringManager = null) {
 
 
 	checkSignPostCollisions(player, signPostManager) {
-        if (!signPostManager) return;
+    if (!signPostManager) return;
+    
+    for (const signPost of signPostManager.signPosts) {
+        if (!signPost.isActive || signPost.isActivated) continue;
         
-        for (const signPost of signPostManager.signPosts) {
-            if (!signPost.isActive || signPost.isActivated) continue;
+        if (signPost.collidesWith(player)) {
+            // Pass player to activate so it can trigger victory state
+            signPost.activate(player);
             
-            if (signPost.collidesWith(player)) {
-                // Activate the sign post spinning animation
-                signPost.activate();
-                
-                console.log("Victory! Sign post hit!");
-                
-                // player.stateMachine.change(PlayerStateName.Victory);
-                
-                break; // Only activate one sign post at a time
-            }
+            console.log("Victory! Sign post hit!");
+            break;
         }
     }
+}
 }

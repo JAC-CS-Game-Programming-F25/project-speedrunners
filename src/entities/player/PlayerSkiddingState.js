@@ -67,6 +67,9 @@ export default class PlayerSkiddingState extends PlayerState {
      * Checks for state transitions.
      */
     checkTransitions() {
+		if(this.player.stateMachine.currentState.name === PlayerStateName.Victory){
+			return;
+		}
         // Exit skid when stopped
         if (Math.abs(this.player.velocity.x) < 0.1) {
             if (input.isKeyHeld(Input.KEYS.A) || input.isKeyHeld(Input.KEYS.D)) {

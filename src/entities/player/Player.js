@@ -20,6 +20,8 @@ import PlayerCrouchingState from './PlayerCrouchingState.js';
 import PlayerRollingState from './PlayerRollingState.js';
 import PlayerBouncingState from './PlayerBouncingState.js';
 import SignPostManager from '../../services/SignPostManager.js';
+import PlayerVictoryState from './PlayerVictoryState.js';
+
 export default class Player extends Entity {
     constructor(x, y, width, height, map) {
         super(x, y, width, height);
@@ -108,6 +110,12 @@ export default class Player extends Entity {
 			PlayerStateName.Idling,
 			new PlayerIdlingState(this)
 		);
+		this.stateMachine.add(
+    		PlayerStateName.Victory,
+    		new PlayerVictoryState(this)
+		);
+
+		this.stateMachine.change(PlayerStateName.Idling);
 	}
 
 	update(dt) {
