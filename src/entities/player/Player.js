@@ -45,6 +45,11 @@ export default class Player extends Entity {
         this.knockbackRight = undefined; // Set by CollisionDetector for knockback direction
         this.sparkles = new InvincibilitySparkles();
 		this.isBouncing = false;
+		this.slopeAngle = 0;
+
+
+
+
         this.sprites = loadPlayerSprites(
             images.get(ImageName.Sonic),
             playerSpriteConfig
@@ -127,20 +132,37 @@ export default class Player extends Entity {
 	}
 
     render(context) {
-        context.save();
-        context.globalAlpha = this.isDamagedInvincible ? this.flicker : 1;
-        this.stateMachine.render(context);
-        if (this.isInvincible) {
-            this.sparkles.render(
-                context,
-                this.position.x,
-                this.position.y,
-                this.dimensions.x,
-                this.dimensions.y
-            );
-        }
-        context.restore();
+    context.save();
+
+    const centerX = this.position.x + this.dimensions.x / 2;
+    const centerY = this.position.y + this.dimensions.y / 2;
+
+    context.translate(centerX, centerY);
+
+    // Clamp rotation (classic Sonic never tilts much)
+    const maxTilt = Math.PI / 10; // ~18°
+    const tilt = Math.max(-maxTilt, Math.min(this.slopeAngle, maxTilt));
+
+    context.rotate(tilt);
+
+    context.translate(-centerX, -centerY);
+
+    context.globalAlpha = this.isDamagedInvincible ? this.flicker : 1;
+    this.stateMachine.render(context);
+
+    if (this.isInvincible) {
+        this.sparkles.render(
+            context,
+            this.position.x,
+            this.position.y,
+            this.dimensions.x,
+            this.dimensions.y
+        );
     }
+
+    context.restore();
+}
+
 
 	hit() {
 		// Safety check: don't take damage if already damaged invincible

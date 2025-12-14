@@ -76,63 +76,126 @@ checkHorizontalCollisions(entity) {
         return false;
     }
 
+
+
+	computeSlopeAngle(entity) {
+    const tileSize = Tile.SIZE;
+    const footY = entity.position.y + entity.dimensions.y;
+
+    const sampleDist = 6;
+
+    const x1 = entity.position.x + entity.dimensions.x / 2 - sampleDist;
+    const x2 = entity.position.x + entity.dimensions.x / 2 + sampleDist;
+
+    const y1 = this.findGroundYAtX(x1, footY);
+    const y2 = this.findGroundYAtX(x2, footY);
+
+    if (y1 === null || y2 === null) return 0;
+
+    const dx = sampleDist * 2;
+    const dy = y2 - y1;
+
+    return Math.atan2(dy, dx);
+}
+
+findGroundYAtX(x, footY) {
+    const tileSize = Tile.SIZE;
+    const tileX = Math.floor(x / tileSize);
+    const tileY = Math.floor(footY / tileSize);
+
+    for (let y = tileY - 1; y <= tileY + 1; y++) {
+        const tile = this.map.getCollisionTileAt(tileX, y);
+        if (!tile || !this.map.isSolidTileAt(tileX, y)) continue;
+
+        const localX = Math.floor(x) % tileSize;
+        const h = tile.getHeightAt(localX);
+        if (h <= 0) continue;
+
+        return y * tileSize + (tileSize - h);
+    }
+
+    return null;
+}
+
+
+
+
+
     /**
      * New slope-aware vertical collision using heightmap sampling
      */
-    checkVerticalCollisions(entity) {
-        const tileSize = Tile.SIZE;
-        
-        // Store previous ground state for slope sticking
-        const wasOnGround = entity.isOnGround;
-        
-        // Reset ground state
-        entity.isOnGround = false;
-        
-        // Find ground position
-        const groundY = this.findGroundY(entity);
-        
-        if (groundY !== null) {
-            const entityBottom = entity.position.y + entity.dimensions.y;
-            const distanceToGround = groundY - entityBottom;
-            
-            // SLOPE STICKING: If we were on ground, stay on ground unless jumping
-            // This prevents vibration by keeping Sonic attached to slopes
-            if (wasOnGround && entity.velocity.y >= 0) {
-                // Snap to ground if within reasonable range (prevents floating/vibrating)
-                if (distanceToGround >= -tileSize && distanceToGround <= tileSize) {
-                    entity.position.y = groundY - entity.dimensions.y;
-                    entity.velocity.y = 0;
-                    entity.isOnGround = true;
-                    return; // Early exit - we're grounded
+checkVerticalCollisions(entity) {
+    const tileSize = Tile.SIZE;
+
+    const wasOnGround = entity.isOnGround;
+    entity.isOnGround = false;
+
+    const groundY = this.findGroundY(entity);
+
+    if (groundY !== null) {
+        const entityBottom = entity.position.y + entity.dimensions.y;
+        const targetY = groundY - entity.dimensions.y;
+        const diff = targetY - entity.position.y;
+
+        if (entity.velocity.y >= 0) {
+            if (wasOnGround) {
+                // ===============================
+                // UPHILL: tiny snap corrections
+                // ===============================
+                if (diff < 0 && Math.abs(diff) <= 2) {
+                    entity.position.y += diff;
                 }
-            }
-            
-            // Normal falling - snap when we reach the ground
-            if (entity.velocity.y >= 0 && entityBottom >= groundY - 1) {
-                entity.position.y = groundY - entity.dimensions.y;
+
+                // ===============================
+                // DOWNHILL: smoothly follow slope
+                // ===============================
+                else if (diff > 0) {
+    // Smooth downhill, but always move at least a tiny amount
+    const followSpeed = Math.max(0.5, Math.abs(entity.velocity.x)); // ensures he keeps up
+    entity.position.y += Math.min(diff, followSpeed);
+}
+
+
+                // ===============================
+                // FOOT BIAS: gently pull Sonic closer
+                // ===============================
+                const footBias = 1; // 1px closer to the ground
+                if (entityBottom + footBias <= groundY) {
+                    entity.position.y += footBias;
+                }
+
+                // Safety snap if penetration occurs
+                if (entity.position.y + entity.dimensions.y > groundY) {
+                    entity.position.y = targetY;
+                }
+
                 entity.velocity.y = 0;
                 entity.isOnGround = true;
+                return;
             }
-            // Jumping up - check ceiling
-            else if (entity.velocity.y < 0) {
-                this.checkCeilingCollision(entity);
+
+            // Initial landing
+            if (entityBottom >= groundY - 1) {
+                entity.position.y = targetY;
+                entity.velocity.y = 0;
+                entity.isOnGround = true;
+                return;
             }
-        } else if (entity.velocity.y < 0) {
-            // No ground found, moving up - check ceiling
+        }
+
+        if (entity.velocity.y < 0) {
             this.checkCeilingCollision(entity);
         }
-        
-        // Extra slope sticking for edge cases: 
-        // If we just lost ground contact while moving horizontally, try to reattach
-        if (wasOnGround && !entity.isOnGround && entity.velocity.y >= 0 && Math.abs(entity.velocity.x) > 0) {
-            const extendedGroundY = this.findGroundYExtended(entity, tileSize * 1.5);
-            if (extendedGroundY !== null) {
-                entity.position.y = extendedGroundY - entity.dimensions.y;
-                entity.velocity.y = 0;
-                entity.isOnGround = true;
-            }
+    } else {
+        if (entity.velocity.y < 0) {
+            this.checkCeilingCollision(entity);
         }
     }
+}
+
+
+
+
     
     /**
      * Extended ground search for slope sticking (looks further down)
@@ -172,61 +235,55 @@ checkHorizontalCollisions(entity) {
      * @param {Entity} entity 
      * @returns {number|null} The Y position of the ground, or null if no ground
      */
-    findGroundY(entity) {
-        const tileSize = Tile.SIZE;
-        
-        // Sample at entity's center bottom (foot position)
-        const footX = entity.position.x + entity.dimensions.x / 2;
-        const footY = entity.position.y + entity.dimensions.y;
-        
-        // Convert to tile coordinates
+   findGroundY(entity) {
+    const tileSize = Tile.SIZE;
+
+    const footY = entity.position.y + entity.dimensions.y;
+
+    const sampleOffsets = [
+        entity.dimensions.x * 0.25,
+        entity.dimensions.x * 0.5,
+        entity.dimensions.x * 0.75
+    ];
+
+    let closestGroundY = null;
+
+    for (const offset of sampleOffsets) {
+        const footX = entity.position.x + offset;
+
         const tileX = Math.floor(footX / tileSize);
         const tileY = Math.floor(footY / tileSize);
-        
-        // Check tiles: current, above, and below
+
         const tilesToCheck = [tileY - 1, tileY, tileY + 1];
-        
-        let closestGroundY = null;
-        
+
         for (const checkTileY of tilesToCheck) {
             if (checkTileY < 0) continue;
-            
+
             const tile = this.map.getCollisionTileAt(tileX, checkTileY);
-            
-            if (tile && this.map.isSolidTileAt(tileX, checkTileY)) {
-                // Calculate local X position within the tile (0-15)
-                const localX = Math.floor(footX) % tileSize;
-                
-                // Get ground height at this position
-                const groundHeight = tile.getHeightAt(localX);
-                
-                // Skip if no ground at this position
-                if (groundHeight <= 0) continue;
-                
-                // Convert to world Y coordinate
-                // groundY = top of tile + (tileSize - groundHeight)
-                const groundY = checkTileY * tileSize + (tileSize - groundHeight);
-                
-                // Only consider ground within a reasonable range
-                const searchRangeUp = tileSize;    // Look up to 1 tile above feet
-                const searchRangeDown = tileSize;  // Look up to 1 tile below feet
-                
-                if (groundY >= footY - searchRangeUp && groundY <= footY + searchRangeDown) {
-                    // Keep the highest valid ground (closest to player's feet from below)
-                    if (closestGroundY === null || groundY < closestGroundY) {
-                        closestGroundY = groundY;
-                    }
+            if (!tile || !this.map.isSolidTileAt(tileX, checkTileY)) continue;
+
+            const localX = Math.floor(footX) % tileSize;
+            const groundHeight = tile.getHeightAt(localX);
+            if (groundHeight <= 0) continue;
+
+            const groundY =
+                checkTileY * tileSize + (tileSize - groundHeight);
+
+            if (
+                groundY >= footY - tileSize &&
+                groundY <= footY + tileSize
+            ) {
+                if (closestGroundY === null || groundY < closestGroundY) {
+                    closestGroundY = groundY;
+					
                 }
             }
         }
-        
-        // Round to prevent sub-pixel jitter
-        if (closestGroundY !== null) {
-            closestGroundY = Math.round(closestGroundY);
-        }
-        
-        return closestGroundY;
     }
+
+    return closestGroundY;
+}
+
     
     /**
      * Check ceiling collision (for jumping up)
