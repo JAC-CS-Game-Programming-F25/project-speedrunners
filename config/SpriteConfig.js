@@ -84,6 +84,32 @@ export const enemySpriteConfig = {
 
 }
 
+export const titleSpriteConfig = {
+	sonic: [
+		{ x: 32, y: 538, width: 256, height: 144},
+		{ x: 360, y: 538, width: 256, height: 144},
+		{ x: 688, y: 538, width: 256, height: 144},
+		{ x: 32, y: 770, width: 256, height: 144},
+		{ x: 360, y: 770, width: 256, height: 144},
+		{ x: 688, y: 770, width: 256, height: 144},
+		{ x: 32, y: 1002, width: 256, height: 144},
+		{ x: 360, y: 1002, width: 256, height: 144},
+		{ x: 688, y: 1002, width: 256, height: 144},
+		{ x: 32, y: 1234, width: 256, height: 144},
+		{ x: 360, y: 1230, width: 256, height: 148},
+		{ x: 688, y: 1234, width: 256, height: 144},
+		{ x: 32, y: 1466, width: 256, height: 144},
+		{ x: 360, y: 1464, width: 256, height: 146},
+		{ x: 688, y: 1462, width: 256, height: 148},
+		{ x: 32, y: 1692, width: 256, height: 150},
+		{ x: 360, y: 1692, width: 256, height: 150},
+		{ x: 688, y: 1692, width: 256, height: 150},
+	],
+	pressstart: [
+		{ x: 536, y: 1976, width: 144, height: 8 }
+	]
+}
+
 export function loadPlayerSprites(spriteSheet, playerSpriteConfig) {
 	const sprites = {};
 
