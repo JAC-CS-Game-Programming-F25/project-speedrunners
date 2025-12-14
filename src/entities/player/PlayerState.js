@@ -31,6 +31,9 @@ export default class PlayerState extends State {
 		if (this.player.springManager) {
 			this.collisionDetector.checkSpringCollisions(this.player, this.player.springManager);
 		}
+		if (this.player.signPostManager) {
+   			this.collisionDetector.checkSignPostCollisions(this.player, this.player.signPostManager);
+		}
 		
 		this.player.currentAnimation.update(dt);
 	}

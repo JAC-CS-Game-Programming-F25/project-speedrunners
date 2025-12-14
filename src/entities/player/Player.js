@@ -19,7 +19,7 @@ import PlayerSkiddingState from './PlayerSkiddingState.js';
 import PlayerCrouchingState from './PlayerCrouchingState.js';
 import PlayerRollingState from './PlayerRollingState.js';
 import PlayerBouncingState from './PlayerBouncingState.js';
-
+import SignPostManager from '../../services/SignPostManager.js';
 export default class Player extends Entity {
     constructor(x, y, width, height, map) {
         super(x, y, width, height);
@@ -37,6 +37,7 @@ export default class Player extends Entity {
         this.spikeManager = null;  
         this.enemyManager = null;  
         this.ringsManager = null;
+		this.signPostManager = null;
         this.rings = [];
         this.hitSpikeTop = false;
         this.knockbackRight = undefined; // Set by CollisionDetector for knockback direction
