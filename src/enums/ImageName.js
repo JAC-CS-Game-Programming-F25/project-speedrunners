@@ -5,7 +5,10 @@ export const ImageName = {
 	GameObjects: "gameObjects",
 	Badniks: "badniks",
 	TitleScreen: "titlescreen&background",
-	Hud: "hud"
+	Hud: "hud",
+	TitleScreen: "titlescreen",
+	TitleScreenTopBG: 'titlescreen-topbg',
+	TitleScreenBottomBG: 'titlescreen-bottombg'
 };
 
 export default ImageName;

@@ -8,6 +8,8 @@ import Input from '../lib/Input.js';
 export const canvas = document.createElement('canvas');
 export const context =
 	canvas.getContext('2d') || new CanvasRenderingContext2D();
+
+context.imageSmoothingEnabled = false
 const assetDefinition = await fetch('./config/assets.json').then((response) =>
 	response.json()
 );
@@ -38,6 +40,7 @@ export const stateMachine = new StateMachine();
 export const timer = new Timer();
 export const input = new Input(canvas);
 export const sounds = new Sounds();
+
 
 images.load(assetDefinition.images);
 sounds.load(assetDefinition.sounds);
