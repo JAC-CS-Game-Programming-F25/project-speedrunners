@@ -32,13 +32,13 @@
 		},
 		{
 			"name": "titlescreen-topbg",
-			"path": "./assets/images/background-top.png",
+			"path": "./assets/images/title-background/background-top.png",
 			"width": 1024,
 			"height": 112
 		},
 		{
 			"name": "titlescreen-bottombg",
-			"path": "./assets/images/background-bottom.png",
+			"path": "./assets/images/title-background/background-bottom.png",
 			"width": 1024,
 			"height": 144
 		},
