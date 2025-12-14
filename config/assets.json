@@ -32,15 +32,39 @@
 		},
 		{
 			"name": "titlescreen-topbg",
-			"path": "./assets/images/background-top.png",
+			"path": "./assets/images/title-background/background-top.png",
 			"width": 1024,
 			"height": 112
 		},
 		{
 			"name": "titlescreen-bottombg",
-			"path": "./assets/images/background-bottom.png",
+			"path": "./assets/images/title-background/background-bottom.png",
 			"width": 1024,
 			"height": 144
+		},
+		{
+			"name": "level-topbg",
+			"path": "./assets/images/level-background/level-background-top.png",
+			"width": 3840,
+			"height": 64
+		},
+		{
+			"name": "level-bottombg",
+			"path": "./assets/images/level-background/level-background-bottom.png",
+			"width": 3840,
+			"height": 104
+		},
+		{
+			"name": "level-middlebg1",
+			"path": "./assets/images/level-background/level-background-middle1.png",
+			"width": 8192,
+			"height": 48
+		},
+		{
+			"name": "level-middlebg2",
+			"path": "./assets/images/level-background/level-background-middle2.png",
+			"width": 8192,
+			"height": 40
 		}
 		,
 		{
@@ -49,6 +73,8 @@
 			"width": 676,
 			"height": 600
 		}
+
+
 
 
 	],

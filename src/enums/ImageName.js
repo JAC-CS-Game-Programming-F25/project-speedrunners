@@ -8,7 +8,11 @@ export const ImageName = {
 	Hud: "hud",
 	TitleScreen: "titlescreen",
 	TitleScreenTopBG: 'titlescreen-topbg',
-	TitleScreenBottomBG: 'titlescreen-bottombg'
+	TitleScreenBottomBG: 'titlescreen-bottombg',
+	LevelTopBG: 'level-topbg',
+	LevelBottomBG: 'level-bottombg',
+	LevelMiddleBG1: 'level-middlebg1',
+	LevelMiddleBG2: 'level-middlebg2'
 };
 
 export default ImageName;
