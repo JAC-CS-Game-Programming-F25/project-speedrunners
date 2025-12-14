@@ -68,12 +68,16 @@
 		 * Checks for state transitions.
 		 */
 		checkTransitions() {
+
+			if (this.player.stateMachine.currentState.name === PlayerStateName.Damage) {
+        	return;
+    		}
            const RUN_EXIT_THRESHOLD = PlayerConfig.runThreshold * 0.8;
 
-if (Math.abs(this.player.velocity.x) < RUN_EXIT_THRESHOLD) {
-    this.player.stateMachine.change(PlayerStateName.Walking);
-    return;
-}
+		if (Math.abs(this.player.velocity.x) < RUN_EXIT_THRESHOLD) {
+    		this.player.stateMachine.change(PlayerStateName.Walking);
+    		return;
+		}
 
             // If velocity is really low, go to idling
             if (!this.isMovingLeft && !this.isMovingRight && Math.abs(this.player.velocity.x) < 0.25) {
