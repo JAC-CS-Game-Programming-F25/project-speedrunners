@@ -16,6 +16,12 @@ export default class TitleScreenState extends State {
 		super();
 
 		this.playState = new PlayState(mapDefinition);
+		
+		// Initialize delay properties
+		this.canStart = false;
+		this.enterDelay = 0.3;
+		this.delayTimer = 0;
+		
 		// Create animation for sonic
 		this.sonicSprites = titleSpriteConfig.sonic.map(
 				(frame) =>
@@ -78,6 +84,14 @@ export default class TitleScreenState extends State {
 	}
 
 	enter(){
+		// Reset delay on every enter
+		this.canStart = false;
+		this.delayTimer = 0;
+		
+		// Reset animations
+		this.sonicIntro.refresh();
+		this.currentSonicAnimation = this.sonicIntro;
+		
 		//start playing the soundtrack
 	}
 
@@ -93,16 +107,26 @@ export default class TitleScreenState extends State {
 		if (this.currentSonicAnimation === this.sonicIntro && this.sonicIntro.isDone()) {
 			this.currentSonicAnimation = this.sonicLoop;
 		}
-		if(input.isKeyHeld(Input.KEYS.ENTER) && this.currentSonicAnimation === this.sonicLoop){
+		
+		// Wait for delay before accepting input
+		if (!this.canStart) {
+			this.delayTimer += dt;
+			if (this.delayTimer >= this.enterDelay) {
+				this.canStart = true;
+			}
+			return;
+		}
+		
+		// Use isKeyPressed instead of isKeyHeld
+		if (input.isKeyPressed(Input.KEYS.ENTER) && this.currentSonicAnimation === this.sonicLoop) {
 			stateMachine.change(GameStateName.Play);
 		}
-
 	}
+	
 	render(){
 		this.sceneTop.render();
 		this.sceneBottom.render();
 		context.save();
-		
 		
 		this.renderSonicAnimation();
 
@@ -129,8 +153,5 @@ export default class TitleScreenState extends State {
 			this.pressStartSprite.render(pressX, pressY, { x: TitleScreenState.SONIC_SCALE, y: TitleScreenState.SONIC_SCALE });
 			context.restore();
 		}
-
-
 	}
-
 }

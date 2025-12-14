@@ -13,11 +13,18 @@ export default class VictoryState extends State {
         this.canSkip = false;
         this.hudImage = null;
         this.map = null;
+        
+        // Tween properties
+        this.tweenProgress = 0;
+        this.tweenDuration = 1.5; // seconds to tween in
+        this.startY = -250; // Start above the screen
+        this.endY = 0; // End at center
     }
     
     enter(params) {
         this.transitionTimer = 0;
         this.canSkip = false;
+        this.tweenProgress = 0;
         
         // Get the map from params so we can render it
         if (params && params.map) {
@@ -32,10 +39,10 @@ export default class VictoryState extends State {
             return;
         }
         
-        // Allow skipping after 1 second
+        // Allow skipping after tween completes
         timer.addTask(
             () => {},
-            1,
+            this.tweenDuration,
             1,
             () => { this.canSkip = true; }
         );
@@ -43,6 +50,14 @@ export default class VictoryState extends State {
     
     update(dt) {
         this.transitionTimer += dt;
+        
+        // Update tween progress
+        if (this.tweenProgress < 1) {
+            this.tweenProgress += dt / this.tweenDuration;
+            if (this.tweenProgress > 1) {
+                this.tweenProgress = 1;
+            }
+        }
         
         // Keep updating the map so animations continue
         if (this.map) {
@@ -59,6 +74,11 @@ export default class VictoryState extends State {
         }
     }
     
+    // Easing function for smooth animation (ease out cubic)
+    easeOutCubic(t) {
+        return 1 - Math.pow(1 - t, 3);
+    }
+    
     render() {
         // Render the game first
         if (this.map) {
@@ -71,9 +91,13 @@ export default class VictoryState extends State {
         
         const config = victorySpriteConfig;
         
+        // Calculate tween offset
+        const easedProgress = this.easeOutCubic(this.tweenProgress);
+        const tweenOffsetY = this.startY + (this.endY - this.startY) * easedProgress;
+        
         // Calculate position to center the background sprite
         const bgX = (CANVAS_WIDTH - config.background.width) / 2;
-        const bgY = (CANVAS_HEIGHT - config.background.height) / 2;
+        const bgY = (CANVAS_HEIGHT - config.background.height) / 2 + tweenOffsetY;
         
         // Draw background sprite (SONIC HAS PASSED)
         context.drawImage(
