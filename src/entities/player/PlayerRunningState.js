@@ -58,15 +58,16 @@
 				this.isMovingRight = false;
 			}
 
-			if (input.isKeyPressed(Input.KEYS.SPACE)) {
+			if (input.isKeyPressed(Input.KEYS.SPACE) && this.player.isOnGround) {
 				this.player.stateMachine.change(PlayerStateName.Jumping);
 			}
 
 			if (input.isKeyPressed(Input.KEYS.S) && 
-        !input.isKeyHeld(Input.KEYS.A) && 
-        !input.isKeyHeld(Input.KEYS.D)) {
-        this.player.stateMachine.change(PlayerStateName.Rolling);
-    }
+				!input.isKeyHeld(Input.KEYS.A) && 
+				!input.isKeyHeld(Input.KEYS.D)) 
+			{
+				this.player.stateMachine.change(PlayerStateName.Rolling);
+			}
 			
 		}
 
@@ -78,12 +79,12 @@
 			if (this.player.stateMachine.currentState.name === PlayerStateName.Damage) {
         	return;
     		}
-           const RUN_EXIT_THRESHOLD = PlayerConfig.runThreshold * 0.8;
+           	const RUN_EXIT_THRESHOLD = PlayerConfig.runThreshold * 0.8;
 
-		if (Math.abs(this.player.velocity.x) < RUN_EXIT_THRESHOLD) {
-    		this.player.stateMachine.change(PlayerStateName.Walking);
-    		return;
-		}
+			if (Math.abs(this.player.velocity.x) < RUN_EXIT_THRESHOLD) {
+				this.player.stateMachine.change(PlayerStateName.Walking);
+				return;
+			}
 
             // If velocity is really low, go to idling
             if (!this.isMovingLeft && !this.isMovingRight && Math.abs(this.player.velocity.x) < 0.25) {
@@ -93,17 +94,6 @@
 			if (this.shouldSkid()) {
 				this.player.stateMachine.change(PlayerStateName.Skidding);
 			}
-
-			// if (!this.player.isOnGround) {
-			// 	if (this.player.velocity.y < 0) {
-			// 		this.player.stateMachine.change(PlayerStateName.Jumping);
-			// 	} else {
-			// 		this.player.stateMachine.change(PlayerStateName.Falling);
-			// 	}
-			// }
-			// if (Math.abs(this.player.velocity.x) >= PlayerConfig.runThreshold) {
-        	// 	this.player.stateMachine.change(PlayerStateName.Running);
-    		// }
 			
 		}
 
