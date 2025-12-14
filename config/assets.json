@@ -41,7 +41,26 @@
 			"path": "./assets/images/background-bottom.png",
 			"width": 1024,
 			"height": 144
+		},
+		{
+			"name": "level-topbg",
+			"path": "./assets/images/level-background/level-background-top.png",
+			"width": 3840,
+			"height": 64
+		},
+		{
+			"name": "level-middlebg",
+			"path": "./assets/images/level-background/level-background-middle.png",
+			"width": 8192,
+			"height": 88
+		},
+		{
+			"name": "level-bottombg",
+			"path": "./assets/images/level-background/level-background-bottom.png",
+			"width": 3840,
+			"height": 104
 		}
+
 
 
 	],
