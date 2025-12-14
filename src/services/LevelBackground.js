@@ -1,5 +1,8 @@
 import { images } from "../globals.js";
 
+/**
+ * A background for the level. Uses parallaxing to make it look 3d, and auto scroll for the water.
+ */
 export default class LevelBackground {
 	constructor(imageName, y = 0, scale = 1, parallax = 1, autoScrollSpeed = 0) {
 		this.imageName = imageName;

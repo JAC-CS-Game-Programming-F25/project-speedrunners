@@ -49,17 +49,24 @@
 			"height": 64
 		},
 		{
-			"name": "level-middlebg",
-			"path": "./assets/images/level-background/level-background-middle.png",
-			"width": 8192,
-			"height": 88
-		},
-		{
 			"name": "level-bottombg",
 			"path": "./assets/images/level-background/level-background-bottom.png",
 			"width": 3840,
 			"height": 104
+		},
+		{
+			"name": "level-middlebg1",
+			"path": "./assets/images/level-background/level-background-middle1.png",
+			"width": 8192,
+			"height": 48
+		},
+		{
+			"name": "level-middlebg2",
+			"path": "./assets/images/level-background/level-background-middle2.png",
+			"width": 8192,
+			"height": 40
 		}
+
 
 
 
