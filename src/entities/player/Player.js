@@ -1,5 +1,5 @@
 import Animation from '../../../lib/Animation.js';
-import { images, context, timer } from '../../globals.js';
+import { images, context, timer,debugOptions } from '../../globals.js';
 import ImageName from '../../enums/ImageName.js';
 import { loadPlayerSprites, playerSpriteConfig } from '../../../config/SpriteConfig.js';
 import StateMachine from '../../../lib/StateMachine.js';
@@ -42,13 +42,13 @@ export default class Player extends Entity {
 		this.signPostManager = null;
         this.rings = [];
         this.hitSpikeTop = false;
-        this.knockbackRight = undefined; // Set by CollisionDetector for knockback direction
+        this.knockbackRight = undefined;
         this.sparkles = new InvincibilitySparkles();
 		this.isBouncing = false;
+		
+        // Slope angle for sprite rotation
 		this.slopeAngle = 0;
-
-
-
+        this.displayAngle = 0; // Smoothed angle for rendering
 
         this.sprites = loadPlayerSprites(
             images.get(ImageName.Sonic),
@@ -124,45 +124,64 @@ export default class Player extends Entity {
 	}
 
 	update(dt) {
+		debugOptions.playerCollision = false;
 		this.stateMachine.update(dt);
 		if (this.isInvincible) {
 			this.sparkles.update(dt);
 		}
-		console.log(`SONIC POSTION: (${this.position.x}, ${this.position.y})`);
+        
+        // Smoothly interpolate display angle towards actual slope angle
+        // This prevents jittery rotation
+        const lerpSpeed = 0.2;
+        this.displayAngle += (this.slopeAngle - this.displayAngle) * lerpSpeed;
+        
+        // If not on ground, quickly return to 0
+        if (!this.isOnGround) {
+            this.displayAngle *= 0.8;
+        }
+        
+        // Debug slope angle
+        if (Math.abs(this.slopeAngle) > 0.01) {
+            console.log(`SlopeAngle: ${this.slopeAngle.toFixed(3)}, DisplayAngle: ${this.displayAngle.toFixed(3)}`);
+        }
+        
+		// console.log(`SONIC POSTION: (${this.position.x}, ${this.position.y})`);
 	}
 
     render(context) {
-    context.save();
+        context.save();
 
-    const centerX = this.position.x + this.dimensions.x / 2;
-    const centerY = this.position.y + this.dimensions.y / 2;
+        const centerX = this.position.x + this.dimensions.x / 2;
+        const centerY = this.position.y + this.dimensions.y / 2;
 
-    context.translate(centerX, centerY);
+        context.translate(centerX, centerY);
 
-    // Clamp rotation (classic Sonic never tilts much)
-    const maxTilt = Math.PI / 10; // ~18°
-    const tilt = Math.max(-maxTilt, Math.min(this.slopeAngle, maxTilt));
+        // Use smoothed display angle with clamping
+        const maxTilt = Math.PI / 6; // ~30° max tilt
+        const tilt = Math.max(-maxTilt, Math.min(this.displayAngle, maxTilt));
+        
+        // Only apply tilt if it's significant enough
+        if (Math.abs(tilt) > 0.02) {
+            context.rotate(tilt);
+        }
 
-    context.rotate(tilt);
+        context.translate(-centerX, -centerY);
 
-    context.translate(-centerX, -centerY);
+        context.globalAlpha = this.isDamagedInvincible ? this.flicker : 1;
+        this.stateMachine.render(context);
 
-    context.globalAlpha = this.isDamagedInvincible ? this.flicker : 1;
-    this.stateMachine.render(context);
+        if (this.isInvincible) {
+            this.sparkles.render(
+                context,
+                this.position.x,
+                this.position.y,
+                this.dimensions.x,
+                this.dimensions.y
+            );
+        }
 
-    if (this.isInvincible) {
-        this.sparkles.render(
-            context,
-            this.position.x,
-            this.position.y,
-            this.dimensions.x,
-            this.dimensions.y
-        );
+        context.restore();
     }
-
-    context.restore();
-}
-
 
 	hit() {
 		// Safety check: don't take damage if already damaged invincible

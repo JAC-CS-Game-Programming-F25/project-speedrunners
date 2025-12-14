@@ -18,57 +18,57 @@ export const SlopeHeights = {
     
     // ============ GOING UP (Left to Right) ============
     // Height INCREASES from left to right (player climbs)
-    // Start at 12-14 to minimize gap from flat ground (16)
+    // Lower numbers = less solid = surface is LOWER
+    // Higher numbers = more solid = surface is HIGHER
     
-    // Gentle slope - piece 1 (12 -> 14)
-    GENTLE_UP_1: [12, 12, 12, 12, 13, 13, 13, 13, 13, 14, 14, 14, 14, 14, 14, 14],
+    // Gentle slope - piece 1 (starts low, goes up gradually)
+    GENTLE_UP_1: [2, 3, 3, 4, 5, 5, 6, 7, 7, 8, 8, 9, 9, 10, 10, 10],
     
-    // Gentle slope - piece 2 (14 -> 16)
-    GENTLE_UP_2: [14, 14, 14, 14, 15, 15, 15, 15, 15, 16, 16, 16, 16, 16, 16, 16],
+    // Gentle slope - piece 2 (continues from 10, ends at 16)
+    GENTLE_UP_2: [10, 10, 11, 11, 12, 12, 13, 13, 14, 14, 15, 15, 16, 16, 16, 16],
     
-    // Medium slope (12 -> 16 in one tile)
-    MEDIUM_UP_1: [12, 12, 13, 13, 13, 14, 14, 14, 15, 15, 15, 16, 16, 16, 16, 16],
+    // Medium slope (2 -> 16 in one tile - steeper)
+    MEDIUM_UP_1: [2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 16],
     
-    // Medium slope - piece 2 (14 -> 16)
-    MEDIUM_UP_2: [14, 14, 14, 15, 15, 15, 15, 16, 16, 16, 16, 16, 16, 16, 16, 16],
+    // Medium slope - piece 2 (8 -> 16)
+    MEDIUM_UP_2: [8, 9, 9, 10, 11, 11, 12, 13, 13, 14, 15, 15, 16, 16, 16, 16],
     
-    // Steep slope (12 -> 16)
-    STEEP_UP: [12, 12, 13, 13, 14, 14, 14, 15, 15, 15, 16, 16, 16, 16, 16, 16],
+    // Steep slope (2 -> 16 quickly)
+    STEEP_UP: [2, 4, 5, 7, 8, 10, 11, 12, 13, 14, 15, 15, 16, 16, 16, 16],
     
-    // Very gentle slopes - almost flat
-    VERY_GENTLE_UP_1: [14, 14, 14, 14, 14, 14, 14, 15, 15, 15, 15, 15, 15, 15, 15, 15],
-    VERY_GENTLE_UP_2: [15, 15, 15, 15, 15, 15, 15, 16, 16, 16, 16, 16, 16, 16, 16, 16],
-    VERY_GENTLE_UP_3: [14, 14, 14, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15, 15],
-    VERY_GENTLE_UP_4: [15, 15, 15, 15, 15, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16],
+    // Very gentle slopes - for long gradual ramps
+    VERY_GENTLE_UP_1: [2, 2, 3, 3, 4, 4, 4, 5, 5, 5, 6, 6, 6, 6, 6, 6],
+    VERY_GENTLE_UP_2: [6, 6, 7, 7, 8, 8, 8, 9, 9, 9, 10, 10, 10, 10, 10, 10],
+    VERY_GENTLE_UP_3: [10, 10, 11, 11, 11, 12, 12, 12, 13, 13, 13, 13, 13, 13, 13, 13],
+    VERY_GENTLE_UP_4: [13, 13, 14, 14, 14, 15, 15, 15, 16, 16, 16, 16, 16, 16, 16, 16],
     
-    // Transition piece (nearly flat)
-    UP_TOP_TRANSITION: [15, 15, 15, 15, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 16],
+    // Transition piece (nearly flat, slight rise)
+    UP_TOP_TRANSITION: [13, 13, 14, 14, 14, 15, 15, 15, 16, 16, 16, 16, 16, 16, 16, 16],
     
     // ============ GOING DOWN (Left to Right) ============
     // Height DECREASES from left to right (player descends)
-    // End at 12-14 to minimize gap when entering from right
     
-    // Gentle slope down - piece 1 (16 -> 14)
-    GENTLE_DOWN_1: [16, 16, 16, 16, 16, 16, 15, 15, 15, 15, 14, 14, 14, 14, 14, 14],
+    // Gentle slope down - piece 1 (16 -> 10)
+    GENTLE_DOWN_1: [16, 16, 16, 15, 15, 14, 14, 13, 13, 12, 12, 11, 11, 10, 10, 10],
     
-    // Gentle slope down - piece 2 (14 -> 12)
-    GENTLE_DOWN_2: [14, 14, 14, 14, 14, 13, 13, 13, 13, 12, 12, 12, 12, 12, 12, 12],
+    // Gentle slope down - piece 2 (10 -> 2)
+    GENTLE_DOWN_2: [10, 10, 9, 9, 8, 8, 7, 7, 6, 5, 5, 4, 4, 3, 3, 2],
     
-    // Medium slope down (16 -> 12)
-    MEDIUM_DOWN_1: [16, 16, 16, 16, 15, 15, 15, 14, 14, 14, 13, 13, 13, 12, 12, 12],
+    // Medium slope down (16 -> 2 in one tile)
+    MEDIUM_DOWN_1: [16, 16, 15, 14, 13, 12, 11, 10, 9, 8, 7, 6, 5, 4, 3, 2],
     
-    // Medium slope down - piece 2 (16 -> 14)
-    MEDIUM_DOWN_2: [16, 16, 16, 16, 16, 15, 15, 15, 15, 14, 14, 14, 14, 14, 14, 14],
+    // Medium slope down - piece 2 (16 -> 8)
+    MEDIUM_DOWN_2: [16, 16, 16, 15, 15, 14, 13, 13, 12, 11, 11, 10, 9, 9, 8, 8],
     
-    // Steep slope down (16 -> 12)
-    STEEP_DOWN: [16, 16, 16, 16, 15, 15, 15, 14, 14, 14, 13, 13, 13, 12, 12, 12],
+    // Steep slope down (16 -> 2)
+    STEEP_DOWN: [16, 16, 16, 15, 14, 13, 12, 11, 10, 8, 7, 5, 4, 3, 2, 2],
     
-    // Very gentle slopes down - almost flat
-    VERY_GENTLE_DOWN_1: [16, 16, 16, 16, 16, 16, 16, 16, 15, 15, 15, 15, 15, 15, 15, 15],
-    VERY_GENTLE_DOWN_2: [15, 15, 15, 15, 15, 15, 15, 14, 14, 14, 14, 14, 14, 14, 14, 14],
+    // Very gentle slopes down
+    VERY_GENTLE_DOWN_1: [16, 16, 16, 16, 15, 15, 15, 14, 14, 14, 13, 13, 13, 13, 13, 13],
+    VERY_GENTLE_DOWN_2: [13, 13, 13, 12, 12, 12, 11, 11, 10, 10, 10, 10, 10, 10, 10, 10],
     
-    // Transition piece (nearly flat)
-    DOWN_TOP_TRANSITION: [16, 16, 16, 16, 16, 16, 16, 16, 16, 16, 15, 15, 15, 15, 15, 15],
+    // Transition piece (starts flat, then drops)
+    DOWN_TOP_TRANSITION: [16, 16, 16, 16, 16, 16, 16, 15, 15, 15, 14, 14, 14, 13, 13, 13],
 };
 
 /**

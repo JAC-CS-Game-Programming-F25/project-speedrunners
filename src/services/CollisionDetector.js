@@ -142,7 +142,7 @@ checkVerticalCollisions(entity) {
                 // ===============================
                 // UPHILL: tiny snap corrections
                 // ===============================
-                if (diff < 0 && Math.abs(diff) <= 2) {
+                if (diff < 0 && Math.abs(diff) <= 6) {
                     entity.position.y += diff;
                 }
 
@@ -171,6 +171,7 @@ checkVerticalCollisions(entity) {
 
                 entity.velocity.y = 0;
                 entity.isOnGround = true;
+                entity.slopeAngle = this.computeSlopeAngle(entity);
                 return;
             }
 
