@@ -2,6 +2,7 @@ import Entity from '../entities/Entity.js';
 import PlayerStateName from '../enums/PlayerStateName.js';
 import Map from './Map.js'
 import Tile from './Tile.js';
+import { isSlopeTile } from '../../config/Slopeconfig.js';
 
 export default class CollisionDetector {
     constructor(map) {
@@ -10,7 +11,7 @@ export default class CollisionDetector {
 
     // ==================== TILE COLLISIONS ====================
     
-    checkHorizontalCollisions(entity) {
+checkHorizontalCollisions(entity) {
         const tileSize = Tile.SIZE;
         const tileLeft = Math.floor(entity.position.x / tileSize);
         const tileRight = Math.floor(
@@ -20,40 +21,232 @@ export default class CollisionDetector {
         const tileBottom = Math.floor(
             (entity.position.y + entity.dimensions.y - 1) / tileSize
         );
+        
+        // Check if entity is currently on a slope (use foot position)
+        const footX = entity.position.x + entity.dimensions.x / 2;
+        const footY = entity.position.y + entity.dimensions.y;
+        const footTileX = Math.floor(footX / tileSize);
+        const footTileY = Math.floor(footY / tileSize);
+        const currentTile = this.map.getCollisionTileAt(footTileX, footTileY);
+        const onSlope = currentTile && currentTile.isSlope;
+        
         if (entity.velocity.x > 0) {
-            if (this.isSolidTileInColumn(tileRight, tileTop, tileBottom)) {
+            // Check if hitting a wall (non-slope solid tile)
+            // Be more permissive when on slopes - only check upper body
+            if (this.isSolidWallInColumn(tileRight, tileTop, onSlope ? tileTop : tileBottom, entity)) {
                 entity.position.x = tileRight * tileSize - entity.dimensions.x;
                 entity.velocity.x = 0;
             }
         } else if (entity.velocity.x < 0) {
-            if (this.isSolidTileInColumn(tileLeft, tileTop, tileBottom)) {
+            if (this.isSolidWallInColumn(tileLeft, tileTop, onSlope ? tileTop : tileBottom, entity)) {
                 entity.position.x = (tileLeft + 1) * tileSize;
                 entity.velocity.x = 0;
             }
         }
     }
 
+    /**
+     * Check for solid wall tiles (excludes slopes to allow walking through them)
+     */
+    isSolidWallInColumn(x, yStart, yEnd, entity) {
+        const tileSize = Tile.SIZE;
+        
+        for (let y = yStart; y <= yEnd; y++) {
+            const tile = this.map.getCollisionTileAt(x, y);
+            if (tile && this.map.isSolidTileAt(x, y)) {
+                // Always allow passing through slope tiles
+                if (tile.isSlope) {
+                    continue;
+                }
+                
+                // For non-slope tiles, check if this is actually blocking
+                // (not just ground we're standing on)
+                const tileTop = y * tileSize;
+                const tileBottom = tileTop + tileSize;
+                const entityBottom = entity.position.y + entity.dimensions.y;
+                
+                // If entity's feet are at or below the tile top, this might be ground not a wall
+                if (entityBottom <= tileTop + 4) {
+                    continue;
+                }
+                
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /**
+     * New slope-aware vertical collision using heightmap sampling
+     */
     checkVerticalCollisions(entity) {
+        const tileSize = Tile.SIZE;
+        
+        // Store previous ground state for slope sticking
+        const wasOnGround = entity.isOnGround;
+        
+        // Reset ground state
+        entity.isOnGround = false;
+        
+        // Find ground position
+        const groundY = this.findGroundY(entity);
+        
+        if (groundY !== null) {
+            const entityBottom = entity.position.y + entity.dimensions.y;
+            const distanceToGround = groundY - entityBottom;
+            
+            // SLOPE STICKING: If we were on ground, stay on ground unless jumping
+            // This prevents vibration by keeping Sonic attached to slopes
+            if (wasOnGround && entity.velocity.y >= 0) {
+                // Snap to ground if within reasonable range (prevents floating/vibrating)
+                if (distanceToGround >= -tileSize && distanceToGround <= tileSize) {
+                    entity.position.y = groundY - entity.dimensions.y;
+                    entity.velocity.y = 0;
+                    entity.isOnGround = true;
+                    return; // Early exit - we're grounded
+                }
+            }
+            
+            // Normal falling - snap when we reach the ground
+            if (entity.velocity.y >= 0 && entityBottom >= groundY - 1) {
+                entity.position.y = groundY - entity.dimensions.y;
+                entity.velocity.y = 0;
+                entity.isOnGround = true;
+            }
+            // Jumping up - check ceiling
+            else if (entity.velocity.y < 0) {
+                this.checkCeilingCollision(entity);
+            }
+        } else if (entity.velocity.y < 0) {
+            // No ground found, moving up - check ceiling
+            this.checkCeilingCollision(entity);
+        }
+        
+        // Extra slope sticking for edge cases: 
+        // If we just lost ground contact while moving horizontally, try to reattach
+        if (wasOnGround && !entity.isOnGround && entity.velocity.y >= 0 && Math.abs(entity.velocity.x) > 0) {
+            const extendedGroundY = this.findGroundYExtended(entity, tileSize * 1.5);
+            if (extendedGroundY !== null) {
+                entity.position.y = extendedGroundY - entity.dimensions.y;
+                entity.velocity.y = 0;
+                entity.isOnGround = true;
+            }
+        }
+    }
+    
+    /**
+     * Extended ground search for slope sticking (looks further down)
+     */
+    findGroundYExtended(entity, maxDistance) {
+        const tileSize = Tile.SIZE;
+        const footX = entity.position.x + entity.dimensions.x / 2;
+        const footY = entity.position.y + entity.dimensions.y;
+        
+        const tileX = Math.floor(footX / tileSize);
+        const localX = Math.floor(footX) % tileSize;
+        
+        // Check tiles below
+        for (let offset = 0; offset <= Math.ceil(maxDistance / tileSize) + 1; offset++) {
+            const checkTileY = Math.floor(footY / tileSize) + offset;
+            const tile = this.map.getCollisionTileAt(tileX, checkTileY);
+            
+            if (tile && this.map.isSolidTileAt(tileX, checkTileY)) {
+                const groundHeight = tile.getHeightAt(localX);
+                
+                if (groundHeight <= 0) continue;
+                
+                const groundY = checkTileY * tileSize + (tileSize - groundHeight);
+                
+                // Only return if within max distance and not too far above
+                if (groundY <= footY + maxDistance && groundY >= footY - 8) {
+                    return Math.round(groundY);
+                }
+            }
+        }
+        
+        return null;
+    }
+    
+    /**
+     * Find the ground Y position under the entity using heightmap sampling
+     * @param {Entity} entity 
+     * @returns {number|null} The Y position of the ground, or null if no ground
+     */
+    findGroundY(entity) {
+        const tileSize = Tile.SIZE;
+        
+        // Sample at entity's center bottom (foot position)
+        const footX = entity.position.x + entity.dimensions.x / 2;
+        const footY = entity.position.y + entity.dimensions.y;
+        
+        // Convert to tile coordinates
+        const tileX = Math.floor(footX / tileSize);
+        const tileY = Math.floor(footY / tileSize);
+        
+        // Check tiles: current, above, and below
+        const tilesToCheck = [tileY - 1, tileY, tileY + 1];
+        
+        let closestGroundY = null;
+        
+        for (const checkTileY of tilesToCheck) {
+            if (checkTileY < 0) continue;
+            
+            const tile = this.map.getCollisionTileAt(tileX, checkTileY);
+            
+            if (tile && this.map.isSolidTileAt(tileX, checkTileY)) {
+                // Calculate local X position within the tile (0-15)
+                const localX = Math.floor(footX) % tileSize;
+                
+                // Get ground height at this position
+                const groundHeight = tile.getHeightAt(localX);
+                
+                // Skip if no ground at this position
+                if (groundHeight <= 0) continue;
+                
+                // Convert to world Y coordinate
+                // groundY = top of tile + (tileSize - groundHeight)
+                const groundY = checkTileY * tileSize + (tileSize - groundHeight);
+                
+                // Only consider ground within a reasonable range
+                const searchRangeUp = tileSize;    // Look up to 1 tile above feet
+                const searchRangeDown = tileSize;  // Look up to 1 tile below feet
+                
+                if (groundY >= footY - searchRangeUp && groundY <= footY + searchRangeDown) {
+                    // Keep the highest valid ground (closest to player's feet from below)
+                    if (closestGroundY === null || groundY < closestGroundY) {
+                        closestGroundY = groundY;
+                    }
+                }
+            }
+        }
+        
+        // Round to prevent sub-pixel jitter
+        if (closestGroundY !== null) {
+            closestGroundY = Math.round(closestGroundY);
+        }
+        
+        return closestGroundY;
+    }
+    
+    /**
+     * Check ceiling collision (for jumping up)
+     * Only collides with non-slope solid tiles
+     */
+    checkCeilingCollision(entity) {
         const tileSize = Tile.SIZE;
         const tileLeft = Math.floor(entity.position.x / tileSize);
         const tileRight = Math.floor(
             (entity.position.x + entity.dimensions.x - 1) / tileSize
         );
         const tileTop = Math.floor(entity.position.y / tileSize);
-        const tileBottom = Math.floor(
-            (entity.position.y + entity.dimensions.y) / tileSize
-        );
-        entity.isOnGround = false;
-        if (entity.velocity.y >= 0) {
-            if (this.isSolidTileInRow(tileBottom, tileLeft, tileRight)) {
-                entity.position.y = tileBottom * tileSize - entity.dimensions.y;
-                entity.velocity.y = 0;
-                entity.isOnGround = true;
-            }
-        } else if (entity.velocity.y < 0) {
-            if (this.isSolidTileInRow(tileTop, tileLeft, tileRight) && !this.isPlatformTileInRow(tileTop, tileLeft, tileRight)) {
+        
+        // Check for solid ceiling (non-slope tiles only)
+        for (let x = tileLeft; x <= tileRight; x++) {
+            const tile = this.map.getCollisionTileAt(x, tileTop);
+            if (tile && this.map.isSolidTileAt(x, tileTop) && !tile.isSlope) {
                 entity.position.y = (tileTop + 1) * tileSize;
                 entity.velocity.y = 0;
+                return;
             }
         }
     }
@@ -75,87 +268,89 @@ export default class CollisionDetector {
         }
         return false;
     }
-
+    
+    isPlatformTileInRow(y, xStart, xEnd) {
+        // Keep this if you have semi-solid platforms
+        return false;
+    }
     // ==================== ENEMY COLLISIONS ====================
     
-checkEnemyCollisions(player, enemyManager, ringManager = null) {
-    let result = {
-        tookDamage: false,
-        killedEnemy: false
-    };
+    checkEnemyCollisions(player, enemyManager, ringManager = null) {
+        let result = {
+            tookDamage: false,
+            killedEnemy: false
+        };
 
-    if (!enemyManager) return result;
+        if (!enemyManager) return result;
 
-    const isJumping = player.stateMachine.currentState.name === PlayerStateName.Jumping;
-    const isRolling = player.stateMachine.currentState.name === PlayerStateName.Rolling;
+        const isJumping = player.stateMachine.currentState.name === PlayerStateName.Jumping;
+        const isRolling = player.stateMachine.currentState.name === PlayerStateName.Rolling;
 
-    // ================= TOP COLLISION (Stomp) =================
-    for (const enemy of enemyManager.enemies) {
-        if (!enemy.isActive || enemy.isDying) continue;
+        // ================= TOP COLLISION (Stomp) =================
+        for (const enemy of enemyManager.enemies) {
+            if (!enemy.isActive || enemy.isDying) continue;
 
-        const topCollision = this.checkTopCollision(player, enemy);
+            const topCollision = this.checkTopCollision(player, enemy);
 
-        if (enemy.collidesWith(player) && topCollision &&
-            (isJumping || player.isDamagedInvincible)) {
-            enemy.die();
-            result.killedEnemy = true;
-            player.velocity.y = -300;
-            console.log(`${enemy.constructor.name} stomped! (jumping=${isJumping}, damageInvincible=${player.isDamageInvincible})`);
+            if (enemy.collidesWith(player) && topCollision &&
+                (isJumping || player.isDamagedInvincible)) {
+                enemy.die();
+                result.killedEnemy = true;
+                player.velocity.y = -300;
+                console.log(`${enemy.constructor.name} stomped! (jumping=${isJumping}, damageInvincible=${player.isDamageInvincible})`);
+            }
         }
-    }
 
-    if (result.killedEnemy) return result;
+        if (result.killedEnemy) return result;
 
-    // ================= POWERUP INVINCIBLE OR ROLLING =================
-    if (player.isInvincible || isRolling) {
+        // ================= POWERUP INVINCIBLE OR ROLLING =================
+        if (player.isInvincible || isRolling) {
+            for (const enemy of enemyManager.enemies) {
+                if (!enemy.isActive || enemy.isDying) continue;
+
+                if (enemy.collidesWith(player)) {
+                    enemy.die();
+                    result.killedEnemy = true;
+                    console.log(`${enemy.constructor.name} destroyed (${player.isInvincible ? "invincible" : "rolling"})`);
+                }
+            }
+            return result;
+        }
+
+        // ================= DAMAGE INVINCIBLE =================
+        if (player.isDamagedInvincible) {
+            console.log("[COLLISION] Player is damage invincible - passing through enemies");
+            return result;
+        }
+
+        // ================= SIDE COLLISION (Damage) =================
+        let hitTakenThisFrame = false;
+
         for (const enemy of enemyManager.enemies) {
             if (!enemy.isActive || enemy.isDying) continue;
 
             if (enemy.collidesWith(player)) {
-                enemy.die();
-                result.killedEnemy = true;
-                console.log(`${enemy.constructor.name} destroyed (${player.isInvincible ? "invincible" : "rolling"})`);
+                const sideCollision = this.checkSideCollision(player, enemy);
+
+                if (!hitTakenThisFrame && sideCollision) {
+                    result.tookDamage = true;
+
+                    const playerCenterX = player.position.x + player.dimensions.x / 2;
+                    const enemyCenterX = enemy.position.x + enemy.dimensions.x / 2;
+                    player.knockbackRight = playerCenterX > enemyCenterX;
+
+                    console.log(`[COLLISION] Knockback: playerX=${playerCenterX}, enemyX=${enemyCenterX}, knockbackRight=${player.knockbackRight}`);
+
+                    player.hit();
+                    hitTakenThisFrame = true;
+                }
+
+                this.resolveEnemyCollision(player, enemy);
             }
         }
-        return result; // Skip damage & solid collision
+
+        return result;
     }
-
-    // ================= DAMAGE INVINCIBLE =================
-    if (player.isDamagedInvincible) {
-        console.log("[COLLISION] Player is damage invincible - passing through enemies");
-        return result; // Skip side collisions
-    }
-
-    // ================= SIDE COLLISION (Damage) =================
-    let hitTakenThisFrame = false;
-
-    for (const enemy of enemyManager.enemies) {
-        if (!enemy.isActive || enemy.isDying) continue;
-
-        if (enemy.collidesWith(player)) {
-            const sideCollision = this.checkSideCollision(player, enemy);
-
-            if (!hitTakenThisFrame && sideCollision) {
-                result.tookDamage = true;
-
-                const playerCenterX = player.position.x + player.dimensions.x / 2;
-                const enemyCenterX = enemy.position.x + enemy.dimensions.x / 2;
-                player.knockbackRight = playerCenterX > enemyCenterX;
-
-                console.log(`[COLLISION] Knockback: playerX=${playerCenterX}, enemyX=${enemyCenterX}, knockbackRight=${player.knockbackRight}`);
-
-                player.hit();
-                hitTakenThisFrame = true;
-            }
-
-            this.resolveEnemyCollision(player, enemy);
-        }
-    }
-
-    return result;
-}
-
-
 
     checkTopCollision(player, enemy) {
         const playerBottom = player.position.y + player.dimensions.y;
@@ -372,20 +567,17 @@ checkEnemyCollisions(player, enemyManager, ringManager = null) {
         }
     }
 
-
-	checkSignPostCollisions(player, signPostManager) {
-    if (!signPostManager) return;
-    
-    for (const signPost of signPostManager.signPosts) {
-        if (!signPost.isActive || signPost.isActivated) continue;
+    checkSignPostCollisions(player, signPostManager) {
+        if (!signPostManager) return;
         
-        if (signPost.collidesWith(player)) {
-            // Pass player to activate so it can trigger victory state
-            signPost.activate(player);
+        for (const signPost of signPostManager.signPosts) {
+            if (!signPost.isActive || signPost.isActivated) continue;
             
-            console.log("Victory! Sign post hit!");
-            break;
+            if (signPost.collidesWith(player)) {
+                signPost.activate(player);
+                console.log("Victory! Sign post hit!");
+                break;
+            }
         }
     }
-}
 }

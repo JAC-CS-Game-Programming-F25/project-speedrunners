@@ -85,7 +85,7 @@ export default class Map {
         // Add sign post at end of level
         // Y position: 176 = ground (208) - signpost height (32)
         this.signPostManager.addSignPost(3933, 180);
-        this.signPostManager.addSignPost(100, 180);
+       // this.signPostManager.addSignPost(100, 180);
     }
     
     setupRings() {
@@ -237,10 +237,38 @@ export default class Map {
         context.restore();
     }
     
+    /**
+     * Get tile from a specific layer by column and row
+     * @param {number} layerIndex - The layer index (0 = collision, 1 = background)
+     * @param {number} col - Column (x tile coordinate)
+     * @param {number} row - Row (y tile coordinate)
+     * @returns {Tile|null}
+     */
     getTileAt(layerIndex, col, row) {
         return this.layers[layerIndex]?.getTile(col, row);
     }
     
+    /**
+     * Get collision layer tile at specified tile coordinates
+     * Used by CollisionDetector for slope height sampling
+     * @param {number} col - Column (x tile coordinate)
+     * @param {number} row - Row (y tile coordinate)
+     * @returns {Tile|null}
+     */
+    getCollisionTileAt(col, row) {
+        // Bounds check
+        if (col < 0 || col >= this.width || row < 0 || row >= this.height) {
+            return null;
+        }
+        return this.collisionLayer.getTile(col, row);
+    }
+    
+    /**
+     * Check if there's a solid tile at the given tile coordinates
+     * @param {number} col - Column (x tile coordinate)
+     * @param {number} row - Row (y tile coordinate)
+     * @returns {boolean}
+     */
     isSolidTileAt(col, row) {
         if (col < 0 || col >= this.width || row < 0 || row >= this.height) {
             return false;
