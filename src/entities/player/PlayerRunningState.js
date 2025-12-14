@@ -74,8 +74,9 @@
 		 * Checks for state transitions.
 		 */
 		checkTransitions() {
-
-			if (this.player.stateMachine.currentState.name === PlayerStateName.Damage) {
+			if (this.player.stateMachine.currentState.name === PlayerStateName.Damage ||
+				this.player.stateMachine.currentState.name === PlayerStateName.Victory
+			) {
         	return;
     		}
            const RUN_EXIT_THRESHOLD = PlayerConfig.runThreshold * 0.8;

@@ -49,6 +49,9 @@ export default class PlayerJumpingState extends PlayerState {
     }
 
     checkTransitions() {
+         if (this.player.stateMachine.currentState.name === PlayerStateName.Victory) {
+        return;
+    }
         if (this.player.isOnGround) {
             if (Math.abs(this.player.velocity.x) > 0.1) {
                 this.player.stateMachine.change(PlayerStateName.Walking);

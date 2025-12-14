@@ -75,6 +75,9 @@ export default class PlayerWalkingState extends PlayerState {
 	 * Checks for state transitions.
 	 */
 	checkTransitions() {
+		if(this.player.stateMachine.currentState.name === PlayerStateName.Victory){
+			return;
+		}
 		if (this.shouldIdle()) {
 			this.player.stateMachine.change(PlayerStateName.Idling);
 			return;
