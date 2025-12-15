@@ -247,7 +247,7 @@ export function loadSignPostSprites(image, config) {
 // Victory Screen Sprite Configuration
 export const victorySpriteConfig = {
     background: { x: 348, y: 184, width: 320, height: 224 },
-    act1: { x: 348, y: 496, width: 40, height: 23, offsetX: 184, offsetY: 74 },
+    act1: { x: 348, y: 496, width: 40, height: 24, offsetX: 184, offsetY: 74 },
     score: { x: 348, y: 416, width: 40, height: 16, offsetX: 80, offsetY: 100 },
     time: { x: 348, y: 440, width: 32, height: 16, offsetX: 80, offsetY: 116 },
     rings: { x: 348, y: 464, width: 32, height: 16, offsetX: 80, offsetY: 132 },
