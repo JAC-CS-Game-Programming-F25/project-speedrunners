@@ -11,7 +11,10 @@ export const SoundName ={
     SignSpin: "signspin",
     Skidding: "skidding",
     Spring: "spring",
-    Tallied: "tallied"
+    Tallied: "tallied",
+    StageClear: "stageClear",
+    Invincibility: "invincibility",
+    GameOver: "gameOver",
 }
 
 export default SoundName;

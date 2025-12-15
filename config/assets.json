@@ -160,6 +160,24 @@
 			"path": "./assets/sounds/Tallied.wav",
 			"size": 1,
 			"volume":0.1
+		},
+		{
+			"name": "stageClear",
+			"path": "./assets/sounds/StageClear.mp3",
+			"size": 1,
+			"volume":0.1
+		},
+		{
+			"name": "gameOver",
+			"path": "./assets/sounds/GameOver.mp3",
+			"size": 1,
+			"volume":0.1
+		},
+		{
+			"name": "invincibility",
+			"path": "./assets/sounds/Invincibility.mp3",
+			"size": 1,
+			"volume":0.1
 		}
 	],
 	"fonts": [

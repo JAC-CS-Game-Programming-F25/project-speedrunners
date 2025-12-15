@@ -4,8 +4,8 @@ import { CANVAS_WIDTH, CANVAS_HEIGHT, context, input, stateMachine, images, time
 import GameStateName from "../enums/GameStateName.js";
 import ImageName from "../enums/ImageName.js";
 import { victorySpriteConfig } from "../../config/SpriteConfig.js";
-import SoundName from "../enums/SoundName.js";
-
+import { sounds } from "../globals.js";
+import {SoundName} from "../enums/SoundName.js";
 export default class VictoryState extends State {
     constructor() {
         super();
@@ -32,6 +32,7 @@ export default class VictoryState extends State {
     }
     
     enter(params) {
+        sounds.play(SoundName.StageClear)
         this.score = params.score || 0;
         // Get current high score
         let highScore = parseInt(localStorage.getItem('highScore')) || 0;
@@ -85,8 +86,9 @@ export default class VictoryState extends State {
     }
 
     exit() {
-            console.log("VictoryState exit called");
+        console.log("VictoryState exit called");
         sounds.stop(SoundName.ScoreTally)
+        sounds.stop(SoundName.StageClear);
         this.isTallySoundPlaying = false;
     }
     
