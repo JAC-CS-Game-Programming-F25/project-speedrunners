@@ -16,25 +16,42 @@ export default class VictoryState extends State {
         
         // Tween properties
         this.tweenProgress = 0;
-        this.tweenDuration = 1.5; // seconds to tween in
-        this.startY = -250; // Start above the screen
-        this.endY = 0; // End at center
+        this.tweenDuration = 1.5;
+        this.startY = -250;
+        this.endY = 0;
+        
+        // Score tallying properties
+        this.displayScore = 0;
+        this.timeBonus = 0;
+        this.ringBonus = 0;
+        this.isTallying = false;
+        this.tallySpeed = 100; // Points to add per tick
+        this.tallyInterval = 0.02; // Seconds between ticks
+        this.tallyTimer = 0;
     }
     
     enter(params) {
-        this.score = params.score;
-        this.rings = params.rings;
-        this.time = params.time;
+        this.score = params.score || 0;
+        this.rings = params.rings || 0;
+        this.time = params.time || 0;
         this.transitionTimer = 0;
         this.canSkip = false;
         this.tweenProgress = 0;
         
-        // Get the map from params so we can render it
+        // Initialize display values
+        this.displayScore = this.score;
+        this.timeBonus = this.calculateTimeBonus();
+        this.ringBonus = this.rings * 100;
+        this.isTallying = false;
+        this.tallyTimer = 0;
+        
+        console.log(`Victory! Score: ${this.score}, Rings: ${this.rings}, Time: ${this.time}`);
+        console.log(`Time Bonus: ${this.timeBonus}, Ring Bonus: ${this.ringBonus}`);
+        
         if (params && params.map) {
             this.map = params.map;
         }
         
-        // Get the HUD image
         this.hudImage = images.get(ImageName.Hud);
         
         if (!this.hudImage) {
@@ -42,12 +59,15 @@ export default class VictoryState extends State {
             return;
         }
         
-        // Allow skipping after tween completes
+        // Start tallying after tween completes
         timer.addTask(
             () => {},
             this.tweenDuration,
             1,
-            () => { this.canSkip = true; }
+            () => { 
+                this.canSkip = true;
+                this.isTallying = true;
+            }
         );
     }
     
@@ -62,6 +82,32 @@ export default class VictoryState extends State {
             }
         }
         
+        // Tally the bonuses
+        if (this.isTallying) {
+            this.tallyTimer += dt;
+            
+            if (this.tallyTimer >= this.tallyInterval) {
+                this.tallyTimer = 0;
+                
+                // Decrease time bonus and add to score
+                if (this.timeBonus > 0) {
+                    const amount = Math.min(this.tallySpeed, this.timeBonus);
+                    this.timeBonus -= amount;
+                    this.displayScore += amount;
+                }
+                // Then decrease ring bonus and add to score
+                else if (this.ringBonus > 0) {
+                    const amount = Math.min(this.tallySpeed, this.ringBonus);
+                    this.ringBonus -= amount;
+                    this.displayScore += amount;
+                }
+                // Tallying complete
+                else {
+                    this.isTallying = false;
+                }
+            }
+        }
+        
         if (this.map && this.map.backgrounds) {
             const cameraX = this.map.camera.position.x;
             this.map.backgrounds.top.update(dt, cameraX);
@@ -70,7 +116,6 @@ export default class VictoryState extends State {
             this.map.backgrounds.bottom.update(dt, cameraX);
         }
         
-        // Keep updating the map so animations continue
         if (this.map) {
             this.map.update(dt);
         }
@@ -80,12 +125,20 @@ export default class VictoryState extends State {
             return;
         }
         
+        // Allow skipping (instant tally) with ENTER
         if (this.canSkip && input.isKeyPressed(Input.KEYS.ENTER)) {
-            stateMachine.change(GameStateName.TitleScreen);
+            if (this.isTallying) {
+                // Instant complete the tally
+                this.displayScore += this.timeBonus + this.ringBonus;
+                this.timeBonus = 0;
+                this.ringBonus = 0;
+                this.isTallying = false;
+            } else {
+                stateMachine.change(GameStateName.TitleScreen);
+            }
         }
     }
     
-    // Easing function for smooth animation (ease out cubic)
     easeOutCubic(t) {
         return 1 - Math.pow(1 - t, 3);
     }
@@ -99,7 +152,6 @@ export default class VictoryState extends State {
             this.map.backgrounds.bottom.render();
         }
         
-        // Render the game 
         if (this.map) {
             this.map.render();
         }
@@ -110,11 +162,9 @@ export default class VictoryState extends State {
         
         const config = victorySpriteConfig;
         
-        // Calculate tween offset
         const easedProgress = this.easeOutCubic(this.tweenProgress);
         const tweenOffsetY = this.startY + (this.endY - this.startY) * easedProgress;
         
-        // Calculate position to center the background sprite
         const bgX = (CANVAS_WIDTH - config.background.width) / 2;
         const bgY = (CANVAS_HEIGHT - config.background.height) / 2 + tweenOffsetY;
         
@@ -154,6 +204,15 @@ export default class VictoryState extends State {
             config.time.width, config.time.height
         );
         
+        // Draw BONUS next to TIME
+        context.drawImage(
+            this.hudImage.image,
+            config.bonus.x, config.bonus.y,
+            config.bonus.width, config.bonus.height,
+            bgX + config.bonus.offsetX, bgY + config.time.offsetY,
+            config.bonus.width, config.bonus.height
+        );
+        
         // Draw RINGS sprite
         context.drawImage(
             this.hudImage.image,
@@ -163,6 +222,64 @@ export default class VictoryState extends State {
             config.rings.width, config.rings.height
         );
         
+        // Draw BONUS next to RINGS
+        context.drawImage(
+            this.hudImage.image,
+            config.bonus.x, config.bonus.y,
+            config.bonus.width, config.bonus.height,
+            bgX + config.bonus.offsetX, bgY + config.rings.offsetY,
+            config.bonus.width, config.bonus.height
+        );
+        
+        // Draw the actual values
+        context.fillStyle = '#FFFFFF';
+        context.font = '18px hud';
+
+        const valueOffsetX = 200;
+        
+        // Draw SCORE value (animated)
+       this.drawHudText(
+    this.displayScore.toString(),
+    bgX + valueOffsetX,
+    bgY + config.score.offsetY + 12
+);
+        
+        // Draw TIME BONUS value (animated)
+        this.drawHudText(
+    this.timeBonus.toString(),
+    bgX + valueOffsetX,
+    bgY + config.time.offsetY + 12
+);
+        
+        // Draw RING BONUS value (animated)
+        this.drawHudText(
+    this.ringBonus.toString(),
+    bgX + valueOffsetX,
+    bgY + config.rings.offsetY + 12
+);
+        
         context.restore();
     }
+    
+    calculateTimeBonus() {
+        const timeInSeconds = this.time || 0;
+        
+        if (timeInSeconds < 30) return 5000;
+        if (timeInSeconds < 45) return 1000;
+        if (timeInSeconds < 60) return 500;
+        if (timeInSeconds < 90) return 400;
+        if (timeInSeconds < 120) return 300;
+        if (timeInSeconds < 180) return 200;
+        if (timeInSeconds < 240) return 100;
+        if (timeInSeconds < 300) return 50;
+        return 0;
+    }
+
+    drawHudText(text, x, y) {
+    context.lineWidth = 1.5;
+    context.strokeStyle = "#0f0a57";
+    context.fillStyle = "#ededf0";
+    context.strokeText(text, x, y);
+    context.fillText(text, x, y);
+}
 }

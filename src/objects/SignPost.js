@@ -56,6 +56,9 @@ export default class SignPost extends Entity {
                 setTimeout(() => {
                     stateMachine.change(GameStateName.Victory, { 
                         map: this.player.map,
+                        score: this.player.map.scoreManager.getScore(),
+                        rings: this.player.map.ringManager.getRingCount(),
+                        time: this.player.map.time,
                     });
                 }, 500);
             }
