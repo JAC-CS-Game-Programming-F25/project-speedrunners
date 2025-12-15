@@ -106,7 +106,7 @@ export const titleSpriteConfig = {
 		{ x: 688, y: 1692, width: 256, height: 150},
 	],
 	pressstart: [
-		{ x: 536, y: 1976, width: 144, height: 8 }
+		{ x: 536, y: 1976, width: 144, height: 7.5 }
 	]
 }
 

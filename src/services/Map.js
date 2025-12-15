@@ -9,6 +9,7 @@ import {
     CANVAS_WIDTH,
     context,
     images,
+    timer,
 } from "../globals.js";  
 import Camera from "./Camera.js";
 import RingManager from "./RingManager.js";
@@ -18,6 +19,8 @@ import EnemyManager from "./EnemyManager.js";
 import SpringManager from "./SpringManager.js";
 import SignPostManager from "./SignPostManager.js";
 import UserInterface from "./UserInterface.js";
+import ScoreManager from "./ScoreManager.js";
+import Timer from "../../lib/Timer.js";
 
 export default class Map {
     static BACKGROUND_LAYER = 1;
@@ -27,6 +30,7 @@ export default class Map {
         this.width = mapDefinition.width;
         this.height = mapDefinition.height;
         this.tilesets = mapDefinition.tilesets;
+        this.backgrounds = null;
         
         const sprites = Sprite.generateSpritesFromSpriteSheet(
             images.get(ImageName.Tiles),
@@ -42,7 +46,10 @@ export default class Map {
         this.backgroundLayer = this.layers[Map.BACKGROUND_LAYER];
         this.collisionLayer = this.layers[Map.COLLISION_LAYER];
         
-        this.player = new Player(32, 188, 32, 40, this);
+        this.scoreManager = new ScoreManager()
+
+
+        this.player = new Player(32, 188, 32, 40, this, this.scoreManager);
         
         this.playerIsHit = false;
         this.playerDamageTimer = 0;
@@ -55,7 +62,7 @@ export default class Map {
             this.width * Tile.SIZE,
             this.height * Tile.SIZE
         );
-        
+
         this.ringManager = new RingManager();
         this.setupRings();
         
@@ -65,7 +72,7 @@ export default class Map {
         this.powerUpManager = new PowerUpManager();
         this.setupPowerUps();
         
-        this.enemyManager = new EnemyManager();
+        this.enemyManager = new EnemyManager(this.scoreManager);
         this.setupEnemies();
         
         this.springManager = new SpringManager();
@@ -80,23 +87,31 @@ export default class Map {
         this.player.springManager = this.springManager;
         this.player.signPostManager = this.signPostManager;
         this.player.ringManager = this.ringManager;
+        this.time = 0; // displayed seconds for UI
 
-        this.ui = new UserInterface(this.player, this.ringManager)
+        this.timer = new Timer()
+
+        // Add a task that increments the time every 1 second
+        this.timer.addTask(() => {
+            this.time += 1;
+        }, 1); 
+
+        this.ui = new UserInterface(this.player, this.ringManager, this.scoreManager, this.time)
     }
 
     setupSignPosts() {
         // Add sign post at end of level
         // Y position: 176 = ground (208) - signpost height (32)
         this.signPostManager.addSignPost(3933, 180);
-        // this.signPostManager.addSignPost(100, 180);
+        this.signPostManager.addSignPost(100, 180);
     }
     
     setupRings() {
-        //this.ringManager.addRingLine(100, 160, 8, 25);
-        //this.ringManager.addRingArc(300, 180, 40, 7);
-        //this.ringManager.addRing(450, 170);
-        //this.ringManager.addRing(480, 150);
-        //this.ringManager.addRing(510, 170);
+        this.ringManager.addRingLine(100, 160, 8, 25);
+        this.ringManager.addRingArc(300, 180, 40, 7);
+        this.ringManager.addRing(450, 170);
+        this.ringManager.addRing(480, 150);
+        this.ringManager.addRing(510, 170);
     }
     
     setupSpikes() {
@@ -111,10 +126,10 @@ export default class Map {
     }
     
     setupEnemies() {
-        //this.enemyManager.addEnemy('buzzbomber', 300, 192);
-        //this.enemyManager.addEnemy('buzzbomber', 600, 192);
-       // this.enemyManager.addEnemy('crab', 850, 192);
-       // this.enemyManager.addEnemy('crab', 250, 192);
+        this.enemyManager.addEnemy('buzzbomber', 300, 192);
+        this.enemyManager.addEnemy('buzzbomber', 600, 192);
+       this.enemyManager.addEnemy('crab', 850, 192);
+       this.enemyManager.addEnemy('crab', 250, 192);
     }
     
     setupSprings() {
@@ -130,7 +145,7 @@ export default class Map {
         this.ringManager.update(dt);
         this.spikeManager.update(dt);
         this.powerUpManager.update(dt, this.player);
-
+        this.timer.update(dt)
         this.player.rings = this.ringManager.getRingCount()
         
         this.enemyManager.update(dt, this.spikeManager, this.powerUpManager);

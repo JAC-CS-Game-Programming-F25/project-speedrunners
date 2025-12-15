@@ -11,7 +11,7 @@ export default class PlayerState extends State {
 	constructor(player) {
 		super();
 		this.player = player;
-		this.collisionDetector = new CollisionDetector(player.map);
+		this.collisionDetector = new CollisionDetector(player.map, player.scoreManager);
 	}
 
 	update(dt) {

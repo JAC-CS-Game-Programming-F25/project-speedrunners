@@ -44,6 +44,7 @@ export const sounds = new Sounds();
 
 images.load(assetDefinition.images);
 sounds.load(assetDefinition.sounds);
+fonts.load(assetDefinition.fonts)
 
 // Debug options
 export const debugOptions = {

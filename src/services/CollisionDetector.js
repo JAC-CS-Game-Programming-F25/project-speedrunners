@@ -4,8 +4,9 @@ import Map from './Map.js'
 import Tile from './Tile.js';
 
 export default class CollisionDetector {
-    constructor(map) {
+    constructor(map, scoreManager) {
         this.map = map;
+        this.scoreManager = scoreManager
     }
 
     // ==================== TILE COLLISIONS ====================
@@ -98,6 +99,7 @@ checkEnemyCollisions(player, enemyManager, ringManager = null) {
         if (enemy.collidesWith(player) && topCollision &&
             (isJumping || player.isDamagedInvincible)) {
             enemy.die();
+            this.scoreManager.add(100)
             result.killedEnemy = true;
             player.velocity.y = -300;
             console.log(`${enemy.constructor.name} stomped! (jumping=${isJumping}, damageInvincible=${player.isDamageInvincible})`);
@@ -113,6 +115,7 @@ checkEnemyCollisions(player, enemyManager, ringManager = null) {
 
             if (enemy.collidesWith(player)) {
                 enemy.die();
+                this.scoreManager.add(100)
                 result.killedEnemy = true;
                 console.log(`${enemy.constructor.name} destroyed (${player.isInvincible ? "invincible" : "rolling"})`);
             }

@@ -4,8 +4,9 @@ import EnemyFactory from "./EnemyFactory.js";
  * Manages all enemies in the game
  */
 export default class EnemyManager {
-    constructor() {
+    constructor(scoreManager) {
         this.enemies = [];
+        this.scoreManager = scoreManager
     }
 
     /**
@@ -95,65 +96,6 @@ export default class EnemyManager {
     }
 
     /**
-<<<<<<< HEAD
-=======
-     * Check collisions with player
-     * @param {Player} player
-     * @param {RingManager} ringManager
-     * @returns {Object} { tookDamage: boolean, killedEnemy: boolean }
-     */
-    checkCollisions(player, ringManager) {
-        let result = {
-            tookDamage: false,
-            killedEnemy: false
-        };
-        for (const enemy of this.enemies) {
-            if (!enemy.isActive || enemy.isDying) continue;
-            
-            // Check for collision
-            if (!enemy.collidesWith(player)) continue
-
-            // If player is invincible, kill enemy from any direction
-            if (player.isInvincible) {
-                enemy.die();
-                result.killedEnemy = true;
-                console.log(`${enemy.constructor.name} destroyed by invincible Sonic!`);
-                continue;
-            }
-
-            if (enemy.checkTopCollision(player)) {
-                enemy.die();
-                result.killedEnemy = true;
-                // Give player a bounce
-                player.velocity.y = -300;
-                console.log(`${enemy.constructor.name} destroyed!`);
-                continue; 
-            }
-
-            // Check if player hit enemy from side (take damage)
-            if (enemy.checkSideCollision(player) && !player.isDamagedInvincible) {
-                result.tookDamage = true;
-                player.hit()
-                
-                // Lose rings if not already damaged this frame
-                if (ringManager && ringManager.getRingCount() > 0) {
-                    ringManager.loseRings(
-                        player.position.x + player.dimensions.x / 2,
-                        player.position.y + player.dimensions.y / 2,
-                        10
-                    );
-                }
-                
-                break; 
-            }
-            
-        }
-
-        return result;
-    }
-
-    /**
->>>>>>> origin/FixingCollisions
      * Remove dead enemies from array
      */
     cleanupDeadEnemies() {
