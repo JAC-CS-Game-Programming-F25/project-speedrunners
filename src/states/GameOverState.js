@@ -45,6 +45,7 @@ export default class GameOverState extends State {
 				this.map = parameters.map;
 			}
 		}
+		
 		// Reset tween position
 		this.tweenY.value = -200;
 		this.canSkip = false;

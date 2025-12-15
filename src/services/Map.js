@@ -99,7 +99,7 @@ export default class Map {
         this.ui = new UserInterface(this.player, this.ringManager, this.scoreManager, this.time)
     }
 
-     setupSignPosts() {
+    setupSignPosts() {
        this.signPostManager.addSignPost(4728, 660);
     }
     
@@ -126,13 +126,11 @@ export default class Map {
         this.powerUpManager.addBox(1219, 576, 'rings');
         this.powerUpManager.addBox(1914, 674, 'speed');
         this.powerUpManager.addBox(4036, 674, 'invincibility');
-        this.powerUpManager.addBox(32, 674, 'invincibility');
         //this.powerUpManager.addBox(500, 192, 'random');
         //this.powerUpManager.addBox(700, 192, 'random');
     }
     
     setupEnemies() {
-        this.enemyManager.addEnemy('crab', 70, 672);
         this.enemyManager.addEnemy('crab', 2312, 672);
         this.enemyManager.addEnemy('crab', 2352, 672);
         this.enemyManager.addEnemy('crab', 2392, 672);
