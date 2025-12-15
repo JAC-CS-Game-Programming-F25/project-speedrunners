@@ -9,6 +9,7 @@ import {
     CANVAS_WIDTH,
     context,
     images,
+    timer,
 } from "../globals.js";  
 import Camera from "./Camera.js";
 import RingManager from "./RingManager.js";
@@ -17,6 +18,9 @@ import PowerUpManager from "./PowerUpManager.js";
 import EnemyManager from "./EnemyManager.js";
 import SpringManager from "./SpringManager.js";
 import SignPostManager from "./SignPostManager.js";
+import UserInterface from "./UserInterface.js";
+import ScoreManager from "./ScoreManager.js";
+import Timer from "../../lib/Timer.js";
 
 export default class Map {
     static BACKGROUND_LAYER = 1;
@@ -26,6 +30,7 @@ export default class Map {
         this.width = mapDefinition.width;
         this.height = mapDefinition.height;
         this.tilesets = mapDefinition.tilesets;
+        this.backgrounds = null;
         
         const sprites = Sprite.generateSpritesFromSpriteSheet(
             images.get(ImageName.Tiles),
@@ -41,7 +46,10 @@ export default class Map {
         this.backgroundLayer = this.layers[Map.BACKGROUND_LAYER];
         this.collisionLayer = this.layers[Map.COLLISION_LAYER];
         
-        this.player = new Player(32, 188, 32, 40, this);
+        this.scoreManager = new ScoreManager()
+
+
+        this.player = new Player(32, 188, 32, 40, this, this.scoreManager);
         
         this.playerIsHit = false;
         this.playerDamageTimer = 0;
@@ -54,7 +62,7 @@ export default class Map {
             this.width * Tile.SIZE,
             this.height * Tile.SIZE
         );
-        
+
         this.ringManager = new RingManager();
         this.setupRings();
         
@@ -64,7 +72,7 @@ export default class Map {
         this.powerUpManager = new PowerUpManager();
         this.setupPowerUps();
         
-        this.enemyManager = new EnemyManager();
+        this.enemyManager = new EnemyManager(this.scoreManager);
         this.setupEnemies();
         
         this.springManager = new SpringManager();
@@ -79,21 +87,31 @@ export default class Map {
         this.player.springManager = this.springManager;
         this.player.signPostManager = this.signPostManager;
         this.player.ringManager = this.ringManager;
+        this.time = 0; // displayed seconds for UI
+
+        this.timer = new Timer()
+
+        // Add a task that increments the time every 1 second
+        this.timer.addTask(() => {
+            this.time += 1;
+        }, 1); 
+
+        this.ui = new UserInterface(this.player, this.ringManager, this.scoreManager, this.time)
     }
 
-     setupSignPosts() {
+    setupSignPosts() {
         // Add sign post at end of level
         // Y position: 176 = ground (208) - signpost height (32)
         this.signPostManager.addSignPost(3933, 180);
-        // this.signPostManager.addSignPost(100, 180);
+        this.signPostManager.addSignPost(100, 180);
     }
     
     setupRings() {
-        //this.ringManager.addRingLine(100, 160, 8, 25);
-        //this.ringManager.addRingArc(300, 180, 40, 7);
-        //this.ringManager.addRing(450, 170);
-        //this.ringManager.addRing(480, 150);
-        //this.ringManager.addRing(510, 170);
+        this.ringManager.addRingLine(100, 160, 8, 25);
+        this.ringManager.addRingArc(300, 180, 40, 7);
+        this.ringManager.addRing(450, 170);
+        this.ringManager.addRing(480, 150);
+        this.ringManager.addRing(510, 170);
     }
     
     setupSpikes() {
@@ -108,10 +126,10 @@ export default class Map {
     }
     
     setupEnemies() {
-        //this.enemyManager.addEnemy('buzzbomber', 300, 192);
-        //this.enemyManager.addEnemy('buzzbomber', 600, 192);
-       // this.enemyManager.addEnemy('crab', 850, 192);
-       // this.enemyManager.addEnemy('crab', 250, 192);
+        this.enemyManager.addEnemy('buzzbomber', 300, 192);
+        this.enemyManager.addEnemy('buzzbomber', 600, 192);
+       this.enemyManager.addEnemy('crab', 850, 192);
+       this.enemyManager.addEnemy('crab', 250, 192);
     }
     
     setupSprings() {
@@ -127,13 +145,14 @@ export default class Map {
         this.ringManager.update(dt);
         this.spikeManager.update(dt);
         this.powerUpManager.update(dt, this.player);
-
+        this.timer.update(dt)
         this.player.rings = this.ringManager.getRingCount()
         
         this.enemyManager.update(dt, this.spikeManager, this.powerUpManager);
         
         this.springManager.update(dt);
         this.signPostManager.update(dt);
+        this.ui.update(dt)
         
         if (this.playerDamageTimer > 0) {
             this.playerDamageTimer -= dt;
@@ -182,39 +201,39 @@ export default class Map {
         this.backgroundLayer.render();
         this.camera.resetTransform(context);
         
-        this.renderUI();
+        this.ui.render()
     }
     
     renderUI() {
-        context.save();
-        context.fillStyle = '#FFD700';
-        context.font = '20px Arial';
-        context.fillText(`Rings: ${this.ringManager.getRingCount()}`, 10, 25);
+        // context.save();
+        // context.fillStyle = '#FFD700';
+        // context.font = '20px Arial';
+        // context.fillText(`Rings: ${this.ringManager.getRingCount()}`, 10, 25);
         
-        if (this.playerIsHit || this.playerDamageTimer > 0) {
-            context.fillStyle = '#FF0000';
-            context.fillText('HIT!', 10, 50);
-        }
+        // if (this.playerIsHit || this.playerDamageTimer > 0) {
+        //     context.fillStyle = '#FF0000';
+        //     context.fillText('HIT!', 10, 50);
+        // }
         
-        let yOffset = 75;
-        if (this.player.hasSpeedShoes) {
-            const timeLeft = this.powerUpManager.getPowerUpTimeRemaining('speed');
-            context.fillStyle = '#00FFFF';
-            context.fillText(`Speed: ${Math.ceil(timeLeft)}s`, 10, yOffset);
-            yOffset += 25;
-        }
+        // let yOffset = 75;
+        // if (this.player.hasSpeedShoes) {
+        //     const timeLeft = this.powerUpManager.getPowerUpTimeRemaining('speed');
+        //     context.fillStyle = '#00FFFF';
+        //     context.fillText(`Speed: ${Math.ceil(timeLeft)}s`, 10, yOffset);
+        //     yOffset += 25;
+        // }
         
-        if (this.player.isInvincible) {
-            const timeLeft = this.powerUpManager.getPowerUpTimeRemaining('invincibility');
-            context.fillStyle = '#FFD700';
-            context.fillText(`Invincible: ${Math.ceil(timeLeft)}s`, 10, yOffset);
-            yOffset += 25;
-        }
+        // if (this.player.isInvincible) {
+        //     const timeLeft = this.powerUpManager.getPowerUpTimeRemaining('invincibility');
+        //     context.fillStyle = '#FFD700';
+        //     context.fillText(`Invincible: ${Math.ceil(timeLeft)}s`, 10, yOffset);
+        //     yOffset += 25;
+        // }
         
-        context.fillStyle = '#FF6B6B';
-        context.fillText(`Enemies: ${this.enemyManager.getActiveCount()}`, 10, yOffset);
+        // context.fillStyle = '#FF6B6B';
+        // context.fillText(`Enemies: ${this.enemyManager.getActiveCount()}`, 10, yOffset);
         
-        context.restore();
+        // context.restore();
     }
     
     static renderGrid() {

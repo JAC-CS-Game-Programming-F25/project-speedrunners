@@ -10,8 +10,6 @@ import LevelBackground from "../services/LevelBackground.js";
 export default class PlayState extends State {
 	constructor(mapDefinition) {
 		super();
-		
-		this.map = new Map(mapDefinition);
 
 		// Get the heights of all the backgrounds (the heights are in assets.json)
 		const topHeight = 64;
@@ -42,8 +40,18 @@ export default class PlayState extends State {
 		// Bottom/Water bg
 		// The 50 at the end is auto scroll speed
 		this.bgBottom = new LevelBackground(ImageName.LevelBottomBG, scaledTop + scaledMiddle1 + scaledMiddle2, scale, 1, 50);
-
 		
+
+	}
+
+	enter(params) {
+		this.map = new Map(params.mapDefinition);
+		this.map.backgrounds = {
+			top: this.bgTop,
+			middle1: this.bgMiddle1,
+			middle2: this.bgMiddle2,
+			bottom: this.bgBottom
+		};
 	}
 
 	update(dt) {
@@ -61,6 +69,7 @@ export default class PlayState extends State {
 		const cameraX = this.map.camera.position.x;
 
 		// draw backgrounds manually
+		context.imageSmoothingEnabled = false;
 		this.bgTop.render();
 		this.bgMiddle1.render();
 		this.bgMiddle2.render();

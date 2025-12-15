@@ -79,10 +79,6 @@
 			"height": 2021
 		}
 
-
-
-
-
 	],
 	"sounds":[
 		{
@@ -96,6 +92,12 @@
 			"path": "./assets/sounds/looseRings.wav",
 			"size": 2,
 			"volume":1
+		}
+	],
+	"fonts": [
+		{
+			"name": "hud",
+			"path": "./assets/fonts/hud-font/sonic-1-hud-font.ttf"
 		}
 	]
 } 

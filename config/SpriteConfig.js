@@ -106,13 +106,30 @@ export const titleSpriteConfig = {
 		{ x: 688, y: 1692, width: 256, height: 150},
 	],
 	pressstart: [
-		{ x: 536, y: 1976, width: 144, height: 8 }
+		{ x: 536, y: 1976, width: 144, height: 7.5 }
 	]
 }
 
 export const titleCardSprites = [
 	{ x: 91, y: 233, width: 157, height: 56}
 ]
+
+export const HUDSpriteConfig = {
+	lives: [
+		{ x: 24, y: 384, width: 48, height: 16}
+	],
+	score: [
+		{ x: 8, y: 416, width: 40, height: 16 } 
+	],
+	time: [
+		{ x: 8, y: 440, width: 32, height: 15 },
+	],
+	rings: [
+		{ x: 8, y: 464, width: 40, height: 16 },
+		{ x: 56, y: 464, width: 40, height: 16 },
+	]
+
+}
 
 export function loadPlayerSprites(spriteSheet, playerSpriteConfig) {
 	const sprites = {};

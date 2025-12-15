@@ -14,8 +14,10 @@ import PlayState from "./PlayState.js";
  */
 export default class TitleTransitionState extends State {
     static SCALE = 1.5; 
-    constructor() {
+    constructor(mapDefinition) {
         super();
+
+        this.mapDefinition = mapDefinition
 
         this.transitionAlpha = 0;
 
@@ -36,7 +38,6 @@ export default class TitleTransitionState extends State {
     }
 
     enter(params) {
-        this.nextStateParams = params;
         this.runTransition();
     }
 
@@ -64,7 +65,7 @@ export default class TitleTransitionState extends State {
         );
 
         // switch to PlayState
-        stateMachine.change(GameStateName.Play, this.nextStateParams);
+        stateMachine.change(GameStateName.Play, { mapDefinition: this.mapDefinition });
     }
 	update(dt) {
 		timer.update(dt);
@@ -72,6 +73,7 @@ export default class TitleTransitionState extends State {
 
 	render() {
         context.save();
+        context.imageSmoothingEnabled = false;
         // Draw black 
         context.fillStyle = `rgba(0,0,0,${this.transitionAlpha})`;
         context.fillRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
