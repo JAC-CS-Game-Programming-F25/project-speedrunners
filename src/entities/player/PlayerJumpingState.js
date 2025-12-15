@@ -1,9 +1,10 @@
 import PlayerState from './PlayerState.js';
 import Player from './Player.js';
 import Input from '../../../lib/Input.js';
-import { input } from '../../globals.js';
+import { input, sounds } from '../../globals.js';
 import { PlayerConfig } from '../../../config/PlayerConfig.js';
 import PlayerStateName from '../../enums/PlayerStateName.js';
+import SoundName from '../../enums/SoundName.js';
 
 /**
  * Represents the jumping state of the player.
@@ -17,6 +18,7 @@ export default class PlayerJumpingState extends PlayerState {
     }
 
     enter() {
+        sounds.play(SoundName.Jumping)
         this.player.velocity.y = PlayerConfig.jumpPower;
         this.player.currentAnimation = this.player.animations.jump;
         this.player.currentAnimation.refresh();

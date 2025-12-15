@@ -84,15 +84,53 @@
 		{
 			"name": "ring",
 			"path": "./assets/sounds/ring.wav",
-			"size": 2,
-			"volume":1
+			"size": 6,
+			"volume":0.1
 		},
 		{
 			"name": "loseRings",
 			"path": "./assets/sounds/looseRings.wav",
+			"size": 1,
+			"volume":0.1
+		},
+		{
+			"name": "greenhill",
+			"path": "./assets/sounds/GreenHillZone.mp3",
+			"size": 1,
+			"volume":0.1,
+			"loop": true
+		},
+		{
+			"name": "titlemusic",
+			"path": "./assets/sounds/TitleMusic.mp3",
+			"size": 1,
+			"volume":0.1
+		},
+		{
+			"name": "destroy",
+			"path": "./assets/sounds/Destroy.wav",
+			"size": 8,
+			"volume":0.1
+		},
+		{
+			"name": "dying",
+			"path": "./assets/sounds/Dying.wav",
+			"size": 1,
+			"volume":0.1
+		},
+		{
+			"name": "jumping",
+			"path": "./assets/sounds/Jumping.wav",
 			"size": 2,
-			"volume":1
+			"volume":0.1
+		},
+		{
+			"name": "rolling",
+			"path": "./assets/sounds/Rolling.wav",
+			"size": 3,
+			"volume":0.1
 		}
+
 	],
 	"fonts": [
 		{

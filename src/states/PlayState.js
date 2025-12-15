@@ -54,6 +54,10 @@ export default class PlayState extends State {
 		};
 	}
 
+	exit() {
+		sounds.stop(SoundName.GreenHill);
+	}
+
 	update(dt) {
 		const cameraX = this.map.camera.position.x;
 

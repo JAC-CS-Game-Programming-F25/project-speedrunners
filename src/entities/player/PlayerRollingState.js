@@ -2,8 +2,9 @@ import PlayerState from './PlayerState.js';
 import Input from '../../../lib/Input.js';
 import Player from './Player.js';
 import PlayerStateName from '../../enums/PlayerStateName.js';
-import { input } from '../../globals.js';
+import { input, sounds } from '../../globals.js';
 import { PlayerConfig } from '../../../config/PlayerConfig.js';
+import SoundName from '../../enums/SoundName.js';
 
 export default class PlayerRollingState extends PlayerState {
     constructor(player) {
@@ -14,6 +15,7 @@ export default class PlayerRollingState extends PlayerState {
     }
     
     enter() {
+        sounds.play(SoundName.Rolling)
         this.player.currentAnimation = this.player.animations.roll;
         this.player.currentAnimation.refresh();
         this.previousX = this.player.position.x;

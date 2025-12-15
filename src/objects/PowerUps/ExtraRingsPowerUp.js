@@ -30,7 +30,10 @@ export default class ExtraRingsPowerUp extends PowerUp {
         // This is an instant powerup, not a timed one
         // The ring manager will handle adding rings
         this.isActive = false;
-        sounds.play(SoundName.Ring);
+
+        setTimeout(() => {
+            sounds.play(SoundName.Ring);
+        }, 300); 
 
     }
 
