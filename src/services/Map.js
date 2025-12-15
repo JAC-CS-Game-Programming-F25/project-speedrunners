@@ -126,6 +126,7 @@ export default class Map {
         this.powerUpManager.addBox(1219, 576, 'rings');
         this.powerUpManager.addBox(1914, 674, 'speed');
         this.powerUpManager.addBox(4036, 674, 'invincibility');
+        this.powerUpManager.addBox(32, 674, 'invincibility');
         //this.powerUpManager.addBox(500, 192, 'random');
         //this.powerUpManager.addBox(700, 192, 'random');
     }

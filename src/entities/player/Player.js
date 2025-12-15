@@ -131,7 +131,7 @@ export default class Player extends Entity {
 	
 
     if (this.isInvincible) {
-        this.sparkles.update(dt);
+ 		this.sparkles.update(dt, this.position.x, this.position.y, this.dimensions.x, this.dimensions.y);
     }
 
     if (this.isOnGround) {

@@ -59,11 +59,16 @@ export const objectSpriteConfig = {
 	spike: [
 		{ x: 308, y: 182, width: 39, height: 32 }
 	],
-
 	spring: {
     	idle: { x: 512, y: 470, width: 32, height: 16 },
     	compressed: { x: 512, y: 494, width: 32, height: 32 }
-	}
+	},
+	invincibilitySparkles: [
+		{ x: 456, y: 182, width: 48, height: 48 },  
+		{ x: 512, y: 182, width: 48, height: 48 },  
+		{ x: 568, y: 182, width: 48, height: 48 },  
+		{ x: 624, y: 182, width: 48, height: 48 }   
+	]
 }		
 
 export const enemySpriteConfig = {
