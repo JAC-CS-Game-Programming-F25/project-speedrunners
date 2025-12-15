@@ -54,11 +54,14 @@ export default class SignPost extends Entity {
                 
                 // Pass the map to VictoryState
                 setTimeout(() => {
+                    const finalScore = this.player.map.scoreManager.getScore();
+                    const finalRings = this.player.ringManager.getRingCount();
+                    const finalTime = this.player.map.time;
                     stateMachine.change(GameStateName.Victory, { 
                         map: this.player.map,
-                        score: this.player.map.scoreManager.getScore(),
-                        rings: this.player.map.ringManager.getRingCount(),
-                        time: this.player.map.time,
+                        score: finalScore,
+                        rings: finalRings,
+                        time: finalTime
                     });
                 }, 500);
             }

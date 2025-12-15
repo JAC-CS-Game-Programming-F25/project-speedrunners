@@ -99,7 +99,7 @@ export default class Map {
         this.ui = new UserInterface(this.player, this.ringManager, this.scoreManager, this.time)
     }
 
-     setupSignPosts() {
+    setupSignPosts() {
        this.signPostManager.addSignPost(4728, 660);
        this.signPostManager.addSignPost(100, 664);
     }

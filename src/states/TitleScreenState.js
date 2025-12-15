@@ -130,6 +130,13 @@ export default class TitleScreenState extends State {
 		
 		this.renderSonicAnimation();
 
+		const highScore = parseInt(localStorage.getItem('highScore')) || 0;
+		context.fillStyle = '#FFFFFF';
+		context.font = '16px hud';
+		context.textAlign = 'right'; // text shown on the top-right corner
+		this.drawHudText(
+			`High Score: ${highScore}`, CANVAS_WIDTH - 20, 30, 1
+		)
 		context.restore();
 	}
 
@@ -155,4 +162,13 @@ export default class TitleScreenState extends State {
 			context.restore();
 		}
 	}
+
+	drawHudText(text, x, y, scale) {
+        context.lineWidth = scale;
+        context.strokeStyle = "#0f0a57"; // black-ish outline around the text
+        context.fillStyle = "#ededf0";   // white text
+
+        context.strokeText(text, x, y);
+        context.fillText(text, x, y);
+    }
 }

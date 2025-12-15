@@ -32,6 +32,15 @@ export default class VictoryState extends State {
     
     enter(params) {
         this.score = params.score || 0;
+        // Get current high score
+        let highScore = parseInt(localStorage.getItem('highScore')) || 0;
+
+        // Update the final score with the new score
+        if (this.score > highScore) {
+            localStorage.setItem('highScore', this.score);
+            highScore = this.score;
+        }
+
         this.rings = params.rings || 0;
         this.time = params.time || 0;
         this.transitionTimer = 0;
