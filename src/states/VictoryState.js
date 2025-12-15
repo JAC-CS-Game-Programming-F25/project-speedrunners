@@ -22,6 +22,9 @@ export default class VictoryState extends State {
     }
     
     enter(params) {
+        this.score = params.score;
+        this.rings = params.rings;
+        this.time = params.time;
         this.transitionTimer = 0;
         this.canSkip = false;
         this.tweenProgress = 0;
@@ -59,6 +62,14 @@ export default class VictoryState extends State {
             }
         }
         
+        if (this.map && this.map.backgrounds) {
+            const cameraX = this.map.camera.position.x;
+            this.map.backgrounds.top.update(dt, cameraX);
+            this.map.backgrounds.middle1.update(dt, cameraX);
+            this.map.backgrounds.middle2.update(dt, cameraX);
+            this.map.backgrounds.bottom.update(dt, cameraX);
+        }
+        
         // Keep updating the map so animations continue
         if (this.map) {
             this.map.update(dt);
@@ -80,7 +91,15 @@ export default class VictoryState extends State {
     }
     
     render() {
-        // Render the game first
+        if (this.map && this.map.backgrounds) {
+            context.imageSmoothingEnabled = false;
+            this.map.backgrounds.top.render();
+            this.map.backgrounds.middle1.render();
+            this.map.backgrounds.middle2.render();
+            this.map.backgrounds.bottom.render();
+        }
+        
+        // Render the game 
         if (this.map) {
             this.map.render();
         }

@@ -5,8 +5,9 @@ import Tile from './Tile.js';
 import { isSlopeTile } from '../../config/Slopeconfig.js';
 
 export default class CollisionDetector {
-    constructor(map) {
+    constructor(map, scoreManager) {
         this.map = map;
+        this.scoreManager = scoreManager
     }
 
     // ==================== TILE COLLISIONS ====================
@@ -368,6 +369,17 @@ checkVerticalCollisions(entity) {
 
         const isJumping = player.stateMachine.currentState.name === PlayerStateName.Jumping;
         const isRolling = player.stateMachine.currentState.name === PlayerStateName.Rolling;
+        if (enemy.collidesWith(player) && topCollision &&
+            (isJumping || player.isDamagedInvincible)) {
+            enemy.die();
+            this.scoreManager.add(100)
+            result.killedEnemy = true;
+            player.velocity.y = -300;
+            console.log(`${enemy.constructor.name} stomped! (jumping=${isJumping}, damageInvincible=${player.isDamageInvincible})`);
+        }
+    }
+
+    if (result.killedEnemy) return result;
 
         // ================= TOP COLLISION (Stomp) =================
         for (const enemy of enemyManager.enemies) {
@@ -378,6 +390,7 @@ checkVerticalCollisions(entity) {
             if (enemy.collidesWith(player) && topCollision &&
                 (isJumping || player.isDamagedInvincible)) {
                 enemy.die();
+                this.scoreManager.add(100)
                 result.killedEnemy = true;
                 player.velocity.y = -300;
               //  console.log(`${enemy.constructor.name} stomped! (jumping=${isJumping}, damageInvincible=${player.isDamageInvincible})`);

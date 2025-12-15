@@ -25,6 +25,7 @@ import PlayState from './states/PlayState.js';
 import GameOverState from './states/GameOverState.js';
 import VictoryState from './states/VictoryState.js';
 import TitleScreenState from './states/TitleScreenState.js';
+import TitleTransitionState from './states/TitleTransitionState.js';
 
 
 // Set the dimensions of the play area.
@@ -56,6 +57,7 @@ sounds.load(soundDefinitions);
 stateMachine.add(GameStateName.GameOver, new GameOverState());
 stateMachine.add(GameStateName.Victory, new VictoryState());
 stateMachine.add(GameStateName.Play, new PlayState(mapDefinition));
+stateMachine.add(GameStateName.TitleTransition, new TitleTransitionState(mapDefinition))
 stateMachine.add(GameStateName.TitleScreen, new TitleScreenState(mapDefinition));
 
 const game = new Game(

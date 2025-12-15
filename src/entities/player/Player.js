@@ -23,7 +23,7 @@ import SignPostManager from '../../services/SignPostManager.js';
 import PlayerVictoryState from './PlayerVictoryState.js';
 
 export default class Player extends Entity {
-    constructor(x, y, width, height, map) {
+    constructor(x, y, width, height, map, scoreManager) {
         super(x, y, width, height);
         this.initialPosition = new Vector(x, y);
         this.position = new Vector(x, y);
@@ -40,6 +40,7 @@ export default class Player extends Entity {
         this.enemyManager = null;  
         this.ringsManager = null;
 		this.signPostManager = null;
+		this.scoreManager = scoreManager;
         this.rings = [];
         this.hitSpikeTop = false;
         this.knockbackRight = undefined;
@@ -50,6 +51,7 @@ export default class Player extends Entity {
 		this.slopeAngle = 0;
         this.displayAngle = 0; // Smoothed angle for rendering
 
+		this.lives = 3
         this.sprites = loadPlayerSprites(
             images.get(ImageName.Sonic),
             playerSpriteConfig
@@ -123,10 +125,13 @@ export default class Player extends Entity {
 		this.stateMachine.change(PlayerStateName.Idling);
 	}
 
-update(dt) {
-	console.log(`SONIC POSITION: (${this.position.x},${this.position.y}`)
-    debugOptions.playerCollision = false;
-    this.stateMachine.update(dt);
+	update(dt) {
+		this.stateMachine.update(dt);
+		if (this.isInvincible) {
+			this.sparkles.update(dt);
+		}
+		// console.log(`SONIC POSTION: (${this.position.x}, ${this.position.y})`);
+	}
 
     if (this.isInvincible) {
         this.sparkles.update(dt);
@@ -197,6 +202,7 @@ render(context) {
 }
     die() {
         if (this.stateMachine.currentState.name !== PlayerStateName.Death) {
+			this.lives -= 1;
             this.stateMachine.change(PlayerStateName.Death)
         }
     }
