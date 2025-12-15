@@ -133,31 +133,35 @@ export default class Enemy extends Entity {
      * @param {number} dt - Delta time
      */
     updateMovement(dt) {
-        // Calculate distance from start position
-        const distanceFromStart = Math.abs(this.position.x - this.startX);
-        
-        // Reverse direction if moved too far
-        if (distanceFromStart >= this.patrolDistance) {
-            this.movingRight = !this.movingRight;
+    const leftBound = this.startX - this.patrolDistance;
+    const rightBound = this.startX + this.patrolDistance;
+
+    // Move
+    if (this.movingRight) {
+        this.position.x += this.moveSpeed * dt;
+
+        if (this.position.x >= rightBound) {
+            this.position.x = rightBound; // clamp
+            this.movingRight = false;
         }
-        
-        // Store old position for collision checking
-        const oldX = this.position.x;
-        
-        // Move in current direction
-        if (this.movingRight) {
-            this.position.x += this.moveSpeed * dt;
-        } else {
-            this.position.x -= this.moveSpeed * dt;
-        }
-        
-        // Check for collisions with solid objects and reverse if needed
-        if (this.checkSolidCollisions()) {
-            // Hit something solid, reverse direction
-            this.position.x = oldX; // Reset position
-            this.movingRight = !this.movingRight; // Reverse direction
+    } else {
+        this.position.x -= this.moveSpeed * dt;
+
+        if (this.position.x <= leftBound) {
+            this.position.x = leftBound; // clamp
+            this.movingRight = true;
         }
     }
+
+    // Solid collision handling
+    const oldX = this.position.x;
+
+    if (this.checkSolidCollisions()) {
+        this.position.x = oldX;
+        this.movingRight = !this.movingRight;
+    }
+}
+
     
     /**
      * Check if enemy is colliding with solid objects (spikes, boxes)
