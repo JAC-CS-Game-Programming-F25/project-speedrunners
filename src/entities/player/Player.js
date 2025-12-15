@@ -52,7 +52,7 @@ export default class Player extends Entity {
 		this.slopeAngle = 0;
         this.displayAngle = 0; // Smoothed angle for rendering
 
-		this.lives = 1
+		this.lives = 3
         this.sprites = loadPlayerSprites(
             images.get(ImageName.Sonic),
             playerSpriteConfig
