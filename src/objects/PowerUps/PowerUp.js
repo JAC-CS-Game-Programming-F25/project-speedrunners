@@ -1,4 +1,6 @@
 import Entity from "../../entities/Entity.js";
+import SoundName from "../../enums/SoundName.js";
+import { sounds } from "../../globals.js";
 
 export default class PowerUp extends Entity {
     static WIDTH = 16;
@@ -16,6 +18,7 @@ export default class PowerUp extends Entity {
 
     activate(player) {
         this.isActive = true;
+        sounds.play(SoundName.Destroy);
         this.timer = 0;
     }
 

@@ -3,9 +3,10 @@ import Input from '../../../lib/Input.js';
 
 import Player from './Player.js';
 import PlayerStateName from '../../enums/PlayerStateName.js';
-import { input, stateMachine } from '../../globals.js';
+import { input, sounds, stateMachine } from '../../globals.js';
 import Tile from '../../services/Tile.js';
 import GameStateName from '../../enums/GameStateName.js';
+import SoundName from '../../enums/SoundName.js';
 
 /**
  * Represents the death state of the player.
@@ -29,6 +30,7 @@ export default class PlayerDeathState extends PlayerState {
 	 * Called when entering the death state.
 	 */
 	enter() {
+        sounds.play(SoundName.Dying)
         this.player.currentAnimation = this.player.animations.death;
         this.deathTimer = 0;
         this.player.lives -= 1;

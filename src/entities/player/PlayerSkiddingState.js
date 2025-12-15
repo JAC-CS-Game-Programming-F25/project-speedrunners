@@ -1,9 +1,10 @@
 import Input from "../../../lib/Input.js";
 import PlayerStateName from "../../enums/PlayerStateName.js";
-import { input } from "../../globals.js";
+import { input, sounds } from "../../globals.js";
 import Player from "./Player.js";
 import PlayerState from "./PlayerState.js";
 import { PlayerConfig } from "../../../config/PlayerConfig.js";
+import SoundName from "../../enums/SoundName.js";
 
 /**
  * Represents the skidding state of the player.
@@ -24,6 +25,7 @@ export default class PlayerSkiddingState extends PlayerState {
      * Called when entering the skidding state.
      */
     enter() {
+        sounds.play(SoundName.Skidding)
         this.player.currentAnimation = this.player.animations.skid;
         
         // Lock skid direction based on current velocity

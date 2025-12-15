@@ -4,7 +4,8 @@ import Sprite from "../../lib/Sprite.js";
 import State from "../../lib/State.js";
 import GameStateName from "../enums/GameStateName.js";
 import ImageName from "../enums/ImageName.js";
-import { CANVAS_HEIGHT, CANVAS_WIDTH, context, images, stateMachine, timer } from "../globals.js";
+import SoundName from "../enums/SoundName.js";
+import { CANVAS_HEIGHT, CANVAS_WIDTH, context, images, sounds, stateMachine, timer } from "../globals.js";
 import Scene from "../services/Scene.js";
 import PlayState from "./PlayState.js";
 
@@ -29,7 +30,6 @@ export default class TitleTransitionState extends State {
             titleCardSprites[0].height
         );
 
-
         // X position of the sprite; start offscreen from the left side.
         this.spriteX = -this.titleCardSprite.width * TitleTransitionState.SCALE;
 
@@ -39,6 +39,7 @@ export default class TitleTransitionState extends State {
 
     enter(params) {
         this.runTransition();
+        sounds.play(SoundName.GreenHill)
     }
 
     async runTransition() {

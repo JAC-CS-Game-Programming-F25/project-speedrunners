@@ -3,6 +3,8 @@ import PlayerStateName from '../enums/PlayerStateName.js';
 import Map from './Map.js'
 import Tile from './Tile.js';
 import { isSlopeTile } from '../../config/Slopeconfig.js';
+import { sounds } from '../globals.js';
+import SoundName from '../enums/SoundName.js';
 
 export default class CollisionDetector {
     constructor(map, scoreManager) {
@@ -378,6 +380,7 @@ checkVerticalCollisions(entity) {
 
         if (enemy.collidesWith(player) && topCollision &&
             (isJumping || player.isDamagedInvincible)) {
+            sounds.play(SoundName.Destroy)
             enemy.die();
             this.scoreManager.add(100);
             result.killedEnemy = true;
@@ -393,6 +396,7 @@ checkVerticalCollisions(entity) {
             if (!enemy.isActive || enemy.isDying) continue;
 
             if (enemy.collidesWith(player)) {
+                sounds.play(SoundName.Destroy)
                 enemy.die();
                 result.killedEnemy = true;
             }

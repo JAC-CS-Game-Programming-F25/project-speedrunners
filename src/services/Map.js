@@ -102,7 +102,7 @@ export default class Map {
 
     setupSignPosts() {
        this.signPostManager.addSignPost(4728, 660);
-       //athis.signPostManager.addSignPost(100, 664);
+       //this.signPostManager.addSignPost(100, 664);
     }
     
     setupRings() {

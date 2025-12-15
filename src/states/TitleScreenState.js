@@ -5,7 +5,8 @@ import Sprite from "../../lib/Sprite.js";
 import State from "../../lib/State.js";
 import GameStateName from "../enums/GameStateName.js";
 import ImageName from "../enums/ImageName.js";
-import { CANVAS_HEIGHT, CANVAS_WIDTH, context, images, input, stateMachine, timer } from "../globals.js";
+import SoundName from "../enums/SoundName.js";
+import { CANVAS_HEIGHT, CANVAS_WIDTH, context, images, input, sounds, stateMachine, timer } from "../globals.js";
 import Scene from "../services/Scene.js";
 import PlayState from "./PlayState.js";
 
@@ -78,10 +79,12 @@ export default class TitleScreenState extends State {
 			bgHeight * scale,
 			scale
 		);
-		
+
+		sounds.play(SoundName.TitleMusic)
 	}
 
 	enter(){
+		sounds.play(SoundName.TitleMusic)
 		// Reset delay on every enter
 		this.canStart = false;
 		this.delayTimer = 0;
@@ -89,13 +92,11 @@ export default class TitleScreenState extends State {
 		// Reset animations
 		this.sonicIntro.refresh();
 		this.currentSonicAnimation = this.sonicIntro;
-		
-		//start playing the soundtrack
 	}
 
 	exit(){
 		//stop playing the soundtrack
-		//enter playstate
+		sounds.stop(SoundName.TitleMusic)
 	}
 
 	update(dt){

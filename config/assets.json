@@ -84,14 +84,100 @@
 		{
 			"name": "ring",
 			"path": "./assets/sounds/ring.wav",
-			"size": 2,
-			"volume":1
+			"size": 6,
+			"volume":0.1
 		},
 		{
 			"name": "loseRings",
 			"path": "./assets/sounds/looseRings.wav",
+			"size": 1,
+			"volume":0.1
+		},
+		{
+			"name": "greenhill",
+			"path": "./assets/sounds/GreenHillZone.mp3",
+			"size": 1,
+			"volume":0.1,
+			"loop": true
+		},
+		{
+			"name": "titlemusic",
+			"path": "./assets/sounds/TitleMusic.mp3",
+			"size": 1,
+			"volume":0.1
+		},
+		{
+			"name": "destroy",
+			"path": "./assets/sounds/Destroy.wav",
+			"size": 8,
+			"volume":0.1
+		},
+		{
+			"name": "dying",
+			"path": "./assets/sounds/Dying.wav",
+			"size": 1,
+			"volume":0.1
+		},
+		{
+			"name": "jumping",
+			"path": "./assets/sounds/Jumping.wav",
 			"size": 2,
-			"volume":1
+			"volume":0.1
+		},
+		{
+			"name": "rolling",
+			"path": "./assets/sounds/Rolling.wav",
+			"size": 3,
+			"volume":0.1
+		},
+		{
+			"name": "scoretally",
+			"path": "./assets/sounds/ScoreTally.wav",
+			"size": 1,
+			"volume":0.1,
+			"loop": true
+		},
+		{
+			"name": "signspin",
+			"path": "./assets/sounds/SignSpin.wav",
+			"size": 1,
+			"volume":0.1
+		},
+		{
+			"name": "skidding",
+			"path": "./assets/sounds/Skidding.wav",
+			"size": 3,
+			"volume":0.1
+		},
+		{
+			"name": "spring",
+			"path": "./assets/sounds/Spring.wav",
+			"size": 3,
+			"volume":0.1
+		},
+		{
+			"name": "tallied",
+			"path": "./assets/sounds/Tallied.wav",
+			"size": 1,
+			"volume":0.1
+		},
+		{
+			"name": "stageClear",
+			"path": "./assets/sounds/StageClear.mp3",
+			"size": 1,
+			"volume":0.1
+		},
+		{
+			"name": "gameOver",
+			"path": "./assets/sounds/GameOver.mp3",
+			"size": 1,
+			"volume":0.1
+		},
+		{
+			"name": "invincibility",
+			"path": "./assets/sounds/Invincibility.mp3",
+			"size": 1,
+			"volume":0.1
 		}
 	],
 	"fonts": [

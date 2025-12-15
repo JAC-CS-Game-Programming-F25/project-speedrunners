@@ -1,10 +1,10 @@
 import Input from "../../lib/Input.js";
 import State from "../../lib/State.js";
-import { CANVAS_WIDTH, CANVAS_HEIGHT, context, input, stateMachine, images, timer } from "../globals.js";
+import { CANVAS_WIDTH, CANVAS_HEIGHT, context, input, stateMachine, images, timer, sounds } from "../globals.js";
 import GameStateName from "../enums/GameStateName.js";
 import ImageName from "../enums/ImageName.js";
 import { victorySpriteConfig } from "../../config/SpriteConfig.js";
-
+import {SoundName} from "../enums/SoundName.js";
 export default class VictoryState extends State {
     constructor() {
         super();
@@ -31,6 +31,7 @@ export default class VictoryState extends State {
     }
     
     enter(params) {
+        sounds.play(SoundName.StageClear)
         this.score = params.score || 0;
         // Get current high score
         let highScore = parseInt(localStorage.getItem('highScore')) || 0;
@@ -67,7 +68,7 @@ export default class VictoryState extends State {
             console.error("HUD image not loaded!");
             return;
         }
-        
+
         // Start tallying after tween completes
         timer.addTask(
             () => {},
@@ -76,8 +77,18 @@ export default class VictoryState extends State {
             () => { 
                 this.canSkip = true;
                 this.isTallying = true;
+                    
+                sounds.play(SoundName.ScoreTally);
+                this.isTallySoundPlaying = true;
             }
         );
+    }
+
+    exit() {
+        console.log("VictoryState exit called");
+        sounds.stop(SoundName.ScoreTally)
+        sounds.stop(SoundName.StageClear);
+        this.isTallySoundPlaying = false;
     }
     
     update(dt) {
@@ -113,6 +124,12 @@ export default class VictoryState extends State {
                 // Tallying complete
                 else {
                     this.isTallying = false;
+                    if (this.isTallySoundPlaying) {
+                        sounds.stop(SoundName.ScoreTally);
+                        this.isTallySoundPlaying = false;
+                    }
+
+                    sounds.play(SoundName.Tallied);
                 }
             }
         }
@@ -142,6 +159,12 @@ export default class VictoryState extends State {
                 this.timeBonus = 0;
                 this.ringBonus = 0;
                 this.isTallying = false;
+
+                if (this.isTallySoundPlaying) {
+                    sounds.stop(SoundName.ScoreTally);
+                    this.isTallySoundPlaying = false;
+                }
+                sounds.play(SoundName.Tallied);
             } else {
                 stateMachine.change(GameStateName.TitleScreen);
             }

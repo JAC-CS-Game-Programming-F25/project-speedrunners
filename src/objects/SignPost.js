@@ -1,10 +1,11 @@
 import Animation from '../../lib/Animation.js';
-import { images, stateMachine } from '../globals.js';
+import { images, sounds, stateMachine } from '../globals.js';
 import { ImageName } from '../enums/ImageName.js';
 import { loadSignPostSprites, signPostSpriteConfig } from '../../config/SpriteConfig.js';
 import Entity from '../entities/Entity.js';
 import GameStateName from '../enums/GameStateName.js';
 import PlayerStateName from '../enums/PlayerStateName.js';
+import SoundName from '../enums/SoundName.js';
 
 export default class SignPost extends Entity {
     constructor(x, y) {
@@ -73,6 +74,7 @@ export default class SignPost extends Entity {
         if (this.isActivated) return;
         
         this.isActivated = true;
+        sounds.play(SoundName.SignSpin)
         this.animationFinished = false;
         this.spinCount = 0;
         this.player = player;
