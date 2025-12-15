@@ -1,8 +1,9 @@
 import Entity from "../entities/Entity.js";
-import { images } from "../globals.js";
+import { images, sounds } from "../globals.js";
 import { ImageName } from "../enums/ImageName.js";
 import { objectSpriteConfig, loadObjectSprites } from "../../config/SpriteConfig.js";
 import PlayerStateName from "../enums/PlayerStateName.js";
+import SoundName from "../enums/SoundName.js";
 
 export default class Spring extends Entity {
     static WIDTH = 32;
@@ -34,23 +35,23 @@ export default class Spring extends Entity {
      * @param {Player} player
      */
     activate(player) {
-    if (this.isCompressed) return;
-    
-    this.isCompressed = true;
-    this.compressTimer = 0;
-    this.dimensions.y = Spring.HEIGHT_COMPRESSED;
-    
-    // Launch player upward
-    player.velocity.y = Spring.BOUNCE_FORCE;
-    
-    // Force player off ground and position above spring
-    player.isOnGround = false;
-    player.position.y = this.position.y - player.dimensions.y - 1;
-    
-    player.stateMachine.change(PlayerStateName.Bounce);
-    
-   // console.log("Spring activated! Player bouncing with velocity:", Spring.BOUNCE_FORCE);
-}
+        if (this.isCompressed) return;
+        sounds.play(SoundName.Spring)
+        this.isCompressed = true;
+        this.compressTimer = 0;
+        this.dimensions.y = Spring.HEIGHT_COMPRESSED;
+        
+        // Launch player upward
+        player.velocity.y = Spring.BOUNCE_FORCE;
+        
+        // Force player off ground and position above spring
+        player.isOnGround = false;
+        player.position.y = this.position.y - player.dimensions.y - 1;
+        
+        player.stateMachine.change(PlayerStateName.Bounce);
+        
+    // console.log("Spring activated! Player bouncing with velocity:", Spring.BOUNCE_FORCE);
+    }
     
     update(dt) {
         if (this.isCompressed) {

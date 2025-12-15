@@ -101,7 +101,7 @@ export default class Map {
 
     setupSignPosts() {
        this.signPostManager.addSignPost(4728, 660);
-    //    this.signPostManager.addSignPost(100, 664);
+        this.signPostManager.addSignPost(120, 660);
     }
     
     setupRings() {
@@ -124,9 +124,9 @@ export default class Map {
     }
     
     setupPowerUps() {
-        this.powerUpManager.addBox(120, 576, 'rings');
-        this.powerUpManager.addBox(150, 674, 'speed');
-        this.powerUpManager.addBox(180, 674, 'invincibility');
+        this.powerUpManager.addBox(1219, 576, 'rings');
+        this.powerUpManager.addBox(1914, 674, 'speed');
+        this.powerUpManager.addBox(4036, 674, 'invincibility');
         //this.powerUpManager.addBox(500, 192, 'random');
         //this.powerUpManager.addBox(700, 192, 'random');
     }

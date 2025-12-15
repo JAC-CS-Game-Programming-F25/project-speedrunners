@@ -6,7 +6,12 @@ export const SoundName ={
     Destroy: "destroy",
     Dying: "dying",
     Jumping: "jumping",
-    Rolling: "rolling"
+    Rolling: "rolling",
+    ScoreTally: "scoretally",
+    SignSpin: "signspin",
+    Skidding: "skidding",
+    Spring: "spring",
+    Tallied: "tallied"
 }
 
 export default SoundName;
