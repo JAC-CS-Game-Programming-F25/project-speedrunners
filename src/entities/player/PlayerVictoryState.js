@@ -16,7 +16,7 @@ export default class PlayerVictoryState extends PlayerState {
         this.player.currentAnimation = this.player.animations.idle;
         this.player.currentAnimation.refresh();
         
-        console.log("Player entered victory state!");
+       // console.log("Player entered victory state!");
     }
     
     update(dt) {

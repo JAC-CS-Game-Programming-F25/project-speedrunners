@@ -45,12 +45,12 @@ export default class SignPost extends Entity {
         
         if (previousFrame === 3 && this.currentAnimation.currentFrame === 0) {
             this.spinCount++;
-            console.log(`Spin ${this.spinCount}/${this.maxSpins} complete`);
+           // console.log(`Spin ${this.spinCount}/${this.maxSpins} complete`);
             
             if (this.spinCount >= this.maxSpins) {
                 this.currentAnimation.currentFrame = 3;
                 this.animationFinished = true;
-                console.log("Sign post animation finished!");
+               // console.log("Sign post animation finished!");
                 
                 // Pass the map to VictoryState
                 setTimeout(() => {
@@ -83,7 +83,7 @@ export default class SignPost extends Entity {
             });
         }
         
-        console.log("Sign post activated!");
+       // console.log("Sign post activated!");
     }
     
     render(context) {

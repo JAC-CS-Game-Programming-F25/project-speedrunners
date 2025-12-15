@@ -26,7 +26,7 @@ export default class Spring extends Entity {
         this.isActive = true;
         this.isSolid = true; // Springs are solid objects
         
-        console.log(`Spring created at (${x}, ${y}), isSolid: ${this.isSolid}, isActive: ${this.isActive}`);
+     //   console.log(`Spring created at (${x}, ${y}), isSolid: ${this.isSolid}, isActive: ${this.isActive}`);
     }
     
     /**
@@ -34,24 +34,23 @@ export default class Spring extends Entity {
      * @param {Player} player
      */
     activate(player) {
-        if (this.isCompressed) return; // Already compressed
-        
-        // Compress spring
-        this.isCompressed = true;
-        this.compressTimer = 0;
-        
-        // Adjust height when compressed
-        this.dimensions.y = Spring.HEIGHT_COMPRESSED;
-        
-        // Launch player upward
-        player.velocity.y = Spring.BOUNCE_FORCE;
-        
-        // PLACEHOLDER: Future bounce state implementation
-        // TODO: Create PlayerBouncingState for spring bounces
-        player.stateMachine.change(PlayerStateName.Bounce);
-        
-        console.log("Spring activated! Player bouncing with velocity:", Spring.BOUNCE_FORCE);
-    }
+    if (this.isCompressed) return;
+    
+    this.isCompressed = true;
+    this.compressTimer = 0;
+    this.dimensions.y = Spring.HEIGHT_COMPRESSED;
+    
+    // Launch player upward
+    player.velocity.y = Spring.BOUNCE_FORCE;
+    
+    // Force player off ground and position above spring
+    player.isOnGround = false;
+    player.position.y = this.position.y - player.dimensions.y - 1;
+    
+    player.stateMachine.change(PlayerStateName.Bounce);
+    
+   // console.log("Spring activated! Player bouncing with velocity:", Spring.BOUNCE_FORCE);
+}
     
     update(dt) {
         if (this.isCompressed) {

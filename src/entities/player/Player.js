@@ -1,5 +1,5 @@
 import Animation from '../../../lib/Animation.js';
-import { images, context, timer } from '../../globals.js';
+import { images, context, timer,debugOptions } from '../../globals.js';
 import ImageName from '../../enums/ImageName.js';
 import { loadPlayerSprites, playerSpriteConfig } from '../../../config/SpriteConfig.js';
 import StateMachine from '../../../lib/StateMachine.js';
@@ -43,9 +43,14 @@ export default class Player extends Entity {
 		this.scoreManager = scoreManager;
         this.rings = [];
         this.hitSpikeTop = false;
-        this.knockbackRight = undefined; // Set by CollisionDetector for knockback direction
+        this.knockbackRight = undefined;
         this.sparkles = new InvincibilitySparkles();
 		this.isBouncing = false;
+		
+        // Slope angle for sprite rotation
+		this.slopeAngle = 0;
+        this.displayAngle = 0; // Smoothed angle for rendering
+
 		this.lives = 3
         this.sprites = loadPlayerSprites(
             images.get(ImageName.Sonic),
@@ -128,54 +133,73 @@ export default class Player extends Entity {
 		// console.log(`SONIC POSTION: (${this.position.x}, ${this.position.y})`);
 	}
 
-    render(context) {
-        context.save();
-        context.globalAlpha = this.isDamagedInvincible ? this.flicker : 1;
-        this.stateMachine.render(context);
-        if (this.isInvincible) {
-            this.sparkles.render(
-                context,
-                this.position.x,
-                this.position.y,
-                this.dimensions.x,
-                this.dimensions.y
-            );
-        }
-        context.restore();
+    if (this.isInvincible) {
+        this.sparkles.update(dt);
     }
 
-	hit() {
-		// Safety check: don't take damage if already damaged invincible
-        if (this.isDamagedInvincible) {
-            console.log("Hit blocked: already damaged invincible");
-            return;
+    if (this.isOnGround) {
+        this.position.y = Math.round(this.position.y);
+
+        // If slopeAngle is exactly 0, snap displayAngle to 0 immediately
+        if (this.slopeAngle === 0) {
+            this.displayAngle = 0; // Instant snap - no interpolation
+        } else {
+            // On a slope - smooth interpolation
+            const diff = this.slopeAngle - this.displayAngle;
+            this.displayAngle += diff * 0.2;
         }
-
-        // Safety check: don't take damage if already in damage state (prevents double-hit)
-        if (this.stateMachine.currentState.name === PlayerStateName.Damage) {
-            console.log("Hit blocked: already in damage state");
-            return;
+    } else {
+        // In air - return to zero
+        this.displayAngle *= 0.8;
+        if (Math.abs(this.displayAngle) < 0.01) {
+            this.displayAngle = 0;
         }
+        this.slopeAngle = 0;
+    }
+}
 
-        // CRITICAL: Check CURRENT ring count from manager, not cached this.rings
-        const currentRings = this.map && this.map.ringManager ? this.map.ringManager.getRingCount() : 0;
-        console.log(`Hit registered! Rings: ${currentRings}, knockbackRight: ${this.knockbackRight}`);
+render(context) {
+    context.globalAlpha = this.isDamagedInvincible ? this.flicker : 1;
+    this.stateMachine.render(context);
+    context.globalAlpha = 1;
 
-        if (currentRings > 0) {
-            // Lose rings
-            this.map.ringManager.loseRings(
-                this.position.x + this.dimensions.x / 2,
-                this.position.y + this.dimensions.y / 2,
-                10
-            );
+    if (this.isInvincible) {
+        this.sparkles.render(
+            context,
+            this.position.x,
+            this.position.y,
+            this.dimensions.x,
+            this.dimensions.y
+        );
+    }
+}
 
-            this.stateMachine.change(PlayerStateName.Damage);
-        }
-        else {
-            this.die();
-		}
-	}
-
+	hit(hitBySpike = false) {
+    if (this.isDamagedInvincible) {
+        return;
+    }
+    if (this.stateMachine.currentState.name === PlayerStateName.Damage) {
+        return;
+    }
+    const currentRings = this.map && this.map.ringManager ? this.map.ringManager.getRingCount() : 0;
+    
+    if (currentRings > 0) {
+        // Calculate ground level - add extra buffer if hit by spike
+        const spikeOffset = hitBySpike ? 30 : 0;
+        const groundLevel = this.position.y + this.dimensions.y + spikeOffset;
+        
+        this.map.ringManager.loseRings(
+            this.position.x + this.dimensions.x / 2,
+            this.position.y + this.dimensions.y / 2,
+            10,
+            groundLevel
+        );
+        this.stateMachine.change(PlayerStateName.Damage);
+    }
+    else {
+        this.die();
+    }
+}
     die() {
         if (this.stateMachine.currentState.name !== PlayerStateName.Death) {
 			this.lives -= 1;
@@ -195,7 +219,7 @@ export default class Player extends Entity {
 			() => {
 				this.isDamagedInvincible = false;
 				this.flicker = 1;
-                console.log("Damage invincibility expired");
+                //console.log("Damage invincibility expired");
 			}
     	);
 	}

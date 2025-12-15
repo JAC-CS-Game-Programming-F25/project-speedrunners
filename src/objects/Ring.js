@@ -120,19 +120,22 @@ export default class Ring extends Entity {
         return 0;
     }
 
-    initializeAsLostRing(sourceX, sourceY) {
-        this.isBouncing = true;
-        this.isLostRing = true;
-        this.bounceTimer = 0;
-        this.canBeCollected = false;
-        
-        this.position.x = sourceX;
-        this.position.y = sourceY;
-        
-        const angle = (Math.random() * 120 + 30) * (Math.PI / 180); 
-        const speed = 150 + Math.random() * 100;
-        
-        this.velocity.x = Math.cos(angle) * speed * (Math.random() > 0.5 ? 1 : -1);
-        this.velocity.y = -Math.abs(Math.sin(angle)) * speed;
-    }
+    initializeAsLostRing(sourceX, sourceY, groundLevel = null) {
+    this.isBouncing = true;
+    this.isLostRing = true;
+    this.bounceTimer = 0;
+    this.canBeCollected = false;
+    
+    this.position.x = sourceX;
+    this.position.y = sourceY;
+    
+    // Use passed ground level, or default to below the source position
+    this.groundLevel = groundLevel || (sourceY + 50);
+    
+    const angle = (Math.random() * 120 + 30) * (Math.PI / 180); 
+    const speed = 150 + Math.random() * 100;
+    
+    this.velocity.x = Math.cos(angle) * speed * (Math.random() > 0.5 ? 1 : -1);
+    this.velocity.y = -Math.abs(Math.sin(angle)) * speed;
+}
 }

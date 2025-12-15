@@ -99,43 +99,67 @@ export default class Map {
         this.ui = new UserInterface(this.player, this.ringManager, this.scoreManager, this.time)
     }
 
-    setupSignPosts() {
-        // Add sign post at end of level
-        // Y position: 176 = ground (208) - signpost height (32)
-        this.signPostManager.addSignPost(3933, 180);
-        this.signPostManager.addSignPost(100, 180);
+     setupSignPosts() {
+       this.signPostManager.addSignPost(4728, 660);
     }
     
     setupRings() {
-        this.ringManager.addRingLine(100, 160, 8, 25);
-        this.ringManager.addRingArc(300, 180, 40, 7);
-        this.ringManager.addRing(450, 170);
-        this.ringManager.addRing(480, 150);
-        this.ringManager.addRing(510, 170);
+        this.ringManager.addRingLine(426, 620, 6, 25);
+        this.ringManager.addRingLine(816, 620, 6, 25);
+        this.ringManager.addRingLine(1530, 361, 8, 25);
+        this.ringManager.addRingLine(1285, 40, 6, 25);
+
+        //this.ringManager.addRing(450, 170);
+        //this.ringManager.addRing(480, 150);
+        //this.ringManager.addRing(510, 170);
     }
     
     setupSpikes() {
-       // this.spikeManager.addSpike(400, 192);
-       // this.spikeManager.addSpike(450, 192);
+        this.spikeManager.addSpike(2242, 672);
+        this.spikeManager.addSpike(2210, 672);
+        this.spikeManager.addSpike(863, 672);
+        this.spikeManager.addSpike(852, 672);
+        this.spikeManager.addSpike(3309, 610);
     }
     
     setupPowerUps() {
-        //this.powerUpManager.addBox(100, 192, 'random');
+        this.powerUpManager.addBox(1219, 576, 'rings');
+        this.powerUpManager.addBox(1914, 674, 'speed');
+        this.powerUpManager.addBox(4036, 674, 'invincibility');
         //this.powerUpManager.addBox(500, 192, 'random');
         //this.powerUpManager.addBox(700, 192, 'random');
     }
     
     setupEnemies() {
-        this.enemyManager.addEnemy('buzzbomber', 300, 192);
-        this.enemyManager.addEnemy('buzzbomber', 600, 192);
-       this.enemyManager.addEnemy('crab', 850, 192);
-       this.enemyManager.addEnemy('crab', 250, 192);
+        this.enemyManager.addEnemy('crab', 2312, 672);
+        this.enemyManager.addEnemy('crab', 2352, 672);
+        this.enemyManager.addEnemy('crab', 2392, 672);
+
+        this.enemyManager.addEnemy('buzzbomber', 2838, 672);
+        this.enemyManager.addEnemy('buzzbomber', 2798, 672);
+        this.enemyManager.addEnemy('buzzbomber', 2748, 672);
+
+        this.enemyManager.addEnemy('crab', 4550, 672);
+        this.enemyManager.addEnemy('crab', 4510, 672);
+        this.enemyManager.addEnemy('crab', 4590, 672);
+
+        this.enemyManager.addEnemy('buzzbomber', 4450, 672);
+        this.enemyManager.addEnemy('buzzbomber', 4410, 672);
+        this.enemyManager.addEnemy('buzzbomber', 4490, 672);
+
+        this.enemyManager.addEnemy('buzzbomber', 1754, 361);
+        this.enemyManager.addEnemy('buzzbomber', 1734, 361);
+        this.enemyManager.addEnemy('buzzbomber', 1714, 361);
+        //this.enemyManager.addEnemy('crab', 800, 192);
     }
     
     setupSprings() {
-        this.springManager.addSpring(120, 208);
-        this.springManager.addSpring(990, 208);
-        this.springManager.addSpring(1506, 208);
+        this.springManager.addSpring(1040, 688);
+        this.springManager.addSpring(1396, 520);
+        this.springManager.addSpring(2048, 370);
+        this.springManager.addSpring(4175, 688);
+        this.springManager.addSpring(4290, 306);
+       // this.springManager.addSpring(2080, 350);
     }
     
     update(dt) {
@@ -174,8 +198,8 @@ export default class Map {
                   // For spikes, use facing direction for knockback (spikes are stationary)
                   this.player.knockbackRight = !this.player.facingRight;
                   
-                  this.player.hit();
-                    console.log("Player hit spike from top!");
+                  this.player.hit(true);
+                   // console.log("Player hit spike from top!");
                 }
             } else {
                 this.playerIsHit = false;
@@ -256,10 +280,38 @@ export default class Map {
         context.restore();
     }
     
+    /**
+     * Get tile from a specific layer by column and row
+     * @param {number} layerIndex - The layer index (0 = collision, 1 = background)
+     * @param {number} col - Column (x tile coordinate)
+     * @param {number} row - Row (y tile coordinate)
+     * @returns {Tile|null}
+     */
     getTileAt(layerIndex, col, row) {
         return this.layers[layerIndex]?.getTile(col, row);
     }
     
+    /**
+     * Get collision layer tile at specified tile coordinates
+     * Used by CollisionDetector for slope height sampling
+     * @param {number} col - Column (x tile coordinate)
+     * @param {number} row - Row (y tile coordinate)
+     * @returns {Tile|null}
+     */
+    getCollisionTileAt(col, row) {
+        // Bounds check
+        if (col < 0 || col >= this.width || row < 0 || row >= this.height) {
+            return null;
+        }
+        return this.collisionLayer.getTile(col, row);
+    }
+    
+    /**
+     * Check if there's a solid tile at the given tile coordinates
+     * @param {number} col - Column (x tile coordinate)
+     * @param {number} row - Row (y tile coordinate)
+     * @returns {boolean}
+     */
     isSolidTileAt(col, row) {
         if (col < 0 || col >= this.width || row < 0 || row >= this.height) {
             return false;

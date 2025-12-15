@@ -39,19 +39,22 @@ export default class RingManager {
         }
     }
 
-    loseRings(playerX, playerY, maxRingsToLose = 10) {
-        const ringsToLose = Math.min(this.totalRingsCollected, maxRingsToLose);
-        if (ringsToLose === 0) return; 
-        
-        for (let i = 0; i < ringsToLose; i++) {
-            const lostRing = GameObjectFactory.createRing(playerX, playerY, true);
-            lostRing.initializeAsLostRing(playerX, playerY);
-            this.rings.push(lostRing);
-        }
-
-        sounds.play(SoundName.LoseRings);
-        this.totalRingsCollected = 0;
+   loseRings(playerX, playerY, maxRingsToLose = 10, groundLevel = null) {
+    const ringsToLose = Math.min(this.totalRingsCollected, maxRingsToLose);
+    if (ringsToLose === 0) return; 
+    
+    // If no ground level passed, estimate it below the player
+    const actualGroundLevel = groundLevel || (playerY + 50);
+    
+    for (let i = 0; i < ringsToLose; i++) {
+        const lostRing = GameObjectFactory.createRing(playerX, playerY, true);
+        lostRing.initializeAsLostRing(playerX, playerY, actualGroundLevel);
+        this.rings.push(lostRing);
     }
+    
+    sounds.play(SoundName.LoseRings);
+    this.totalRingsCollected = 0;
+}
 
     update(dt) {
         this.rings.forEach(ring => ring.update(dt));
