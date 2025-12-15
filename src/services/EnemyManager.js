@@ -95,8 +95,6 @@ export default class EnemyManager {
     }
 
     /**
-<<<<<<< HEAD
-=======
      * Check collisions with player
      * @param {Player} player
      * @param {RingManager} ringManager
@@ -117,7 +115,7 @@ export default class EnemyManager {
             if (player.isInvincible) {
                 enemy.die();
                 result.killedEnemy = true;
-                console.log(`${enemy.constructor.name} destroyed by invincible Sonic!`);
+               // console.log(`${enemy.constructor.name} destroyed by invincible Sonic!`);
                 continue;
             }
 
@@ -126,7 +124,7 @@ export default class EnemyManager {
                 result.killedEnemy = true;
                 // Give player a bounce
                 player.velocity.y = -300;
-                console.log(`${enemy.constructor.name} destroyed!`);
+                //console.log(`${enemy.constructor.name} destroyed!`);
                 continue; 
             }
 
@@ -153,7 +151,6 @@ export default class EnemyManager {
     }
 
     /**
->>>>>>> origin/FixingCollisions
      * Remove dead enemies from array
      */
     cleanupDeadEnemies() {

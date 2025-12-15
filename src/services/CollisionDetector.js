@@ -77,46 +77,87 @@ checkHorizontalCollisions(entity) {
     }
 
 
+computeSlopeAngle(entity) {
+    if (!entity.isOnGround) {
+        return 0;
+    }
 
-	computeSlopeAngle(entity) {
     const tileSize = Tile.SIZE;
     const footY = entity.position.y + entity.dimensions.y;
+    const centerX = entity.position.x + entity.dimensions.x / 2;
 
-    const sampleDist = 6;
+    // Get the tile directly under Sonic's CENTER foot position
+    const tileX = Math.floor(centerX / tileSize);
+    const tileY = Math.floor((footY + 1) / tileSize); // +1 to check tile we're standing ON
 
-    const x1 = entity.position.x + entity.dimensions.x / 2 - sampleDist;
-    const x2 = entity.position.x + entity.dimensions.x / 2 + sampleDist;
+    const standingTile = this.map.getCollisionTileAt(tileX, tileY);
+    
+    // ONLY calculate angle if the tile we're standing on is a slope
+    // Check the tile ID directly
+    const standingTileId = standingTile ? standingTile.id : null;
+    
+    if (!standingTileId || !isSlopeTile(standingTileId)) {
+        return 0; // Not on a slope tile - no tilt
+    }
 
-    const y1 = this.findGroundYAtX(x1, footY);
-    const y2 = this.findGroundYAtX(x2, footY);
+    // We're on a slope - now calculate the angle
+    const sampleDist = 8;
+    const leftX = centerX - sampleDist;
+    const rightX = centerX + sampleDist;
 
-    if (y1 === null || y2 === null) return 0;
+    const leftY = this.findGroundYAtX(leftX, footY);
+    const rightY = this.findGroundYAtX(rightX, footY);
 
-    const dx = sampleDist * 2;
-    const dy = y2 - y1;
+    if (leftY === null || rightY === null) {
+        return 0;
+    }
 
-    return Math.atan2(dy, dx);
+    // Calculate height difference
+    const dy = rightY - leftY;
+    
+    // If difference is tiny, treat as flat
+    if (Math.abs(dy) <= 1) {
+        return 0;
+    }
+
+    const dx = rightX - leftX;
+    
+    // atan2 gives us the angle
+    // Positive dy = right side is LOWER = downhill to right = positive angle (tilt forward when going right)
+    // Negative dy = right side is HIGHER = uphill to right = negative angle (tilt back when going right)
+    const angle = Math.atan2(dy, dx);
+
+    // Clamp to max tilt
+    const maxAngle = Math.PI / 8; // ~22.5 degrees - reduced for subtlety
+    return Math.max(-maxAngle, Math.min(angle, maxAngle));
 }
 
 findGroundYAtX(x, footY) {
     const tileSize = Tile.SIZE;
     const tileX = Math.floor(x / tileSize);
-    const tileY = Math.floor(footY / tileSize);
 
-    for (let y = tileY - 1; y <= tileY + 1; y++) {
-        const tile = this.map.getCollisionTileAt(tileX, y);
-        if (!tile || !this.map.isSolidTileAt(tileX, y)) continue;
+    for (let offsetY = -1; offsetY <= 1; offsetY++) {
+        const tileY = Math.floor(footY / tileSize) + offsetY;
 
-        const localX = Math.floor(x) % tileSize;
+        const tile = this.map.getCollisionTileAt(tileX, tileY);
+        if (!tile || !this.map.isSolidTileAt(tileX, tileY)) continue;
+
+        // Safe modulo for localX
+        let localX = Math.floor(x) % tileSize;
+        if (localX < 0) localX += tileSize;
+
         const h = tile.getHeightAt(localX);
         if (h <= 0) continue;
 
-        return y * tileSize + (tileSize - h);
+        const groundY = tileY * tileSize + (tileSize - h);
+
+        if (Math.abs(groundY - footY) <= 10) {
+            return groundY;
+        }
     }
 
     return null;
 }
-
 
 
 
@@ -126,60 +167,38 @@ findGroundYAtX(x, footY) {
      */
 checkVerticalCollisions(entity) {
     const tileSize = Tile.SIZE;
-
     const wasOnGround = entity.isOnGround;
     entity.isOnGround = false;
 
     const groundY = this.findGroundY(entity);
 
     if (groundY !== null) {
-        const entityBottom = entity.position.y + entity.dimensions.y;
+        const entityBottom = Math.round(entity.position.y + entity.dimensions.y);
         const targetY = groundY - entity.dimensions.y;
-        const diff = targetY - entity.position.y;
+        const diff = groundY - entityBottom;
 
         if (entity.velocity.y >= 0) {
             if (wasOnGround) {
-                // ===============================
-                // UPHILL: tiny snap corrections
-                // ===============================
-                if (diff < 0 && Math.abs(diff) <= 6) {
-                    entity.position.y += diff;
+                const speed = Math.abs(entity.velocity.x);
+                const maxSnapUp = Math.max(12, speed * 0.8);
+                const maxSnapDown = Math.max(16, speed * 0.8);
+
+                if (diff >= -maxSnapUp && diff <= maxSnapDown) {
+                    entity.position.y = Math.round(targetY);
+                    entity.velocity.y = 0;
+                    entity.isOnGround = true;
+                    entity.slopeAngle = this.computeSlopeAngle(entity);
+                    return;
                 }
+            }
 
-                // ===============================
-                // DOWNHILL: smoothly follow slope
-                // ===============================
-                else if (diff > 0) {
-    // Smooth downhill, but always move at least a tiny amount
-    const followSpeed = Math.max(0.5, Math.abs(entity.velocity.x)); // ensures he keeps up
-    entity.position.y += Math.min(diff, followSpeed);
-}
-
-
-                // ===============================
-                // FOOT BIAS: gently pull Sonic closer
-                // ===============================
-                const footBias = 1; // 1px closer to the ground
-                if (entityBottom + footBias <= groundY) {
-                    entity.position.y += footBias;
-                }
-
-                // Safety snap if penetration occurs
-                if (entity.position.y + entity.dimensions.y > groundY) {
-                    entity.position.y = targetY;
-                }
-
+            // Landing from air - MORE GENEROUS for initial spawn
+            // Changed from (-10, 14) to (-16, 20)
+            if (diff >= -16 && diff <= 20) {
+                entity.position.y = Math.round(targetY);
                 entity.velocity.y = 0;
                 entity.isOnGround = true;
                 entity.slopeAngle = this.computeSlopeAngle(entity);
-                return;
-            }
-
-            // Initial landing
-            if (entityBottom >= groundY - 1) {
-                entity.position.y = targetY;
-                entity.velocity.y = 0;
-                entity.isOnGround = true;
                 return;
             }
         }
@@ -188,12 +207,12 @@ checkVerticalCollisions(entity) {
             this.checkCeilingCollision(entity);
         }
     } else {
+        entity.slopeAngle = 0;
         if (entity.velocity.y < 0) {
             this.checkCeilingCollision(entity);
         }
     }
 }
-
 
 
 
@@ -236,53 +255,59 @@ checkVerticalCollisions(entity) {
      * @param {Entity} entity 
      * @returns {number|null} The Y position of the ground, or null if no ground
      */
-   findGroundY(entity) {
+  findGroundY(entity) {
     const tileSize = Tile.SIZE;
-
     const footY = entity.position.y + entity.dimensions.y;
 
     const sampleOffsets = [
-        entity.dimensions.x * 0.25,
+        entity.dimensions.x * 0.2,
+        entity.dimensions.x * 0.4,
         entity.dimensions.x * 0.5,
-        entity.dimensions.x * 0.75
+        entity.dimensions.x * 0.6,
+        entity.dimensions.x * 0.8
     ];
 
-    let closestGroundY = null;
+    let bestGroundY = null;
 
     for (const offset of sampleOffsets) {
         const footX = entity.position.x + offset;
-
         const tileX = Math.floor(footX / tileSize);
-        const tileY = Math.floor(footY / tileSize);
 
-        const tilesToCheck = [tileY - 1, tileY, tileY + 1];
+        let localX = Math.floor(footX) % tileSize;
+        if (localX < 0) localX += tileSize;
 
-        for (const checkTileY of tilesToCheck) {
+        const baseTileY = Math.floor(footY / tileSize);
+
+        for (const checkTileY of [baseTileY - 1, baseTileY, baseTileY + 1]) {
             if (checkTileY < 0) continue;
 
             const tile = this.map.getCollisionTileAt(tileX, checkTileY);
             if (!tile || !this.map.isSolidTileAt(tileX, checkTileY)) continue;
 
-            const localX = Math.floor(footX) % tileSize;
             const groundHeight = tile.getHeightAt(localX);
-            if (groundHeight <= 0) continue;
+            
+            // DEBUG: Log tiles that return 0 height but are solid
+            if (groundHeight <= 0) {
+                console.warn(`[MISSING SLOPE?] Tile ID: ${tile.id} at (${tileX}, ${checkTileY}) returned height 0. isSlope: ${tile.isSlope}, heights: ${tile.heights}`);
+                continue;
+            }
 
-            const groundY =
-                checkTileY * tileSize + (tileSize - groundHeight);
+            const groundY = checkTileY * tileSize + (tileSize - groundHeight);
 
-            if (
-                groundY >= footY - tileSize &&
-                groundY <= footY + tileSize
-            ) {
-                if (closestGroundY === null || groundY < closestGroundY) {
-                    closestGroundY = groundY;
-					
+            if (groundY >= footY - 20 && groundY <= footY + 20) {
+                if (bestGroundY === null || groundY < bestGroundY) {
+                    bestGroundY = groundY;
                 }
             }
         }
     }
 
-    return closestGroundY;
+    // DEBUG: Log when no ground is found
+    if (bestGroundY === null) {
+        //console.warn(`[NO GROUND] No ground found for entity at (${entity.position.x.toFixed(1)}, ${entity.position.y.toFixed(1)})`);
+    }
+
+    return bestGroundY !== null ? Math.round(bestGroundY) : null;
 }
 
     
@@ -355,7 +380,7 @@ checkVerticalCollisions(entity) {
                 enemy.die();
                 result.killedEnemy = true;
                 player.velocity.y = -300;
-                console.log(`${enemy.constructor.name} stomped! (jumping=${isJumping}, damageInvincible=${player.isDamageInvincible})`);
+              //  console.log(`${enemy.constructor.name} stomped! (jumping=${isJumping}, damageInvincible=${player.isDamageInvincible})`);
             }
         }
 
@@ -369,7 +394,7 @@ checkVerticalCollisions(entity) {
                 if (enemy.collidesWith(player)) {
                     enemy.die();
                     result.killedEnemy = true;
-                    console.log(`${enemy.constructor.name} destroyed (${player.isInvincible ? "invincible" : "rolling"})`);
+                  //  console.log(`${enemy.constructor.name} destroyed (${player.isInvincible ? "invincible" : "rolling"})`);
                 }
             }
             return result;
@@ -377,7 +402,7 @@ checkVerticalCollisions(entity) {
 
         // ================= DAMAGE INVINCIBLE =================
         if (player.isDamagedInvincible) {
-            console.log("[COLLISION] Player is damage invincible - passing through enemies");
+           // console.log("[COLLISION] Player is damage invincible - passing through enemies");
             return result;
         }
 
@@ -397,7 +422,7 @@ checkVerticalCollisions(entity) {
                     const enemyCenterX = enemy.position.x + enemy.dimensions.x / 2;
                     player.knockbackRight = playerCenterX > enemyCenterX;
 
-                    console.log(`[COLLISION] Knockback: playerX=${playerCenterX}, enemyX=${enemyCenterX}, knockbackRight=${player.knockbackRight}`);
+                  //  console.log(`[COLLISION] Knockback: playerX=${playerCenterX}, enemyX=${enemyCenterX}, knockbackRight=${player.knockbackRight}`);
 
                     player.hit();
                     hitTakenThisFrame = true;
@@ -513,29 +538,36 @@ checkVerticalCollisions(entity) {
 
     // ==================== SPRING COLLISIONS ====================
     
-    checkSpringCollisions(player, springManager) {
-        if (!springManager) return;
+checkSpringCollisions(player, springManager) {
+    if (!springManager) return;
+    
+    for (const spring of springManager.springs) {
+        if (!spring.isActive || !spring.isSolid) continue;
         
-        for (const spring of springManager.springs) {
-            if (!spring.isActive || !spring.isSolid) continue;
+        if (spring.collidesWith(player)) {
+            if (this.checkSpringActivation(player, spring)) {
+                spring.activate(player);
+                // Don't resolve collision after bouncing - player is launching
+                continue;
+            }
             
-            if (spring.collidesWith(player)) {
-                if (this.checkSpringActivation(player, spring)) {
-                    spring.activate(player);
-                }
-                
+            // Only resolve collision if spring wasn't activated
+            // (e.g., hitting from side or already compressed)
+            if (!spring.isCompressed) {
                 this.resolveSpringCollision(player, spring);
             }
         }
     }
+}
     
-    checkSpringActivation(player, spring) {
-        const playerBottom = player.position.y + player.dimensions.y;
-        const springTop = spring.position.y;
-        const overlapTop = playerBottom - springTop;
-        
-        return player.velocity.y > 0 && overlapTop < 10;
-    }
+   checkSpringActivation(player, spring) {
+    const playerBottom = player.position.y + player.dimensions.y;
+    const springTop = spring.position.y;
+    const overlapTop = playerBottom - springTop;
+    
+    // More lenient: activate if falling OR just landed, and overlap is reasonable
+    return player.velocity.y >= 0 && overlapTop > 0 && overlapTop < 16;
+}
     
     resolveSpringCollision(player, spring) {
         const overlapLeft = (player.position.x + player.dimensions.x) - spring.position.x;
@@ -633,7 +665,7 @@ checkVerticalCollisions(entity) {
             
             if (signPost.collidesWith(player)) {
                 signPost.activate(player);
-                console.log("Victory! Sign post hit!");
+             //   console.log("Victory! Sign post hit!");
                 break;
             }
         }

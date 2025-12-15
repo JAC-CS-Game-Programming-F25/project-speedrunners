@@ -15,63 +15,60 @@ export default class PlayerState extends State {
 	}
 
 	update(dt) {
-		this.applyGravity(dt);
-		this.updatePosition(dt);
-		
-		if (this.player.powerUpManager) {
-			this.collisionDetector.checkBoxCollisions(this.player, this.player.powerUpManager);
-		}
-		if (this.player.spikeManager) {
-			const spikeResult = this.collisionDetector.checkSpikeCollisions(this.player, this.player.spikeManager);
-			this.player.hitSpikeTop = spikeResult.hitTop;
-		}
-		if (this.player.enemyManager) {
-			this.collisionDetector.checkEnemyCollisions(this.player, this.player.enemyManager, this.player.ringManager);
-		}
-		if (this.player.springManager) {
-			this.collisionDetector.checkSpringCollisions(this.player, this.player.springManager);
-		}
-		if (this.player.signPostManager) {
-   			this.collisionDetector.checkSignPostCollisions(this.player, this.player.signPostManager);
-		}
-		
-		this.player.currentAnimation.update(dt);
-	}
+    this.applyGravity(dt);
+    this.updatePosition(dt); // Spring check is now inside here
+    
+    if (this.player.powerUpManager) {
+        this.collisionDetector.checkBoxCollisions(this.player, this.player.powerUpManager);
+    }
+    if (this.player.spikeManager) {
+        const spikeResult = this.collisionDetector.checkSpikeCollisions(this.player, this.player.spikeManager);
+        this.player.hitSpikeTop = spikeResult.hitTop;
+    }
+    if (this.player.enemyManager) {
+        this.collisionDetector.checkEnemyCollisions(this.player, this.player.enemyManager, this.player.ringManager);
+    }
+    // REMOVED: Spring check is now in updatePosition
+    if (this.player.signPostManager) {
+        this.collisionDetector.checkSignPostCollisions(this.player, this.player.signPostManager);
+    }
+    
+    this.player.currentAnimation.update(dt);
+}
 
 	render(context) {
-		super.render();
-
-		context.save();
-
-		// Handle orientation
-		if (!this.player.facingRight) {
-			context.scale(-1, 1);
-			context.translate(
-				Math.floor(-this.player.position.x - this.player.dimensions.x),
-				Math.floor(this.player.position.y)
-			);
-		} else {
-			context.translate(
-				Math.floor(this.player.position.x),
-				Math.floor(this.player.position.y)
-			);
-		}
-
-		// Get current frame
-		const frame = this.player.currentAnimation.getCurrentFrame();
-
-		// Align sprite bottom to hitbox bottom
-		const offsetY = this.player.dimensions.y - frame.height;
-
-		// Render sprite at (0, offsetY)
-		frame.render(0, offsetY);
-
-		context.restore();
-
-		if (debugOptions.playerCollision) {
-			this.renderDebug(context);
-		}
-	}
+    super.render();
+    context.save();
+    
+    const posX = Math.round(this.player.position.x);
+    const posY = Math.round(this.player.position.y);
+    
+    const centerX = posX + this.player.dimensions.x / 2;
+    const centerY = posY + this.player.dimensions.y / 2;
+    
+    // Apply tilt rotation
+    if (this.player.isOnGround && Math.abs(this.player.displayAngle) > 0.01) {
+        context.translate(centerX, centerY);
+        context.rotate(this.player.displayAngle);
+        context.translate(-centerX, -centerY);
+    }
+    
+    if (!this.player.facingRight) {
+        context.scale(-1, 1);
+        context.translate(
+            -posX - this.player.dimensions.x,
+            posY
+        );
+    } else {
+        context.translate(posX, posY);
+    }
+    
+    const frame = this.player.currentAnimation.getCurrentFrame();
+    const offsetY = this.player.dimensions.y - frame.height + 4;
+    
+    frame.render(0, offsetY);
+    context.restore();
+}
 
 	renderDebug(context) {
 		const left = Math.floor(this.player.position.x / Tile.SIZE) - 1;
@@ -91,13 +88,13 @@ export default class PlayerState extends State {
 			context.fillRect(tile.x * Tile.SIZE, tile.y * Tile.SIZE, Tile.SIZE, Tile.SIZE);
 		});
 
-		context.strokeStyle = 'blue';
-		context.strokeRect(
-			this.player.position.x,
-			this.player.position.y,
-			this.player.dimensions.x,
-			this.player.dimensions.y
-		);
+		// context.strokeStyle = 'blue';
+		// context.strokeRect(
+		// 	this.player.position.x,
+		// 	this.player.position.y,
+		// 	this.player.dimensions.x,
+		// 	this.player.dimensions.y
+		// );
 	}
 
 	getCollidingTiles(left, top, right, bottom) {
@@ -203,23 +200,33 @@ export default class PlayerState extends State {
 	}
 
 	updatePosition(dt) {
-		const dx = this.player.velocity.x * dt;
-		const dy = this.player.velocity.y * dt;
+    const dx = this.player.velocity.x * dt;
+    const dy = this.player.velocity.y * dt;
 
-		this.player.position.x += dx;
-		this.collisionDetector.checkHorizontalCollisions(this.player);
+    this.player.position.x += dx;
+    this.collisionDetector.checkHorizontalCollisions(this.player);
 
-		this.player.position.y += dy;
-		this.collisionDetector.checkVerticalCollisions(this.player);
+    this.player.position.y += dy;
+    
+    // Check springs BEFORE vertical collision
+    let hitSpring = false;
+    if (this.player.springManager) {
+        hitSpring = this.collisionDetector.checkSpringCollisions(this.player, this.player.springManager);
+    }
+    
+    // Only check ground collision if we didn't hit a spring
+    if (!hitSpring) {
+        this.collisionDetector.checkVerticalCollisions(this.player);
+    }
 
-		this.player.position.x = Math.max(
-			0,
-			Math.min(
-				Math.round(this.player.position.x),
-				this.player.map.width * Tile.SIZE - this.player.dimensions.x
-			)
-		);
+    this.player.position.x = Math.max(
+        0,
+        Math.min(
+            Math.round(this.player.position.x),
+            this.player.map.width * Tile.SIZE - this.player.dimensions.x
+        )
+    );
 
-		this.player.position.y = Math.round(this.player.position.y);
-	}
+    this.player.position.y = Math.round(this.player.position.y);
+}
 }

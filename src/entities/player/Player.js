@@ -123,98 +123,78 @@ export default class Player extends Entity {
 		this.stateMachine.change(PlayerStateName.Idling);
 	}
 
-	update(dt) {
-		debugOptions.playerCollision = false;
-		this.stateMachine.update(dt);
-		if (this.isInvincible) {
-			this.sparkles.update(dt);
-		}
-        
-        // Smoothly interpolate display angle towards actual slope angle
-        // This prevents jittery rotation
-        const lerpSpeed = 0.2;
-        this.displayAngle += (this.slopeAngle - this.displayAngle) * lerpSpeed;
-        
-        // If not on ground, quickly return to 0
-        if (!this.isOnGround) {
-            this.displayAngle *= 0.8;
-        }
-        
-        // Debug slope angle
-        if (Math.abs(this.slopeAngle) > 0.01) {
-            console.log(`SlopeAngle: ${this.slopeAngle.toFixed(3)}, DisplayAngle: ${this.displayAngle.toFixed(3)}`);
-        }
-        
-		// console.log(`SONIC POSTION: (${this.position.x}, ${this.position.y})`);
-	}
+update(dt) {
+	console.log(`SONIC POSITION: (${this.position.x},${this.position.y}`)
+    debugOptions.playerCollision = false;
+    this.stateMachine.update(dt);
 
-    render(context) {
-        context.save();
-
-        const centerX = this.position.x + this.dimensions.x / 2;
-        const centerY = this.position.y + this.dimensions.y / 2;
-
-        context.translate(centerX, centerY);
-
-        // Use smoothed display angle with clamping
-        const maxTilt = Math.PI / 6; // ~30° max tilt
-        const tilt = Math.max(-maxTilt, Math.min(this.displayAngle, maxTilt));
-        
-        // Only apply tilt if it's significant enough
-        if (Math.abs(tilt) > 0.02) {
-            context.rotate(tilt);
-        }
-
-        context.translate(-centerX, -centerY);
-
-        context.globalAlpha = this.isDamagedInvincible ? this.flicker : 1;
-        this.stateMachine.render(context);
-
-        if (this.isInvincible) {
-            this.sparkles.render(
-                context,
-                this.position.x,
-                this.position.y,
-                this.dimensions.x,
-                this.dimensions.y
-            );
-        }
-
-        context.restore();
+    if (this.isInvincible) {
+        this.sparkles.update(dt);
     }
 
-	hit() {
-		// Safety check: don't take damage if already damaged invincible
-        if (this.isDamagedInvincible) {
-            console.log("Hit blocked: already damaged invincible");
-            return;
+    if (this.isOnGround) {
+        this.position.y = Math.round(this.position.y);
+
+        // If slopeAngle is exactly 0, snap displayAngle to 0 immediately
+        if (this.slopeAngle === 0) {
+            this.displayAngle = 0; // Instant snap - no interpolation
+        } else {
+            // On a slope - smooth interpolation
+            const diff = this.slopeAngle - this.displayAngle;
+            this.displayAngle += diff * 0.2;
         }
-
-        // Safety check: don't take damage if already in damage state (prevents double-hit)
-        if (this.stateMachine.currentState.name === PlayerStateName.Damage) {
-            console.log("Hit blocked: already in damage state");
-            return;
+    } else {
+        // In air - return to zero
+        this.displayAngle *= 0.8;
+        if (Math.abs(this.displayAngle) < 0.01) {
+            this.displayAngle = 0;
         }
+        this.slopeAngle = 0;
+    }
+}
 
-        // CRITICAL: Check CURRENT ring count from manager, not cached this.rings
-        const currentRings = this.map && this.map.ringManager ? this.map.ringManager.getRingCount() : 0;
-        console.log(`Hit registered! Rings: ${currentRings}, knockbackRight: ${this.knockbackRight}`);
+render(context) {
+    context.globalAlpha = this.isDamagedInvincible ? this.flicker : 1;
+    this.stateMachine.render(context);
+    context.globalAlpha = 1;
 
-        if (currentRings > 0) {
-            // Lose rings
-            this.map.ringManager.loseRings(
-                this.position.x + this.dimensions.x / 2,
-                this.position.y + this.dimensions.y / 2,
-                10
-            );
+    if (this.isInvincible) {
+        this.sparkles.render(
+            context,
+            this.position.x,
+            this.position.y,
+            this.dimensions.x,
+            this.dimensions.y
+        );
+    }
+}
 
-            this.stateMachine.change(PlayerStateName.Damage);
-        }
-        else {
-            this.die();
-		}
-	}
-
+	hit(hitBySpike = false) {
+    if (this.isDamagedInvincible) {
+        return;
+    }
+    if (this.stateMachine.currentState.name === PlayerStateName.Damage) {
+        return;
+    }
+    const currentRings = this.map && this.map.ringManager ? this.map.ringManager.getRingCount() : 0;
+    
+    if (currentRings > 0) {
+        // Calculate ground level - add extra buffer if hit by spike
+        const spikeOffset = hitBySpike ? 30 : 0;
+        const groundLevel = this.position.y + this.dimensions.y + spikeOffset;
+        
+        this.map.ringManager.loseRings(
+            this.position.x + this.dimensions.x / 2,
+            this.position.y + this.dimensions.y / 2,
+            10,
+            groundLevel
+        );
+        this.stateMachine.change(PlayerStateName.Damage);
+    }
+    else {
+        this.die();
+    }
+}
     die() {
         if (this.stateMachine.currentState.name !== PlayerStateName.Death) {
             this.stateMachine.change(PlayerStateName.Death)
@@ -233,7 +213,7 @@ export default class Player extends Entity {
 			() => {
 				this.isDamagedInvincible = false;
 				this.flicker = 1;
-                console.log("Damage invincibility expired");
+                //console.log("Damage invincibility expired");
 			}
     	);
 	}

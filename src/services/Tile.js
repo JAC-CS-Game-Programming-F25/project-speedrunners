@@ -4,12 +4,6 @@ import { getSlopeHeights } from "../../config/Slopeconfig.js";
 export default class Tile {
     static SIZE = 16;
     
-    /**
-     * Represents one tile in a Layer and on the screen.
-     *
-     * @param {number} id
-     * @param {Sprite[]} sprites
-     */
     constructor(id, sprites) {
         this.sprites = sprites;
         this.id = id;
@@ -19,18 +13,17 @@ export default class Tile {
         this.isSlope = this.heights !== null;
     }
     
-    /**
-     * Get the ground height at a specific local X position (0-15)
-     * @param {number} localX - X position within the tile (0-15)
-     * @returns {number} Height at that position (0-16)
-     */
     getHeightAt(localX) {
-        if (this.isSlope && this.heights) {
-            const clampedX = Math.max(0, Math.min(15, Math.floor(localX)));
-            return this.heights[clampedX];
+        // Use this.heights, not this.heightMap!
+        if (this.heights && this.heights.length === 16) {
+            const x = Math.max(0, Math.min(15, Math.floor(localX)));
+            return this.heights[x];
         }
-        // Non-slope solid tiles are always full height (flat top)
-        return Tile.SIZE;
+        
+        // If it's a solid non-slope tile, return full height
+        // Note: You need to check how isSolid is set - it might not exist
+        // For now, assume non-slope solid tiles should return 16
+        return 16;
     }
     
     render(x, y) {

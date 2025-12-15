@@ -18,7 +18,7 @@ export default class PlayerRollingState extends PlayerState {
         this.player.currentAnimation.refresh();
         this.previousX = this.player.position.x;
         this.stuckFrames = 0;
-        console.log(`Entered rolling with velocity: ${this.player.velocity.x}`);
+       // console.log(`Entered rolling with velocity: ${this.player.velocity.x}`);
     }
     
     update(dt) {
@@ -28,7 +28,7 @@ export default class PlayerRollingState extends PlayerState {
         
         // Check if we hit a wall
         if (Math.abs(velocityBeforeCollision) > 1 && this.player.velocity.x === 0) {
-            console.log("Roll stopped by wall collision!");
+           // console.log("Roll stopped by wall collision!");
             this.player.stateMachine.change(PlayerStateName.Idling);
             return;
         }
@@ -37,7 +37,7 @@ export default class PlayerRollingState extends PlayerState {
         if (Math.abs(this.player.position.x - this.previousX) < 0.5) {
             this.stuckFrames++;
             if (this.stuckFrames >= 3) {
-                console.log("Roll stopped - not moving!");
+               // console.log("Roll stopped - not moving!");
                 this.player.stateMachine.change(PlayerStateName.Idling);
                 return;
             }

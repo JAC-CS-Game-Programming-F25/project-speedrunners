@@ -7,7 +7,7 @@ import {ImageName} from "../../enums/ImageName.js";
 export default class InvincibilityPowerUp extends PowerUp {
     constructor(x, y) {
         super(x, y);
-        this.duration = 15; 
+        this.duration = 5; 
         this.sprite = InvincibilityPowerUp.generateSprite();
     }
 
