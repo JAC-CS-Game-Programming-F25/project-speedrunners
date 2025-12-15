@@ -7,6 +7,8 @@ import State from "../../lib/State.js";
 import GameStateName from "../enums/GameStateName.js";
 import ImageName from "../enums/ImageName.js";
 import { CANVAS_HEIGHT, CANVAS_WIDTH, context, images, input, stateMachine, timer } from "../globals.js";
+import { sounds } from "../globals.js";
+import {SoundName} from "../enums/SoundName.js";
 
 /**
  * Displays the game over screen along with the final score.
@@ -36,6 +38,7 @@ export default class GameOverState extends State {
 	}
 
 	enter(parameters) {
+		sounds.play(SoundName.GameOver);
 		if (parameters) {
 			// Get the final score
 			this.score = parameters.score || 0;
@@ -62,6 +65,9 @@ export default class GameOverState extends State {
 			Easing.easeInOutBack,
 			() => { this.canSkip = true; } // Enable skipping when tween completes
 		);
+	}
+	exit(){
+		sounds.stop(SoundName.GameOver);
 	}
 
 	update(dt) {

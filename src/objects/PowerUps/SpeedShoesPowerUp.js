@@ -3,6 +3,8 @@ import Sprite from "../../../lib/Sprite.js";
 import { images } from "../../globals.js";
 import {ImageName} from "../../enums/ImageName.js";
 import { PlayerConfig } from "../../../config/PlayerConfig.js";
+import { sounds } from "../../globals.js";
+import {SoundName} from "../../enums/SoundName.js";
 
 export default class SpeedShoesPowerUp extends PowerUp {
     constructor(x, y) {
@@ -20,6 +22,10 @@ export default class SpeedShoesPowerUp extends PowerUp {
     }
     
     activate(player) {
+        const greenHill = sounds.get(SoundName.GreenHill);
+        greenHill.setPlaybackRate(1.1);               
+
+        //sounds.play(SoundName.GreenHill); FASTER SPEED 
         super.activate(player);
         // Save original speeds
         this.originalMaxSpeed = PlayerConfig.maxSpeed;
@@ -33,6 +39,10 @@ export default class SpeedShoesPowerUp extends PowerUp {
     }
     
     deactivate(player) {
+        const greenHill = sounds.get(SoundName.GreenHill);
+        greenHill.setPlaybackRate(1.0); // normal speed
+
+        //sounds.play(SoundName.GreenHill); NORMAL SPEED
         super.deactivate(player);
         // Restore original speeds
         if (this.originalMaxSpeed !== null) {
