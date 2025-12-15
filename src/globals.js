@@ -5,7 +5,7 @@ import StateMachine from '../lib/StateMachine.js';
 import Timer from '../lib/Timer.js';
 import Input from '../lib/Input.js';
 
-export const canvas = document.createElement('canvas');
+export const canvas = document.getElementById('canvas');
 export const context =
 	canvas.getContext('2d') || new CanvasRenderingContext2D();
 
