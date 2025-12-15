@@ -49,7 +49,7 @@ export default class Map {
         this.scoreManager = new ScoreManager()
 
 
-        this.player = new Player(32, 188, 32, 40, this, this.scoreManager);
+        this.player = new Player(32, 664, 32, 40, this, this.scoreManager);
         
         this.playerIsHit = false;
         this.playerDamageTimer = 0;
