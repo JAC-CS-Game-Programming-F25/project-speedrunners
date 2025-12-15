@@ -68,7 +68,8 @@ export const objectSpriteConfig = {
 		{ x: 512, y: 182, width: 48, height: 48 },  
 		{ x: 568, y: 182, width: 48, height: 48 },  
 		{ x: 624, y: 182, width: 48, height: 48 }   
-	]
+	],
+	gameover: [{ x: 456, y: 391, width: 144, height: 16 }]
 }		
 
 export const enemySpriteConfig = {

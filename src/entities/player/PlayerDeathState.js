@@ -3,8 +3,9 @@ import Input from '../../../lib/Input.js';
 
 import Player from './Player.js';
 import PlayerStateName from '../../enums/PlayerStateName.js';
-import { input } from '../../globals.js';
+import { input, stateMachine } from '../../globals.js';
 import Tile from '../../services/Tile.js';
+import GameStateName from '../../enums/GameStateName.js';
 
 /**
  * Represents the death state of the player.
@@ -21,6 +22,7 @@ export default class PlayerDeathState extends PlayerState {
         this.deathDuration = 2; // 2 seconds for death animation
         this.deathVelocity = -200; // Initial upward velocity
         this.deathGravity = 600; // Gravity during death
+        this.isHandlingDeath = false;
 	}
 
 	/**
@@ -29,6 +31,9 @@ export default class PlayerDeathState extends PlayerState {
 	enter() {
         this.player.currentAnimation = this.player.animations.death;
         this.deathTimer = 0;
+        this.player.lives -= 1;
+        console.log("=== PLAYER DEATH STATE ENTERED ===");
+        console.log("Lives remaining:", this.player.lives);
     }
 
 	/**
@@ -36,28 +41,46 @@ export default class PlayerDeathState extends PlayerState {
 	 * @param {number} dt - The time passed since the last update.
 	 */
 	update(dt) {
-    this.deathTimer += dt;
+        if (this.isHandlingDeath) return
+        this.deathTimer += dt;
 
-    // Apply death physics (up then down)
-    this.player.velocity.y = this.deathVelocity + this.deathGravity * this.deathTimer;
-    this.player.position.y += this.player.velocity.y * dt;
+        // Apply death physics (up then down)
+        this.player.velocity.y = this.deathVelocity + this.deathGravity * this.deathTimer;
+        this.player.position.y += this.player.velocity.y * dt;
 
-    // Optional: keep him horizontally still
-    this.player.velocity.x = 0;
+        // Optional: keep him horizontally still
+        this.player.velocity.x = 0;
 
-    // Update death animation
-    this.player.currentAnimation.update(dt);
+        // Update death animation
+        this.player.currentAnimation.update(dt);
 
-    // Optional: stop him if he goes below the screen (or you can respawn)
-    if (this.player.position.y > this.player.map.height * Tile.SIZE) {
-        this.resetPlayer();
-    }
+        if (this.player.position.y > this.player.map.height * Tile.SIZE) {
+            this.handleDeath();
+        }
 
-    // End death after duration
-    if (this.deathTimer >= this.deathDuration) {
-        this.resetPlayer();
-    }
+        // End death after duration
+        if (this.deathTimer >= this.deathDuration) {
+            this.handleDeath();
+        }
 	}
+
+    handleDeath() {
+        if (this.isHandlingDeath) return;
+        this.isHandlingDeath = true
+        // Check if player has lives remaining. if it's 0 it's game over
+        if (this.player.lives <= 0) {
+            // transition to game over state, while getting the final score.
+            const finalScore = this.player.map.scoreManager.getScore();
+            stateMachine.change(GameStateName.GameOver, { 
+                score: finalScore,
+                map: this.player.map  
+            });
+        } else {
+            // if Sonic still has lives, respawn
+            this.resetPlayer();
+            this.isHandlingDeath = false
+        }
+    }
 
 
     /**

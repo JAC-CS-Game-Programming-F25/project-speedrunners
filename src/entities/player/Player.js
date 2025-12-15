@@ -21,6 +21,7 @@ import PlayerRollingState from './PlayerRollingState.js';
 import PlayerBouncingState from './PlayerBouncingState.js';
 import SignPostManager from '../../services/SignPostManager.js';
 import PlayerVictoryState from './PlayerVictoryState.js';
+import GameStateName from '../../enums/GameStateName.js';
 
 export default class Player extends Entity {
     constructor(x, y, width, height, map, scoreManager) {
@@ -127,79 +128,79 @@ export default class Player extends Entity {
 
 	update(dt) {
 		this.stateMachine.update(dt);
-		console.log(`${this.position.x},${this.position.y}`)
+		// console.log(`${this.position.x},${this.position.y}`)
 	
 
-    if (this.isInvincible) {
- 		this.sparkles.update(dt, this.position.x, this.position.y, this.dimensions.x, this.dimensions.y);
-    }
+		if (this.isInvincible) {
+			this.sparkles.update(dt, this.position.x, this.position.y, this.dimensions.x, this.dimensions.y);
+		}
 
-    if (this.isOnGround) {
-        this.position.y = Math.round(this.position.y);
+		if (this.isOnGround) {
+			this.position.y = Math.round(this.position.y);
 
-        // If slopeAngle is exactly 0, snap displayAngle to 0 immediately
-        if (this.slopeAngle === 0) {
-            this.displayAngle = 0; // Instant snap - no interpolation
-        } else {
-            // On a slope - smooth interpolation
-            const diff = this.slopeAngle - this.displayAngle;
-            this.displayAngle += diff * 0.2;
-        }
-    } else {
-        // In air - return to zero
-        this.displayAngle *= 0.8;
-        if (Math.abs(this.displayAngle) < 0.01) {
-            this.displayAngle = 0;
-        }
-        this.slopeAngle = 0;
-    }
-}
+			// If slopeAngle is exactly 0, snap displayAngle to 0 immediately
+			if (this.slopeAngle === 0) {
+				this.displayAngle = 0; // Instant snap - no interpolation
+			} else {
+				// On a slope - smooth interpolation
+				const diff = this.slopeAngle - this.displayAngle;
+				this.displayAngle += diff * 0.2;
+			}
+		} else {
+			// In air - return to zero
+			this.displayAngle *= 0.8;
+			if (Math.abs(this.displayAngle) < 0.01) {
+				this.displayAngle = 0;
+			}
+			this.slopeAngle = 0;
+		}
+	}
 
-render(context) {
-    context.globalAlpha = this.isDamagedInvincible ? this.flicker : 1;
-    this.stateMachine.render(context);
-    context.globalAlpha = 1;
+	render(context) {
+		context.globalAlpha = this.isDamagedInvincible ? this.flicker : 1;
+		this.stateMachine.render(context);
+		context.globalAlpha = 1;
 
-    if (this.isInvincible) {
-        this.sparkles.render(
-            context,
-            this.position.x,
-            this.position.y,
-            this.dimensions.x,
-            this.dimensions.y
-        );
-    }
-}
+		if (this.isInvincible) {
+			this.sparkles.render(
+				context,
+				this.position.x,
+				this.position.y,
+				this.dimensions.x,
+				this.dimensions.y
+			);
+		}
+	}
 
 	hit(hitBySpike = false) {
-    if (this.isDamagedInvincible) {
-        return;
-    }
-    if (this.stateMachine.currentState.name === PlayerStateName.Damage) {
-        return;
-    }
-    const currentRings = this.map && this.map.ringManager ? this.map.ringManager.getRingCount() : 0;
-    
-    if (currentRings > 0) {
-        // Calculate ground level - add extra buffer if hit by spike
-        const spikeOffset = hitBySpike ? 30 : 0;
-        const groundLevel = this.position.y + this.dimensions.y + spikeOffset;
-        
-        this.map.ringManager.loseRings(
-            this.position.x + this.dimensions.x / 2,
-            this.position.y + this.dimensions.y / 2,
-            10,
-            groundLevel
-        );
-        this.stateMachine.change(PlayerStateName.Damage);
-    }
-    else {
-        this.die();
-    }
-}
+		if (this.isDamagedInvincible) {
+			return;
+		}
+		if (this.stateMachine.currentState.name === PlayerStateName.Damage) {
+			return;
+		}
+		const currentRings = this.map && this.map.ringManager ? this.map.ringManager.getRingCount() : 0;
+		
+		if (currentRings > 0) {
+			// Calculate ground level - add extra buffer if hit by spike
+			const spikeOffset = hitBySpike ? 30 : 0;
+			const groundLevel = this.position.y + this.dimensions.y + spikeOffset;
+			
+			this.map.ringManager.loseRings(
+				this.position.x + this.dimensions.x / 2,
+				this.position.y + this.dimensions.y / 2,
+				10,
+				groundLevel
+			);
+			this.stateMachine.change(PlayerStateName.Damage);
+		}
+		else {
+			this.die();
+		}
+	}
+
     die() {
         if (this.stateMachine.currentState.name !== PlayerStateName.Death) {
-			this.lives -= 1;
             this.stateMachine.change(PlayerStateName.Death)
         }
     }

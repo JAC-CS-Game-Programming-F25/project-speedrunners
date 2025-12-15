@@ -132,6 +132,7 @@ export default class Map {
     }
     
     setupEnemies() {
+        this.enemyManager.addEnemy('crab', 70, 672);
         this.enemyManager.addEnemy('crab', 2312, 672);
         this.enemyManager.addEnemy('crab', 2352, 672);
         this.enemyManager.addEnemy('crab', 2392, 672);
