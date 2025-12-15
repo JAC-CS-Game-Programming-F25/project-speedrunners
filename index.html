@@ -1,65 +1,91 @@
 <!DOCTYPE html>
 <html lang="en">
-	<head>
-		<meta charset="UTF-8" />
-		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-		<meta http-equiv="X-UA-Compatible" content="ie=edge" />
-		<title>Game Name</title>
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+	<link rel="icon" href="./icon.png">
 
-		<style>
-			* {
-				box-sizing: border-box;
-			}
+    <title>Sonic The Hedgehog</title>
 
-			body {
-				display: flex;
-				justify-content: center;
-				align-items: center;
-				height: 100vh;
-				margin: 0;
-				background-color: #121212;
-			}
+    <style>
+html, body {
+    width: 100%;
+    height: 100%;
+    margin: 0;
+    background: black;
+    overflow: hidden;
+}
 
-			canvas {
-				background-color: rgb(208, 244, 247);
-				outline: none;
-				image-rendering: crisp-edges;
-				image-rendering: pixelated;	
-			}
-		</style>
-	</head>
+/* === CANVAS — ABSOLUTE TRUE CENTER === */
+#canvas {
+    position: fixed;
+    inset: 0;
+    margin: auto;
+    display: block;
+}
 
-	<body>
-		<ol style="color: white">
-			<!-- <li>
-				Read the
-				<a
-					href="https://vikramsinghmtl.github.io/420-5P6-Game-Programming/project/requirements"
-					>project requirements</a
-				>.
-			</li>
-			<li>
-				Replace the sample proposal in this repo with the one for your
-				game idea.
-			</li>
-			<li>Get the proposal greenlit by Vik.</li>
-			<li>
-				Place any assets in <code>assets/</code> and remember to update
-				<code>src/config.json</code>.
-			</li>
-			<li>
-				Decide on a height and width inside <code>src/globals.js</code>.
-				The height and width will most likely be determined based on the
-				size of the assets you find.
-			</li>
-			<li>
-				Start building the individual components of your game,
-				constantly referring to the proposal you wrote to keep yourself
-				on track.
-			</li>
-			<li>Delete this list from <code>index.html</code>.</li>
-			<li>Good luck, you got this!</li> -->
-		</ol>
-		<script type="module" src="./src/main.js"></script>
-	</body>
+
+/* === INSTRUCTIONS OVERLAY === */
+.instructions {
+    position: fixed;
+    top: 50%;
+    transform: translateY(-50%);
+    color: white;
+    font-family: 'hud', Arial, sans-serif;
+    font-size: 7px;
+    text-align: center;
+    pointer-events: none;
+    max-width: 120px;
+    white-space: nowrap;
+}
+
+.left-instructions {
+    left: 12px;
+}
+
+.right-instructions {
+    right: 12px;
+}
+
+.instructions h3 {
+    color: #FFFF00;
+    margin: 0 0 4px 0;
+    font-size: 8px;
+}
+
+.instructions p {
+    margin: 2px 0;
+    line-height: 1.2;
+}
+
+
+
+    </style>
+</head>
+
+<body>
+
+  <div class="instructions left-instructions">
+    <h3>GOAL</h3>
+    <p>Reach the signpost at the other</p>
+	<p>side of the map</p>
+	<br/>
+    <p>Kill enemies</p>
+    <p>by jumping</p>
+    <p>or rolling!</p>
+</div>
+
+<canvas id="canvas"></canvas>
+
+<div class="instructions right-instructions">
+    <h3>CONTROLS</h3>
+    <p>MOVE: A/D</p>
+    <p>JUMP: SPACE</p>
+    <p>CROUCH: S</p>
+    <p>ROLL: MOVE + S</p>
+</div>
+
+
+    <script type="module" src="./src/main.js"></script>
+</body>
 </html>
