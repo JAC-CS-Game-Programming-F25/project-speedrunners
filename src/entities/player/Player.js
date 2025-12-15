@@ -128,7 +128,7 @@ export default class Player extends Entity {
 
 	update(dt) {
 		this.stateMachine.update(dt);
-		// console.log(`${this.position.x},${this.position.y}`)
+		console.log(`${this.position.x},${this.position.y}`)
 	
 
 		if (this.isInvincible) {

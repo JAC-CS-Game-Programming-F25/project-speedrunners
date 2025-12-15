@@ -9,7 +9,7 @@ import {SoundName} from "../../enums/SoundName.js";
 export default class InvincibilityPowerUp extends PowerUp {
     constructor(x, y) {
         super(x, y);
-        this.duration = 5; 
+        this.duration = 8; 
         this.sprite = InvincibilityPowerUp.generateSprite();
         
     }

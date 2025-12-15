@@ -22,6 +22,7 @@ import UserInterface from "./UserInterface.js";
 import ScoreManager from "./ScoreManager.js";
 import Timer from "../../lib/Timer.js";
 
+
 export default class Map {
     static BACKGROUND_LAYER = 1;
     static COLLISION_LAYER = 0;
@@ -109,7 +110,9 @@ export default class Map {
         this.ringManager.addRingLine(816, 620, 6, 25);
         this.ringManager.addRingLine(1530, 361, 8, 25);
         this.ringManager.addRingLine(1285, 40, 6, 25);
-
+        this.ringManager.addRingGrid(1704,580,5,5);
+        this.ringManager.addRingGrid(2206,510,5,8);
+        this.ringManager.addRingGrid(3618,90,5,8);
         //this.ringManager.addRing(450, 170);
         //this.ringManager.addRing(480, 150);
         //this.ringManager.addRing(510, 170);
@@ -118,9 +121,11 @@ export default class Map {
     setupSpikes() {
         this.spikeManager.addSpike(2242, 672);
         this.spikeManager.addSpike(2210, 672);
-        this.spikeManager.addSpike(863, 672);
-        this.spikeManager.addSpike(852, 672);
-        this.spikeManager.addSpike(3309, 610);
+        this.spikeManager.addSpike(2290, 672);
+        //this.spikeManager.addSpike(863, 672);
+        //this.spikeManager.addSpike(852, 672);
+        this.spikeManager.addSpike(3919,192);
+        this.spikeManager.addSpike(3979,192);
     }
     
     setupPowerUps() {
@@ -132,9 +137,9 @@ export default class Map {
     }
     
     setupEnemies() {
-        this.enemyManager.addEnemy('crab', 2312, 672);
-        this.enemyManager.addEnemy('crab', 2352, 672);
-        this.enemyManager.addEnemy('crab', 2392, 672);
+        this.enemyManager.addEnemy('crab', 852, 672);
+        this.enemyManager.addEnemy('crab', 2400, 672);
+        this.enemyManager.addEnemy('crab', 2350, 672);
 
         this.enemyManager.addEnemy('buzzbomber', 2838, 672);
         this.enemyManager.addEnemy('buzzbomber', 2798, 672);
@@ -148,9 +153,9 @@ export default class Map {
         this.enemyManager.addEnemy('buzzbomber', 4410, 672);
         this.enemyManager.addEnemy('buzzbomber', 4490, 672);
 
-        this.enemyManager.addEnemy('buzzbomber', 1754, 361);
+        this.enemyManager.addEnemy('buzzbomber', 1794, 361);
         this.enemyManager.addEnemy('buzzbomber', 1734, 361);
-        this.enemyManager.addEnemy('buzzbomber', 1714, 361);
+        this.enemyManager.addEnemy('buzzbomber', 1874, 361);
         //this.enemyManager.addEnemy('crab', 800, 192);
     }
     
