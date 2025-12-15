@@ -360,93 +360,77 @@ checkVerticalCollisions(entity) {
     // ==================== ENEMY COLLISIONS ====================
     
     checkEnemyCollisions(player, enemyManager, ringManager = null) {
-        let result = {
-            tookDamage: false,
-            killedEnemy: false
-        };
+    let result = {
+        tookDamage: false,
+        killedEnemy: false
+    };
 
-        if (!enemyManager) return result;
+    if (!enemyManager) return result;
 
-        const isJumping = player.stateMachine.currentState.name === PlayerStateName.Jumping;
-        const isRolling = player.stateMachine.currentState.name === PlayerStateName.Rolling;
+    const isJumping = player.stateMachine.currentState.name === PlayerStateName.Jumping;
+    const isRolling = player.stateMachine.currentState.name === PlayerStateName.Rolling;
+
+    // ================= TOP COLLISION (Stomp) =================
+    for (const enemy of enemyManager.enemies) {
+        if (!enemy.isActive || enemy.isDying) continue;
+
+        const topCollision = this.checkTopCollision(player, enemy);
+
         if (enemy.collidesWith(player) && topCollision &&
             (isJumping || player.isDamagedInvincible)) {
             enemy.die();
-            this.scoreManager.add(100)
+            this.scoreManager.add(100);
             result.killedEnemy = true;
             player.velocity.y = -300;
-            console.log(`${enemy.constructor.name} stomped! (jumping=${isJumping}, damageInvincible=${player.isDamageInvincible})`);
         }
     }
 
     if (result.killedEnemy) return result;
 
-        // ================= TOP COLLISION (Stomp) =================
-        for (const enemy of enemyManager.enemies) {
-            if (!enemy.isActive || enemy.isDying) continue;
-
-            const topCollision = this.checkTopCollision(player, enemy);
-
-            if (enemy.collidesWith(player) && topCollision &&
-                (isJumping || player.isDamagedInvincible)) {
-                enemy.die();
-                this.scoreManager.add(100)
-                result.killedEnemy = true;
-                player.velocity.y = -300;
-              //  console.log(`${enemy.constructor.name} stomped! (jumping=${isJumping}, damageInvincible=${player.isDamageInvincible})`);
-            }
-        }
-
-        if (result.killedEnemy) return result;
-
-        // ================= POWERUP INVINCIBLE OR ROLLING =================
-        if (player.isInvincible || isRolling) {
-            for (const enemy of enemyManager.enemies) {
-                if (!enemy.isActive || enemy.isDying) continue;
-
-                if (enemy.collidesWith(player)) {
-                    enemy.die();
-                    result.killedEnemy = true;
-                  //  console.log(`${enemy.constructor.name} destroyed (${player.isInvincible ? "invincible" : "rolling"})`);
-                }
-            }
-            return result;
-        }
-
-        // ================= DAMAGE INVINCIBLE =================
-        if (player.isDamagedInvincible) {
-           // console.log("[COLLISION] Player is damage invincible - passing through enemies");
-            return result;
-        }
-
-        // ================= SIDE COLLISION (Damage) =================
-        let hitTakenThisFrame = false;
-
+    // ================= POWERUP INVINCIBLE OR ROLLING =================
+    if (player.isInvincible || isRolling) {
         for (const enemy of enemyManager.enemies) {
             if (!enemy.isActive || enemy.isDying) continue;
 
             if (enemy.collidesWith(player)) {
-                const sideCollision = this.checkSideCollision(player, enemy);
-
-                if (!hitTakenThisFrame && sideCollision) {
-                    result.tookDamage = true;
-
-                    const playerCenterX = player.position.x + player.dimensions.x / 2;
-                    const enemyCenterX = enemy.position.x + enemy.dimensions.x / 2;
-                    player.knockbackRight = playerCenterX > enemyCenterX;
-
-                  //  console.log(`[COLLISION] Knockback: playerX=${playerCenterX}, enemyX=${enemyCenterX}, knockbackRight=${player.knockbackRight}`);
-
-                    player.hit();
-                    hitTakenThisFrame = true;
-                }
-
-                this.resolveEnemyCollision(player, enemy);
+                enemy.die();
+                result.killedEnemy = true;
             }
         }
-
         return result;
     }
+
+    // ================= DAMAGE INVINCIBLE =================
+    if (player.isDamagedInvincible) {
+        return result;
+    }
+
+    // ================= SIDE COLLISION (Damage) =================
+    let hitTakenThisFrame = false;
+
+    for (const enemy of enemyManager.enemies) {
+        if (!enemy.isActive || enemy.isDying) continue;
+
+        if (enemy.collidesWith(player)) {
+            const sideCollision = this.checkSideCollision(player, enemy);
+
+            if (!hitTakenThisFrame && sideCollision) {
+                result.tookDamage = true;
+
+                const playerCenterX = player.position.x + player.dimensions.x / 2;
+                const enemyCenterX = enemy.position.x + enemy.dimensions.x / 2;
+                player.knockbackRight = playerCenterX > enemyCenterX;
+
+                player.hit();
+                hitTakenThisFrame = true;
+            }
+
+            this.resolveEnemyCollision(player, enemy);
+        }
+    }
+
+    return result;
+}
 
     checkTopCollision(player, enemy) {
         const playerBottom = player.position.y + player.dimensions.y;

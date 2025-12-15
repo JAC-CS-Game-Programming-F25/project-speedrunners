@@ -127,11 +127,7 @@ export default class Player extends Entity {
 
 	update(dt) {
 		this.stateMachine.update(dt);
-		if (this.isInvincible) {
-			this.sparkles.update(dt);
-		}
-		// console.log(`SONIC POSTION: (${this.position.x}, ${this.position.y})`);
-	}
+	
 
     if (this.isInvincible) {
         this.sparkles.update(dt);
